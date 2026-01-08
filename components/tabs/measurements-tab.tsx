@@ -1,0 +1,393 @@
+"use client"
+
+import type React from "react"
+
+import { useState, useEffect } from "react"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Ruler, Trash2, Plus } from "lucide-react"
+import { userProfiles } from "@/lib/user-profiles"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
+interface MeasurementsTabProps {
+  userId: string
+}
+
+export function MeasurementsTab({ userId }: MeasurementsTabProps) {
+  const profile = userProfiles[userId]
+  const [measurements, setMeasurements] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [formData, setFormData] = useState({
+    measurementDate: new Date().toISOString().split("T")[0],
+    weight: "",
+    neck: "", // Adicionado pescoço para cálculo de BF%
+    chest: "",
+    waist: "",
+    hips: "",
+    armLeft: "",
+    armRight: "",
+    thighLeft: "",
+    thighRight: "",
+    bodyFatPercentage: "",
+    notes: "",
+  })
+
+  useEffect(() => {
+    loadMeasurements()
+  }, [userId])
+
+  const loadMeasurements = async () => {
+    try {
+      const response = await fetch(`/api/measurements?userId=${userId}`)
+      const data = await response.json()
+      if (data.success) {
+        setMeasurements(data.data)
+      }
+    } catch (error) {
+      console.error("[v0] Error loading measurements:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const calculateBodyFat = () => {
+    const weight = Number.parseFloat(formData.weight)
+    const waist = Number.parseFloat(formData.waist)
+    const neck = Number.parseFloat(formData.neck)
+    const hips = Number.parseFloat(formData.hips)
+    const heightCm = profile.height
+
+    if (!weight || !waist || !neck || !heightCm) {
+      return ""
+    }
+
+    let bodyFat = 0
+
+    // Fórmula para homens
+    if (profile.id === "kleber") {
+      bodyFat = 495 / (1.0324 - 0.19077 * Math.log10(waist - neck) + 0.15456 * Math.log10(heightCm)) - 450
+    }
+    // Fórmula para mulheres
+    else {
+      if (!hips) return ""
+      bodyFat = 495 / (1.29579 - 0.35004 * Math.log10(waist + hips - neck) + 0.221 * Math.log10(heightCm)) - 450
+    }
+
+    return bodyFat.toFixed(1)
+  }
+
+  useEffect(() => {
+    const bf = calculateBodyFat()
+    if (bf) {
+      setFormData((prev) => ({ ...prev, bodyFatPercentage: bf }))
+    }
+  }, [formData.weight, formData.waist, formData.neck, formData.hips])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    try {
+      const response = await fetch("/api/measurements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, ...formData }),
+      })
+
+      if (response.ok) {
+        setDialogOpen(false)
+        setFormData({
+          measurementDate: new Date().toISOString().split("T")[0],
+          weight: "",
+          neck: "", // Reset neck
+          chest: "",
+          waist: "",
+          hips: "",
+          armLeft: "",
+          armRight: "",
+          thighLeft: "",
+          thighRight: "",
+          bodyFatPercentage: "",
+          notes: "",
+        })
+        loadMeasurements()
+      }
+    } catch (error) {
+      console.error("[v0] Error saving measurement:", error)
+    }
+  }
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("Deseja excluir esta medida?")) return
+
+    try {
+      await fetch(`/api/measurements?id=${id}`, { method: "DELETE" })
+      loadMeasurements()
+    } catch (error) {
+      console.error("[v0] Error deleting measurement:", error)
+    }
+  }
+
+  const latestMeasurement = measurements[0]
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Medidas Corporais</h2>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button style={{ backgroundColor: profile.theme.primary, color: "white" }}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Medição
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Registrar Medidas</DialogTitle>
+              <DialogDescription>Registre suas medidas corporais para acompanhar o progresso</DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <Label>Data</Label>
+                  <Input
+                    type="date"
+                    value={formData.measurementDate}
+                    onChange={(e) => setFormData({ ...formData, measurementDate: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>Peso (kg) *</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={formData.weight}
+                    onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>Pescoço (cm) *</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={formData.neck}
+                    onChange={(e) => setFormData({ ...formData, neck: e.target.value })}
+                    placeholder="Para calcular BF%"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>Cintura (cm) *</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={formData.waist}
+                    onChange={(e) => setFormData({ ...formData, waist: e.target.value })}
+                    placeholder="Para calcular BF%"
+                    required
+                  />
+                </div>
+                {profile.id === "pamela" && (
+                  <div>
+                    <Label>Quadril (cm) *</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      value={formData.hips}
+                      onChange={(e) => setFormData({ ...formData, hips: e.target.value })}
+                      placeholder="Para calcular BF%"
+                      required
+                    />
+                  </div>
+                )}
+                <div>
+                  <Label>% Gordura (calculado automaticamente)</Label>
+                  <Input
+                    type="text"
+                    value={
+                      formData.bodyFatPercentage ? `${formData.bodyFatPercentage}%` : "Preencha peso, pescoço e cintura"
+                    }
+                    readOnly
+                    className="bg-muted"
+                    style={{ backgroundColor: profile.theme.success + "20", fontWeight: "bold" }}
+                  />
+                </div>
+                <div>
+                  <Label>Peito (cm)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={formData.chest}
+                    onChange={(e) => setFormData({ ...formData, chest: e.target.value })}
+                  />
+                </div>
+                {profile.id === "kleber" && (
+                  <div>
+                    <Label>Quadril (cm)</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      value={formData.hips}
+                      onChange={(e) => setFormData({ ...formData, hips: e.target.value })}
+                    />
+                  </div>
+                )}
+                <div>
+                  <Label>Braço Esquerdo (cm)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={formData.armLeft}
+                    onChange={(e) => setFormData({ ...formData, armLeft: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>Braço Direito (cm)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={formData.armRight}
+                    onChange={(e) => setFormData({ ...formData, armRight: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>Coxa Esquerda (cm)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={formData.thighLeft}
+                    onChange={(e) => setFormData({ ...formData, thighLeft: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>Coxa Direita (cm)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={formData.thighRight}
+                    onChange={(e) => setFormData({ ...formData, thighRight: e.target.value })}
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Label>Observações</Label>
+                  <Input
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    placeholder="Ex: Medido pela manhã em jejum"
+                  />
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                * Campos obrigatórios para cálculo automático do percentual de gordura
+              </p>
+              <Button type="submit" className="w-full" style={{ backgroundColor: profile.theme.primary }}>
+                Salvar Medidas
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {latestMeasurement && (
+        <Card className="p-6 border-2" style={{ borderColor: profile.theme.primary + "30" }}>
+          <h3 className="text-lg font-bold mb-4">Medidas Atuais</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {latestMeasurement.weight && (
+              <div>
+                <p className="text-sm text-muted-foreground">Peso</p>
+                <p className="text-2xl font-bold">{latestMeasurement.weight}kg</p>
+              </div>
+            )}
+            {latestMeasurement.body_fat_percentage && (
+              <div>
+                <p className="text-sm text-muted-foreground">% Gordura</p>
+                <p className="text-2xl font-bold">{latestMeasurement.body_fat_percentage}%</p>
+              </div>
+            )}
+            {latestMeasurement.chest && (
+              <div>
+                <p className="text-sm text-muted-foreground">Peito</p>
+                <p className="text-2xl font-bold">{latestMeasurement.chest}cm</p>
+              </div>
+            )}
+            {latestMeasurement.waist && (
+              <div>
+                <p className="text-sm text-muted-foreground">Cintura</p>
+                <p className="text-2xl font-bold">{latestMeasurement.waist}cm</p>
+              </div>
+            )}
+            {latestMeasurement.hips && (
+              <div>
+                <p className="text-sm text-muted-foreground">Quadril</p>
+                <p className="text-2xl font-bold">{latestMeasurement.hips}cm</p>
+              </div>
+            )}
+            {latestMeasurement.arm_right && (
+              <div>
+                <p className="text-sm text-muted-foreground">Braço</p>
+                <p className="text-2xl font-bold">{latestMeasurement.arm_right}cm</p>
+              </div>
+            )}
+            {latestMeasurement.thigh_right && (
+              <div>
+                <p className="text-sm text-muted-foreground">Coxa</p>
+                <p className="text-2xl font-bold">{latestMeasurement.thigh_right}cm</p>
+              </div>
+            )}
+          </div>
+        </Card>
+      )}
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-bold">Histórico de Medidas</h3>
+        {loading ? (
+          <p className="text-center text-muted-foreground py-8">Carregando...</p>
+        ) : measurements.length === 0 ? (
+          <Card className="p-8 text-center">
+            <Ruler className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-muted-foreground">Nenhuma medida registrada ainda</p>
+          </Card>
+        ) : (
+          measurements.map((m) => (
+            <Card key={m.id} className="p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="font-semibold mb-2">{new Date(m.measurement_date).toLocaleDateString("pt-BR")}</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                    {m.weight && <p>Peso: {m.weight}kg</p>}
+                    {m.body_fat_percentage && <p>BF: {m.body_fat_percentage}%</p>}
+                    {m.chest && <p>Peito: {m.chest}cm</p>}
+                    {m.waist && <p>Cintura: {m.waist}cm</p>}
+                    {m.hips && <p>Quadril: {m.hips}cm</p>}
+                    {m.arm_right && <p>Braço: {m.arm_right}cm</p>}
+                    {m.thigh_right && <p>Coxa: {m.thigh_right}cm</p>}
+                  </div>
+                  {m.notes && <p className="text-sm text-muted-foreground mt-2">{m.notes}</p>}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDelete(m.id)}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            </Card>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
