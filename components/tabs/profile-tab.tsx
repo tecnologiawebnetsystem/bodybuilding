@@ -3,12 +3,24 @@
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { UserIcon } from "lucide-react"
+import { UserIcon, Bell } from "lucide-react"
+import { NotificationSettings } from "@/components/notification-settings"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface UserPreferences {
   theme_primary: string
   theme_secondary: string
   theme_accent: string
+  enable_gym_workouts?: boolean
+  enable_running?: boolean
+  enable_home_workouts?: boolean
 }
 
 interface ProfileTabProps {
@@ -20,6 +32,7 @@ interface ProfileTabProps {
 export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
   const [userProfile, setUserProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
 
   useEffect(() => {
     loadUserProfile()
@@ -88,6 +101,26 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
           </div>
         </div>
       </Card>
+
+      <Dialog open={notificationsOpen} onOpenChange={setNotificationsOpen}>
+        <DialogTrigger asChild>
+          <Button
+            className="w-full bg-transparent"
+            variant="outline"
+            style={{ borderColor: preferences.theme_primary }}
+          >
+            <Bell className="w-4 h-4 mr-2" style={{ color: preferences.theme_primary }} />
+            Configurar Notificações
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Configurações de Notificações</DialogTitle>
+            <DialogDescription>Configure lembretes para beber água e horários de treino</DialogDescription>
+          </DialogHeader>
+          <NotificationSettings userId={userId} preferences={preferences} />
+        </DialogContent>
+      </Dialog>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4">

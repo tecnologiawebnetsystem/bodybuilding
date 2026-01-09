@@ -4,10 +4,11 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, Clock, Target, Flame, Calendar, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
+import { CheckCircle2, Clock, Target, Flame, Calendar, Trash2, ChevronLeft, ChevronRight, Share2 } from "lucide-react"
 import { weeklyCalProgram } from "@/lib/calisthenics-data"
 import { julianaCalProgram } from "@/lib/calisthenics-data-juliana"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { FitnessPDFGenerator, sharePDF } from "@/lib/pdf-generator"
 
 interface UserPreferences {
   theme_primary: string
@@ -24,6 +25,7 @@ export function CalisthenicsTab({ userId, preferences }: CalisthenicsTabProps) {
   const [workoutHistory, setWorkoutHistory] = useState<any[]>([])
   const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay())
   const [showSuccess, setShowSuccess] = useState(false)
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
 
   const adjustedDayIndex = selectedDayIndex === 0 ? 6 : selectedDayIndex - 1
 
@@ -90,6 +92,51 @@ export function CalisthenicsTab({ userId, preferences }: CalisthenicsTabProps) {
     setSelectedDayIndex(newDay)
   }
 
+  const handleExportPDF = async () => {
+    setIsGeneratingPDF(true)
+    try {
+      const generator = new FitnessPDFGenerator()
+      const workoutProgram = userId === "juliana" ? julianaCalProgram : weeklyCalProgram
+
+      const userName = userId === "kleber" ? "Kleber Gonçalves" : userId === "pamela" ? "Pamela Gonçalves" : "Juliana"
+
+      const blob = generator.generateCalisthenicsWorkoutPDF(userName, workoutProgram, {
+        primary: preferences.theme_primary,
+        secondary: preferences.theme_secondary,
+      })
+
+      await sharePDF(blob, `treino-em-casa-${userId}.pdf`)
+    } catch (error) {
+      console.error("[v0] Error generating PDF:", error)
+      alert("Erro ao gerar PDF. Tente novamente.")
+    } finally {
+      setIsGeneratingPDF(false)
+    }
+  }
+
+  const handleExportCurrentDayPDF = async () => {
+    setIsGeneratingPDF(true)
+    try {
+      const generator = new FitnessPDFGenerator()
+      const userName = userId === "kleber" ? "Kleber Gonçalves" : userId === "pamela" ? "Pamela Gonçalves" : "Juliana"
+
+      // Apenas o treino do dia atual
+      const singleDayProgram = [currentWorkout]
+
+      const blob = generator.generateCalisthenicsWorkoutPDF(userName, singleDayProgram, {
+        primary: preferences.theme_primary,
+        secondary: preferences.theme_secondary,
+      })
+
+      await sharePDF(blob, `treino-${currentWorkout.day.toLowerCase()}-${userId}.pdf`)
+    } catch (error) {
+      console.error("[v0] Error generating PDF:", error)
+      alert("Erro ao gerar PDF. Tente novamente.")
+    } finally {
+      setIsGeneratingPDF(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -98,6 +145,22 @@ export function CalisthenicsTab({ userId, preferences }: CalisthenicsTabProps) {
           🔥 Treino em Casa
         </h1>
         <p className="text-muted-foreground">Treino exclusivo de 30min no almoço • Seg-Sex: 12h-12h30 • Sáb: 1h</p>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExportPDF}
+          disabled={isGeneratingPDF}
+          className="mt-2 bg-transparent"
+        >
+          {isGeneratingPDF ? (
+            <>Gerando PDF...</>
+          ) : (
+            <>
+              <Share2 className="w-4 h-4 mr-2" />
+              Compartilhar Programa
+            </>
+          )}
+        </Button>
       </div>
 
       {/* Stats Overview */}
@@ -125,11 +188,27 @@ export function CalisthenicsTab({ userId, preferences }: CalisthenicsTabProps) {
             <Button variant="outline" size="sm" onClick={() => changeDay(-1)}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <div className="text-center">
+            <div className="text-center flex-1">
               <h3 className="text-2xl font-bold" style={{ color: preferences.theme_primary }}>
                 {currentWorkout.day}
               </h3>
               <p className="text-sm text-muted-foreground">{currentWorkout.time}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportCurrentDayPDF}
+                disabled={isGeneratingPDF || currentWorkout.duration === "DESCANSO"}
+                className="mt-2 bg-transparent"
+              >
+                {isGeneratingPDF ? (
+                  <>Gerando...</>
+                ) : (
+                  <>
+                    <Share2 className="w-3 h-3 mr-1" />
+                    Compartilhar
+                  </>
+                )}
+              </Button>
             </div>
             <Button variant="outline" size="sm" onClick={() => changeDay(1)}>
               <ChevronRight className="w-4 h-4" />

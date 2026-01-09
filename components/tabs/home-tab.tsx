@@ -31,18 +31,23 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
       const profileData = await profileResponse.json()
       if (profileData.success) {
         setUserProfile(profileData.data)
+        if (profileData.data.current_weight) {
+          setCurrentWeight(Number.parseFloat(profileData.data.current_weight))
+        }
       }
 
-      const measurementsResponse = await fetch(`/api/measurements?userId=${userId}`)
-      const measurementsData = await measurementsResponse.json()
-      if (measurementsData.success && measurementsData.data.length > 0) {
-        const latestWeight = Number.parseFloat(measurementsData.data[0].weight)
-        setCurrentWeight(latestWeight)
-      } else {
-        const weightResponse = await fetch(`/api/weight?userId=${userId}`)
-        const weightData = await weightResponse.json()
-        if (weightData.logs && weightData.logs.length > 0) {
-          setCurrentWeight(Number.parseFloat(weightData.logs[0].weight))
+      if (!profileData.data?.current_weight) {
+        const measurementsResponse = await fetch(`/api/measurements?userId=${userId}`)
+        const measurementsData = await measurementsResponse.json()
+        if (measurementsData.success && measurementsData.data.length > 0) {
+          const latestWeight = Number.parseFloat(measurementsData.data[0].weight)
+          setCurrentWeight(latestWeight)
+        } else {
+          const weightResponse = await fetch(`/api/weight?userId=${userId}`)
+          const weightData = await weightResponse.json()
+          if (weightData.logs && weightData.logs.length > 0) {
+            setCurrentWeight(Number.parseFloat(weightData.logs[0].weight))
+          }
         }
       }
 

@@ -16,7 +16,7 @@ export const kleberWorkouts: WorkoutPlan[] = [
   {
     name: "Treino A",
     focus: "Peito e Ombros (Ênfase em Ombros Largos + Peito Firme)",
-    muscleGroups: ["Peito", "Ombros", "Tríceps"],
+    muscleGroups: ["Peito", "Ombros", "Tríceps", "Abdômen"], // Adicionado Abdômen
     exercises: [
       {
         name: "Supino Reto com Barra",
@@ -78,12 +78,32 @@ export const kleberWorkouts: WorkoutPlan[] = [
         sets: "3 séries de 10-12 repetições",
         notes: "Volume dos tríceps.",
       },
+      {
+        name: "Prancha Isométrica",
+        sets: "3 séries de 60 segundos",
+        notes: "Core forte melhora todos os exercícios. Reduz barriga.",
+      },
+      {
+        name: "Abdominal Supra (Crunch)",
+        sets: "3 séries de 20-25 repetições",
+        notes: "Parte superior do abdômen. Queima gordura.",
+      },
+      {
+        name: "Elevação de Pernas Suspenso",
+        sets: "3 séries de 12-15 repetições",
+        notes: "Abdômen inferior. Exercício avançado e intenso.",
+      },
+      {
+        name: "Abdominal Oblíquo na Polia",
+        sets: "3 séries de 15 repetições (cada lado)",
+        notes: "Elimina pochete lateral. Define cintura.",
+      },
     ],
   },
   {
     name: "Treino B",
-    focus: "Costas e Bíceps",
-    muscleGroups: ["Costas", "Bíceps", "Lombar"],
+    focus: "Costas e Bíceps (Treino Intenso com Abdômen)",
+    muscleGroups: ["Costas", "Bíceps", "Lombar", "Abdômen"], // Adicionado Abdômen
     exercises: [
       {
         name: "Barra Fixa (Pegada Aberta)",
@@ -119,6 +139,46 @@ export const kleberWorkouts: WorkoutPlan[] = [
         name: "Rosca Martelo",
         sets: "3 séries de 12-15 repetições",
         notes: "Espessura dos braços.",
+      },
+      {
+        name: "Pullover com Halteres",
+        sets: "3 séries de 12-15 repetições",
+        notes: "Expansão da caixa torácica. Costas e peito.",
+      },
+      {
+        name: "Remada Unilateral com Halteres",
+        sets: "3 séries de 10-12 repetições (cada lado)",
+        notes: "Densidade e simetria das costas.",
+      },
+      {
+        name: "Hiperextensão Lombar",
+        sets: "3 séries de 15 repetições",
+        notes: "Fortalece lombar e previne lesões.",
+      },
+      {
+        name: "Rosca Concentrada",
+        sets: "3 séries de 12-15 repetições",
+        notes: "Pico dos bíceps. Isolamento total.",
+      },
+      {
+        name: "Abdominal na Polia Alta",
+        sets: "4 séries de 15-20 repetições",
+        notes: "Resistência progressiva. Queima muita barriga.",
+      },
+      {
+        name: "Prancha com Elevação de Braço",
+        sets: "3 séries de 45 segundos",
+        notes: "Core instável. Trabalho intenso do abdômen.",
+      },
+      {
+        name: "Russian Twist com Anilha",
+        sets: "3 séries de 20 repetições (cada lado)",
+        notes: "Oblíquos e rotação. Elimina gordura lateral.",
+      },
+      {
+        name: "Mountain Climbers",
+        sets: "3 séries de 30 segundos",
+        notes: "Cardio intenso + abdômen. Derrete barriga!",
       },
     ],
   },

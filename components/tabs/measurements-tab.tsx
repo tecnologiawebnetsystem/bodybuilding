@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Ruler, Trash2, Plus, User, Target } from "lucide-react"
+import { Ruler, Trash2, Plus, User, Target, TrendingUp, TrendingDown } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -32,6 +32,7 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
   const [profileForm, setProfileForm] = useState({
     height: "",
     targetWeight: "",
+    currentWeight: "",
     gender: "",
   })
 
@@ -64,9 +65,9 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
         setProfileForm({
           height: data.data.height || "",
           targetWeight: data.data.target_weight || "",
+          currentWeight: data.data.current_weight || "",
           gender: data.data.gender || "",
         })
-        // Carregar peso ideal
         loadIdealWeight()
       }
     } catch (error) {
@@ -110,6 +111,7 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
           userId,
           height: profileForm.height,
           targetWeight: profileForm.targetWeight,
+          currentWeight: profileForm.currentWeight,
           gender: profileForm.gender,
         }),
       })
@@ -239,6 +241,17 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
                     step="0.1"
                     value={profileForm.height}
                     onChange={(e) => setProfileForm({ ...profileForm, height: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>Peso Atual (kg)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={profileForm.currentWeight}
+                    onChange={(e) => setProfileForm({ ...profileForm, currentWeight: e.target.value })}
+                    placeholder="Seu peso atual"
                     required
                   />
                 </div>
@@ -541,33 +554,124 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
             <p className="text-muted-foreground">Nenhuma medida registrada ainda</p>
           </Card>
         ) : (
-          measurements.map((m) => (
-            <Card key={m.id} className="p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <p className="font-semibold mb-2">{new Date(m.measurement_date).toLocaleDateString("pt-BR")}</p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                    {m.weight && <p>Peso: {m.weight}kg</p>}
-                    {m.body_fat_percentage && <p>BF: {m.body_fat_percentage}%</p>}
-                    {m.chest && <p>Peito: {m.chest}cm</p>}
-                    {m.waist && <p>Cintura: {m.waist}cm</p>}
-                    {m.hips && <p>Quadril: {m.hips}cm</p>}
-                    {m.arm_right && <p>Braço: {m.arm_right}cm</p>}
-                    {m.thigh_right && <p>Coxa: {m.thigh_right}cm</p>}
+          <div className="grid gap-4">
+            {measurements.map((m, index) => {
+              const previousMeasurement = measurements[index + 1]
+              const weightDiff = previousMeasurement
+                ? Number.parseFloat(m.weight) - Number.parseFloat(previousMeasurement.weight)
+                : 0
+              const waistDiff =
+                previousMeasurement && m.waist && previousMeasurement.waist
+                  ? Number.parseFloat(m.waist) - Number.parseFloat(previousMeasurement.waist)
+                  : 0
+
+              return (
+                <Card key={m.id} className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <p className="font-bold text-lg">
+                        {new Date(m.measurement_date).toLocaleDateString("pt-BR", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </p>
+                      {m.notes && <p className="text-sm text-muted-foreground mt-1">{m.notes}</p>}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(m.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
-                  {m.notes && <p className="text-sm text-muted-foreground mt-2">{m.notes}</p>}
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(m.id)}
-                  className="text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </Card>
-          ))
+
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    {m.weight && (
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">Peso</p>
+                        <div className="flex items-baseline gap-2">
+                          <p className="text-lg font-bold" style={{ color: themeColor }}>
+                            {m.weight}kg
+                          </p>
+                          {weightDiff !== 0 && (
+                            <span
+                              className={`text-xs flex items-center ${weightDiff > 0 ? "text-red-500" : "text-green-500"}`}
+                            >
+                              {weightDiff > 0 ? (
+                                <TrendingUp className="w-3 h-3" />
+                              ) : (
+                                <TrendingDown className="w-3 h-3" />
+                              )}
+                              {Math.abs(weightDiff).toFixed(1)}kg
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {m.body_fat_percentage && (
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">% Gordura</p>
+                        <p className="text-lg font-bold">{m.body_fat_percentage}%</p>
+                      </div>
+                    )}
+
+                    {m.waist && (
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">Cintura</p>
+                        <div className="flex items-baseline gap-2">
+                          <p className="text-lg font-bold">{m.waist}cm</p>
+                          {waistDiff !== 0 && (
+                            <span
+                              className={`text-xs flex items-center ${waistDiff > 0 ? "text-red-500" : "text-green-500"}`}
+                            >
+                              {waistDiff > 0 ? (
+                                <TrendingUp className="w-3 h-3" />
+                              ) : (
+                                <TrendingDown className="w-3 h-3" />
+                              )}
+                              {Math.abs(waistDiff).toFixed(1)}cm
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {m.chest && (
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">Peito</p>
+                        <p className="text-lg font-bold">{m.chest}cm</p>
+                      </div>
+                    )}
+
+                    {m.arm_right && (
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">Braço</p>
+                        <p className="text-lg font-bold">{m.arm_right}cm</p>
+                      </div>
+                    )}
+
+                    {m.hips && (
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">Quadril</p>
+                        <p className="text-lg font-bold">{m.hips}cm</p>
+                      </div>
+                    )}
+
+                    {m.thigh_right && (
+                      <div className="bg-muted/50 p-3 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">Coxa</p>
+                        <p className="text-lg font-bold">{m.thigh_right}cm</p>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              )
+            })}
+          </div>
         )}
       </div>
     </div>

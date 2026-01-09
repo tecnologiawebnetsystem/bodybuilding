@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Dumbbell, Delete } from "lucide-react"
+import { Dumbbell, Delete, Settings } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface PinLoginProps {
   onLogin: (userId: string) => void
@@ -12,6 +13,7 @@ interface PinLoginProps {
 export function PinLogin({ onLogin }: PinLoginProps) {
   const [pin, setPin] = useState<string>("")
   const [error, setError] = useState<string>("")
+  const router = useRouter()
 
   useEffect(() => {
     if (pin.length === 6) {
@@ -53,6 +55,14 @@ export function PinLogin({ onLogin }: PinLoginProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-500 via-purple-500 to-blue-600 p-4">
       <div className="absolute inset-0 bg-[url('/abstract-fitness-pattern.png')] opacity-10 bg-repeat" />
+
+      <button
+        onClick={() => router.push("/admin")}
+        className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-background/20 hover:bg-background/40 backdrop-blur-sm flex items-center justify-center transition-all opacity-30 hover:opacity-100"
+        aria-label="Admin"
+      >
+        <Settings className="w-4 h-4 text-white/70" />
+      </button>
 
       <Card className="w-full max-w-md relative z-10 bg-background/95 backdrop-blur border-4 border-primary/30 shadow-2xl">
         <CardHeader className="text-center space-y-4 pb-2">

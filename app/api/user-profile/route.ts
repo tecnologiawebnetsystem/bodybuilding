@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const users = await sql`
-      SELECT user_id, name, pin, height, target_weight, gender, age, initial_weight, start_date 
+      SELECT user_id, name, pin, height, target_weight, current_weight, gender, age, initial_weight, start_date 
       FROM users
       WHERE user_id = ${userId}
     `
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { userId, height, targetWeight, gender } = body
+    const { userId, height, targetWeight, currentWeight, gender } = body
 
     if (!userId) {
       return NextResponse.json({ error: "userId é obrigatório" }, { status: 400 })
@@ -41,6 +41,7 @@ export async function PUT(request: NextRequest) {
       SET 
         height = COALESCE(${height}, height),
         target_weight = COALESCE(${targetWeight}, target_weight),
+        current_weight = COALESCE(${currentWeight}, current_weight),
         gender = COALESCE(${gender}, gender)
       WHERE user_id = ${userId}
       RETURNING *

@@ -1,8 +1,11 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
-import { Apple, Droplets, Pill, Flame, UtensilsCrossed, Clock } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Apple, Droplets, Pill, Flame, UtensilsCrossed, Clock, Share2 } from "lucide-react"
 import { getSupplementsByUser } from "@/lib/supplements-data"
+import { useState } from "react"
+import { FitnessPDFGenerator, sharePDF } from "@/lib/pdf-generator"
 
 interface UserPreferences {
   theme_primary: string
@@ -186,8 +189,52 @@ export function NutritionTab({ userId, preferences }: NutritionTabProps) {
   const supplements = getSupplementsByUser(userId)
   const meals = mealPlans[userId as keyof typeof mealPlans] || []
   const totalCalories = meals.length > 0 ? meals.reduce((sum, meal) => sum + meal.calories, 0) : 0
-
   const showSupplements = userId !== "juliana"
+
+  const [isGeneratingNutritionPDF, setIsGeneratingNutritionPDF] = useState(false)
+  const [isGeneratingSupplementsPDF, setIsGeneratingSupplementsPDF] = useState(false)
+
+  const handleExportNutritionPDF = async () => {
+    setIsGeneratingNutritionPDF(true)
+    try {
+      const generator = new FitnessPDFGenerator()
+
+      const userName = userId === "kleber" ? "Kleber Gonçalves" : userId === "pamela" ? "Pamela Gonçalves" : "Juliana"
+
+      const blob = generator.generateNutritionPDF(userName, meals, totalCalories, {
+        primary: preferences.theme_primary,
+        secondary: preferences.theme_secondary,
+      })
+
+      await sharePDF(blob, `plano-nutricao-${userId}.pdf`)
+    } catch (error) {
+      console.error("[v0] Error generating nutrition PDF:", error)
+      alert("Erro ao gerar PDF. Tente novamente.")
+    } finally {
+      setIsGeneratingNutritionPDF(false)
+    }
+  }
+
+  const handleExportSupplementsPDF = async () => {
+    setIsGeneratingSupplementsPDF(true)
+    try {
+      const generator = new FitnessPDFGenerator()
+
+      const userName = userId === "kleber" ? "Kleber Gonçalves" : userId === "pamela" ? "Pamela Gonçalves" : "Juliana"
+
+      const blob = generator.generateSupplementsPDF(userName, supplements, {
+        primary: preferences.theme_primary,
+        secondary: preferences.theme_secondary,
+      })
+
+      await sharePDF(blob, `plano-suplementos-${userId}.pdf`)
+    } catch (error) {
+      console.error("[v0] Error generating supplements PDF:", error)
+      alert("Erro ao gerar PDF. Tente novamente.")
+    } finally {
+      setIsGeneratingSupplementsPDF(false)
+    }
+  }
 
   if (meals.length === 0) {
     return (
@@ -205,12 +252,23 @@ export function NutritionTab({ userId, preferences }: NutritionTabProps) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Nutrição & Alimentação</h2>
-        <p className="text-muted-foreground">Plano personalizado</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Nutrição & Alimentação</h2>
+          <p className="text-muted-foreground">Plano personalizado</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={handleExportNutritionPDF} disabled={isGeneratingNutritionPDF}>
+          {isGeneratingNutritionPDF ? (
+            <>Gerando...</>
+          ) : (
+            <>
+              <Share2 className="w-4 h-4 mr-2" />
+              Compartilhar Nutrição
+            </>
+          )}
+        </Button>
       </div>
 
-      {/* Daily Targets */}
       <Card className="p-6 bg-gradient-to-br from-primary/10 to-accent/10">
         <h3 className="text-xl font-bold mb-4">Metas Diárias</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -288,10 +346,26 @@ export function NutritionTab({ userId, preferences }: NutritionTabProps) {
         </div>
       </Card>
 
-      {/* Supplements */}
       {showSupplements && (
         <Card className="p-6">
-          <h3 className="text-xl font-bold mb-4">Suplementação Recomendada</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold">Suplementação Recomendada</h3>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportSupplementsPDF}
+              disabled={isGeneratingSupplementsPDF}
+            >
+              {isGeneratingSupplementsPDF ? (
+                <>Gerando...</>
+              ) : (
+                <>
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Compartilhar
+                </>
+              )}
+            </Button>
+          </div>
           <div className="space-y-4">
             {supplements.map((supp, idx) => (
               <div
@@ -323,7 +397,6 @@ export function NutritionTab({ userId, preferences }: NutritionTabProps) {
         </Card>
       )}
 
-      {/* Important Notes */}
       <Card
         className="p-6"
         style={{ backgroundColor: `${preferences.theme_accent}10`, borderColor: `${preferences.theme_accent}20` }}

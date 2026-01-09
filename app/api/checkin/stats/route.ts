@@ -25,9 +25,8 @@ export async function GET(request: NextRequest) {
         AND checkin_date >= DATE_TRUNC('month', CURRENT_DATE)
     `
 
-    // Última semana de atividades
     const lastWeek = await sql`
-      SELECT checkin_date, checkin_type, workout_name, distance
+      SELECT id, checkin_date, checkin_type, workout_name, distance
       FROM daily_checkins
       WHERE user_id = ${userId}
         AND checkin_date >= CURRENT_DATE - INTERVAL '7 days'

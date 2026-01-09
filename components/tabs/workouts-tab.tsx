@@ -4,8 +4,9 @@ import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Dumbbell, Clock } from "lucide-react"
+import { Dumbbell, Clock, Share2 } from "lucide-react"
 import { getWorkoutsByUser } from "@/lib/workout-data"
+import { FitnessPDFGenerator, sharePDF } from "@/lib/pdf-generator"
 
 interface WorkoutsTabProps {
   userId: string
@@ -13,8 +14,78 @@ interface WorkoutsTabProps {
 
 export function WorkoutsTab({ userId }: WorkoutsTabProps) {
   const [expandedWorkout, setExpandedWorkout] = useState<string | null>(null)
+  const [generatingPDF, setGeneratingPDF] = useState<string | null>(null)
 
   const workoutPlans = getWorkoutsByUser(userId)
+
+  const handleExportPDF = async () => {
+    setGeneratingPDF("Plano Completo")
+    try {
+      const generator = new FitnessPDFGenerator()
+
+      const userName = userId === "kleber" ? "Kleber Gonçalves" : userId === "pamela" ? "Pamela Gonçalves" : "Juliana"
+
+      const schedule = [
+        {
+          day: "Segunda-feira",
+          workoutName: "Treino A - Peito/Tríceps",
+          description: workoutPlans.find((w) => w.name === "Treino A")?.focus,
+        },
+        {
+          day: "Terça-feira",
+          workoutName: "Treino B - Costas/Bíceps",
+          description: workoutPlans.find((w) => w.name === "Treino B")?.focus,
+        },
+        {
+          day: "Quarta-feira",
+          workoutName: "Treino C - Pernas/Ombros",
+          description: workoutPlans.find((w) => w.name === "Treino C")?.focus,
+        },
+        {
+          day: "Quinta-feira",
+          workoutName: "Treino A - Peito/Tríceps",
+          description: workoutPlans.find((w) => w.name === "Treino A")?.focus,
+        },
+        {
+          day: "Sexta-feira",
+          workoutName: "Treino B - Costas/Bíceps",
+          description: workoutPlans.find((w) => w.name === "Treino B")?.focus,
+        },
+      ]
+
+      const blob = generator.generateGymWorkoutPDF(userName, schedule, { primary: "#3b82f6", secondary: "#1e40af" })
+
+      await sharePDF(blob, `treino-musculacao-${userId}.pdf`)
+    } catch (error) {
+      console.error("[v0] Error generating PDF:", error)
+      alert("Erro ao gerar PDF. Tente novamente.")
+    } finally {
+      setGeneratingPDF(null)
+    }
+  }
+
+  const handleExportSingleWorkout = async (workout: any) => {
+    setGeneratingPDF(workout.name)
+    try {
+      const generator = new FitnessPDFGenerator()
+      const userName = userId === "kleber" ? "Kleber Gonçalves" : userId === "pamela" ? "Pamela Gonçalves" : "Juliana"
+
+      const theme =
+        userId === "kleber"
+          ? { primary: "#3b82f6", secondary: "#1e40af" }
+          : userId === "pamela"
+            ? { primary: "#ec4899", secondary: "#be185d" }
+            : { primary: "#84cc16", secondary: "#65a30d" }
+
+      const blob = generator.generateGymWorkoutPDF(userName, workout, theme)
+      await sharePDF(blob, `${workout.name.toLowerCase().replace(/\s+/g, "-")}-${userId}.pdf`)
+    } catch (error) {
+      console.error("[v0] Error generating PDF:", error)
+      alert("Erro ao gerar PDF. Tente novamente.")
+    } finally {
+      setGeneratingPDF(null)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -23,6 +94,16 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
           <h2 className="text-2xl font-bold">Seus Treinos</h2>
           <p className="text-muted-foreground">Plano ABC personalizado</p>
         </div>
+        <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={generatingPDF === "Plano Completo"}>
+          {generatingPDF === "Plano Completo" ? (
+            <>Gerando...</>
+          ) : (
+            <>
+              <Share2 className="w-4 h-4 mr-2" />
+              Compartilhar Plano Completo
+            </>
+          )}
+        </Button>
       </div>
 
       {/* Pre-workout cardio */}
@@ -58,12 +139,28 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
                   ))}
                 </div>
               </div>
-              <Button
-                variant={expandedWorkout === workout.name ? "secondary" : "outline"}
-                onClick={() => setExpandedWorkout(expandedWorkout === workout.name ? null : workout.name)}
-              >
-                {expandedWorkout === workout.name ? "Fechar" : "Ver Exercícios"}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleExportSingleWorkout(workout)}
+                  disabled={generatingPDF === workout.name}
+                >
+                  {generatingPDF === workout.name ? (
+                    <>Gerando...</>
+                  ) : (
+                    <>
+                      <Share2 className="w-4 h-4" />
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant={expandedWorkout === workout.name ? "secondary" : "outline"}
+                  onClick={() => setExpandedWorkout(expandedWorkout === workout.name ? null : workout.name)}
+                >
+                  {expandedWorkout === workout.name ? "Fechar" : "Ver Exercícios"}
+                </Button>
+              </div>
             </div>
 
             {expandedWorkout === workout.name && (

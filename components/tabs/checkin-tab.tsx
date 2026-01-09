@@ -125,24 +125,37 @@ export function CheckinTab({ userId, preferences }: CheckinTabProps) {
   }
 
   const confirmDelete = (checkinId: number) => {
+    console.log("[v0] confirmDelete called with ID:", checkinId)
     setCheckinToDelete(checkinId)
+    console.log("[v0] State will be set to:", checkinId)
     setDeleteConfirmOpen(true)
   }
 
   const handleDeleteCheckin = async () => {
-    if (!checkinToDelete) return
+    console.log("[v0] handleDeleteCheckin called, checkinToDelete state:", checkinToDelete)
 
-    console.log("[v0] Deleting checkin:", checkinToDelete)
+    if (!checkinToDelete) {
+      console.log("[v0] No checkin to delete, returning")
+      return
+    }
+
+    console.log("[v0] Starting delete process for ID:", checkinToDelete)
     setLoading(true)
+
     try {
-      const response = await fetch(`/api/checkin?id=${checkinToDelete}`, {
+      const url = `/api/checkin?id=${checkinToDelete}`
+      console.log("[v0] Calling DELETE endpoint:", url)
+
+      const response = await fetch(url, {
         method: "DELETE",
       })
 
+      console.log("[v0] Response status:", response.status)
       const result = await response.json()
       console.log("[v0] Delete result:", result)
 
       if (result.success) {
+        console.log("[v0] Delete successful, closing dialog and reloading stats")
         setDeleteConfirmOpen(false)
         setCheckinToDelete(null)
 
@@ -155,6 +168,7 @@ export function CheckinTab({ userId, preferences }: CheckinTabProps) {
         })
         setModalOpen(true)
       } else {
+        console.log("[v0] Delete failed:", result.error)
         setModalContent({
           title: "Erro!",
           message: "Não foi possível excluir o registro.",
@@ -377,7 +391,11 @@ export function CheckinTab({ userId, preferences }: CheckinTabProps) {
               size="lg"
               variant="outline"
               className="flex-1 bg-transparent"
-              onClick={() => setDeleteConfirmOpen(false)}
+              onClick={() => {
+                console.log("[v0] Cancel button clicked")
+                setDeleteConfirmOpen(false)
+                setCheckinToDelete(null)
+              }}
               disabled={loading}
             >
               Cancelar
@@ -385,7 +403,10 @@ export function CheckinTab({ userId, preferences }: CheckinTabProps) {
             <Button
               size="lg"
               className="flex-1 bg-destructive hover:bg-destructive/90"
-              onClick={handleDeleteCheckin}
+              onClick={() => {
+                console.log("[v0] Excluir button clicked! Current checkinToDelete:", checkinToDelete)
+                handleDeleteCheckin()
+              }}
               disabled={loading}
             >
               {loading ? "Excluindo..." : "Excluir"}
