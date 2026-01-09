@@ -6,10 +6,16 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Activity, TrendingUp, CheckCircle2, Timer, Trash2 } from "lucide-react"
-import { userProfiles } from "@/lib/user-profiles"
+
+interface UserPreferences {
+  theme_primary: string
+  theme_secondary: string
+  theme_accent: string
+}
 
 interface RunningTabProps {
   userId: string
+  preferences: UserPreferences
 }
 
 interface RunRecord {
@@ -19,13 +25,12 @@ interface RunRecord {
   duration: number
 }
 
-export function RunningTab({ userId }: RunningTabProps) {
+export function RunningTab({ userId, preferences }: RunningTabProps) {
   const [distance, setDistance] = useState("")
   const [duration, setDuration] = useState("")
   const [history, setHistory] = useState<RunRecord[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const [modalMessage, setModalMessage] = useState("")
-  const profile = userProfiles[userId]
 
   useEffect(() => {
     loadHistory()
@@ -118,6 +123,36 @@ export function RunningTab({ userId }: RunningTabProps) {
   const totalDistance = history.reduce((sum, run) => sum + run.distance, 0)
   const avgDistance = history.length > 0 ? totalDistance / history.length : 0
 
+  const isJuliana = userId === "juliana"
+  const runningPlan = isJuliana
+    ? [
+        {
+          week: "Semana 1-2",
+          distance: "1-2 km",
+          pace: "Muito Leve (7-8 min/km)",
+          notes: "Caminhada rápida + trote leve",
+        },
+        {
+          week: "Semana 3-4",
+          distance: "2-3 km",
+          pace: "Leve (6-7 min/km)",
+          notes: "Aumentar tempo de trote gradualmente",
+        },
+        { week: "Semana 5-6", distance: "3-4 km", pace: "Leve-Moderado", notes: "Foco em completar sem parar" },
+        { week: "Semana 7-8", distance: "4-5 km", pace: "Moderado", notes: "Construir resistência cardiovascular" },
+      ]
+    : [
+        {
+          week: "Semana 1-2",
+          distance: "2-3 km",
+          pace: "Leve (6-7 min/km)",
+          notes: "Foco em completar, não em velocidade",
+        },
+        { week: "Semana 3-4", distance: "3-4 km", pace: "Leve-Moderado", notes: "Aumentar distância gradualmente" },
+        { week: "Semana 5-6", distance: "4-5 km", pace: "Moderado", notes: "Manter consistência" },
+        { week: "Semana 7-8", distance: "5-6 km", pace: "Moderado", notes: "Corpo adaptado, pronto para mais" },
+      ]
+
   return (
     <div className="space-y-6">
       <div>
@@ -129,14 +164,14 @@ export function RunningTab({ userId }: RunningTabProps) {
       <div className="grid grid-cols-2 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Activity className="w-5 h-5" style={{ color: profile.theme.primary }} />
+            <Activity className="w-5 h-5" style={{ color: preferences.theme_primary }} />
             <p className="text-sm text-muted-foreground">Total</p>
           </div>
           <p className="text-2xl font-bold">{totalDistance.toFixed(1)} km</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="w-5 h-5" style={{ color: profile.theme.accent }} />
+            <TrendingUp className="w-5 h-5" style={{ color: preferences.theme_accent }} />
             <p className="text-sm text-muted-foreground">Média</p>
           </div>
           <p className="text-2xl font-bold">{avgDistance.toFixed(1)} km</p>
@@ -145,25 +180,17 @@ export function RunningTab({ userId }: RunningTabProps) {
 
       {/* Progressive Plan */}
       <Card className="p-6">
-        <h3 className="text-xl font-bold mb-4">Plano Progressivo (Semanas 1-8)</h3>
+        <h3 className="text-xl font-bold mb-4">
+          {isJuliana ? "Plano Progressivo Leve (Semanas 1-8)" : "Plano Progressivo (Semanas 1-8)"}
+        </h3>
         <div className="space-y-3">
-          {[
-            {
-              week: "Semana 1-2",
-              distance: "2-3 km",
-              pace: "Leve (6-7 min/km)",
-              notes: "Foco em completar, não em velocidade",
-            },
-            { week: "Semana 3-4", distance: "3-4 km", pace: "Leve-Moderado", notes: "Aumentar distância gradualmente" },
-            { week: "Semana 5-6", distance: "4-5 km", pace: "Moderado", notes: "Manter consistência" },
-            { week: "Semana 7-8", distance: "5-6 km", pace: "Moderado", notes: "Corpo adaptado, pronto para mais" },
-          ].map((plan, idx) => (
+          {runningPlan.map((plan, idx) => (
             <div key={idx} className="p-4 rounded-lg bg-muted/50">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-semibold">{plan.week}</h4>
                 <span
                   className="px-3 py-1 rounded-full text-sm font-medium"
-                  style={{ backgroundColor: `${profile.theme.accent}30` }}
+                  style={{ backgroundColor: `${preferences.theme_accent}30` }}
                 >
                   {plan.distance}
                 </span>
@@ -197,7 +224,7 @@ export function RunningTab({ userId }: RunningTabProps) {
             onClick={handleLogRun}
             className="w-full"
             size="lg"
-            style={{ backgroundColor: profile.theme.primary }}
+            style={{ backgroundColor: preferences.theme_primary }}
           >
             <CheckCircle2 className="w-5 h-5 mr-2" />
             Registrar Corrida
@@ -221,14 +248,14 @@ export function RunningTab({ userId }: RunningTabProps) {
               .map((run, idx) => (
                 <div key={run.id || idx} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <div className="flex items-center gap-3">
-                    <Timer className="w-5 h-5" style={{ color: profile.theme.primary }} />
+                    <Timer className="w-5 h-5" style={{ color: preferences.theme_primary }} />
                     <div>
                       <p className="font-medium">{new Date(run.date).toLocaleDateString("pt-BR")}</p>
                       <p className="text-sm text-muted-foreground">{run.duration} minutos</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <p className="text-lg font-bold" style={{ color: profile.theme.primary }}>
+                    <p className="text-lg font-bold" style={{ color: preferences.theme_primary }}>
                       {run.distance} km
                     </p>
                     <Button variant="ghost" size="sm" onClick={() => run.id && handleDeleteRun(run.id)}>
@@ -245,12 +272,12 @@ export function RunningTab({ userId }: RunningTabProps) {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <div className="flex items-center gap-3 mb-2">
-              <CheckCircle2 className="w-8 h-8" style={{ color: profile.theme.success }} />
+              <CheckCircle2 className="w-8 h-8" style={{ color: preferences.theme_primary }} />
               <DialogTitle className="text-2xl">Corrida</DialogTitle>
             </div>
             <DialogDescription className="text-lg pt-2">{modalMessage}</DialogDescription>
           </DialogHeader>
-          <Button size="lg" onClick={() => setModalOpen(false)} style={{ backgroundColor: profile.theme.primary }}>
+          <Button size="lg" onClick={() => setModalOpen(false)} style={{ backgroundColor: preferences.theme_primary }}>
             OK
           </Button>
         </DialogContent>

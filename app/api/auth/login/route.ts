@@ -9,6 +9,7 @@ export async function POST(request: NextRequest) {
     const pinMap: Record<string, string> = {
       "080754": "kleber",
       "191018": "pamela",
+      "862401": "juliana",
     }
 
     const userId = pinMap[pin]

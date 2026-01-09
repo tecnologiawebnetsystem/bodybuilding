@@ -5,14 +5,19 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Droplet, Plus, Minus } from "lucide-react"
-import { userProfiles } from "@/lib/user-profiles"
+
+interface UserPreferences {
+  theme_primary: string
+  theme_secondary: string
+  theme_accent: string
+}
 
 interface HydrationTabProps {
   userId: string
+  preferences: UserPreferences
 }
 
-export function HydrationTab({ userId }: HydrationTabProps) {
-  const profile = userProfiles[userId]
+export function HydrationTab({ userId, preferences }: HydrationTabProps) {
   const [waterIntake, setWaterIntake] = useState(0)
   const [goal, setGoal] = useState(3000)
   const [loading, setLoading] = useState(true)
@@ -74,10 +79,10 @@ export function HydrationTab({ userId }: HydrationTabProps) {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Hidratação Diária</h2>
 
-      <Card className="p-8 border-2" style={{ borderColor: profile.theme.accent + "30" }}>
+      <Card className="p-8 border-2" style={{ borderColor: preferences.theme_accent + "30" }}>
         <div className="text-center mb-6">
-          <Droplet className="w-16 h-16 mx-auto mb-4" style={{ color: profile.theme.accent }} />
-          <p className="text-6xl font-bold mb-2" style={{ color: profile.theme.primary }}>
+          <Droplet className="w-16 h-16 mx-auto mb-4" style={{ color: preferences.theme_accent }} />
+          <p className="text-6xl font-bold mb-2" style={{ color: preferences.theme_primary }}>
             {waterIntake}ml
           </p>
           <p className="text-muted-foreground">de {goal}ml</p>
@@ -88,7 +93,7 @@ export function HydrationTab({ userId }: HydrationTabProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <Button
             onClick={() => addWater(250)}
-            style={{ backgroundColor: profile.theme.accent }}
+            style={{ backgroundColor: preferences.theme_accent }}
             className="h-20 flex-col gap-2"
           >
             <Plus className="w-5 h-5" />
@@ -97,7 +102,7 @@ export function HydrationTab({ userId }: HydrationTabProps) {
           </Button>
           <Button
             onClick={() => addWater(500)}
-            style={{ backgroundColor: profile.theme.accent }}
+            style={{ backgroundColor: preferences.theme_accent }}
             className="h-20 flex-col gap-2"
           >
             <Plus className="w-5 h-5" />
@@ -106,7 +111,7 @@ export function HydrationTab({ userId }: HydrationTabProps) {
           </Button>
           <Button
             onClick={() => addWater(1000)}
-            style={{ backgroundColor: profile.theme.accent }}
+            style={{ backgroundColor: preferences.theme_accent }}
             className="h-20 flex-col gap-2"
           >
             <Plus className="w-5 h-5" />
@@ -121,33 +126,33 @@ export function HydrationTab({ userId }: HydrationTabProps) {
         </div>
 
         {progressPercent >= 100 && (
-          <div className="mt-6 p-4 bg-success/20 rounded-lg text-center">
-            <p className="font-bold text-success">Parabéns! Meta de hidratação alcançada hoje!</p>
+          <div className="mt-6 p-4 bg-green-500/20 rounded-lg text-center">
+            <p className="font-bold text-green-600">Parabéns! Meta de hidratação alcançada hoje!</p>
           </div>
         )}
       </Card>
 
-      <Card className="p-6" style={{ backgroundColor: profile.theme.accent + "10" }}>
+      <Card className="p-6" style={{ backgroundColor: preferences.theme_accent + "10" }}>
         <h3 className="font-bold mb-4">Por que hidratar?</h3>
         <ul className="space-y-2 text-sm">
           <li className="flex items-start gap-2">
-            <span className="text-success">✓</span>
+            <span className="text-green-600">✓</span>
             <span>Melhora o desempenho nos treinos</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-success">✓</span>
+            <span className="text-green-600">✓</span>
             <span>Acelera a recuperação muscular</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-success">✓</span>
+            <span className="text-green-600">✓</span>
             <span>Auxilia na queima de gordura</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-success">✓</span>
+            <span className="text-green-600">✓</span>
             <span>Melhora a digestão e absorção de nutrientes</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-success">✓</span>
+            <span className="text-green-600">✓</span>
             <span>Reduz retenção de líquidos</span>
           </li>
         </ul>

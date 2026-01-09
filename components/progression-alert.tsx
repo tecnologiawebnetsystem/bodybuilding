@@ -4,16 +4,21 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { AlertCircle, TrendingUp } from "lucide-react"
-import { userProfiles } from "@/lib/user-profiles"
+
+interface UserPreferences {
+  theme_primary: string
+  theme_secondary: string
+  theme_accent: string
+}
 
 interface ProgressionAlertProps {
   userId: string
+  preferences: UserPreferences
 }
 
-export function ProgressionAlert({ userId }: ProgressionAlertProps) {
+export function ProgressionAlert({ userId, preferences }: ProgressionAlertProps) {
   const [showAlert, setShowAlert] = useState(false)
   const [progression, setProgression] = useState<any>(null)
-  const profile = userProfiles[userId]
 
   useEffect(() => {
     checkProgression()
@@ -30,12 +35,10 @@ export function ProgressionAlert({ userId }: ProgressionAlertProps) {
         const daysUntilEnd = Math.floor((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
         setProgression(result.data)
-        // Mostrar alerta 7 dias antes do fim do ciclo
         if (daysUntilEnd <= 7 && daysUntilEnd >= 0) {
           setShowAlert(true)
         }
       } else {
-        // Criar primeira progressão se não existir
         await createFirstProgression()
       }
     } catch (error) {
@@ -81,10 +84,10 @@ export function ProgressionAlert({ userId }: ProgressionAlertProps) {
   if (!showAlert) return null
 
   return (
-    <Card className="border-2 mb-6" style={{ borderColor: profile.theme.warning || "#f59e0b" }}>
+    <Card className="border-2 mb-6" style={{ borderColor: preferences.theme_primary }}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <AlertCircle className="w-6 h-6" style={{ color: profile.theme.warning || "#f59e0b" }} />
+          <AlertCircle className="w-6 h-6" style={{ color: preferences.theme_primary }} />
           Novo Ciclo de Treino Disponível!
         </CardTitle>
       </CardHeader>
@@ -94,15 +97,21 @@ export function ProgressionAlert({ userId }: ProgressionAlertProps) {
           próximo nível?
         </p>
         <div className="flex items-center gap-3">
-          <div className="flex-1 text-center p-3 rounded-lg" style={{ backgroundColor: `${profile.theme.primary}20` }}>
-            <div className="text-2xl font-bold" style={{ color: profile.theme.primary }}>
+          <div
+            className="flex-1 text-center p-3 rounded-lg"
+            style={{ backgroundColor: `${preferences.theme_primary}20` }}
+          >
+            <div className="text-2xl font-bold" style={{ color: preferences.theme_primary }}>
               Ciclo {progression?.cycle_number}
             </div>
             <div className="text-xs text-muted-foreground">Atual</div>
           </div>
-          <TrendingUp className="w-8 h-8" style={{ color: profile.theme.success }} />
-          <div className="flex-1 text-center p-3 rounded-lg" style={{ backgroundColor: `${profile.theme.success}20` }}>
-            <div className="text-2xl font-bold" style={{ color: profile.theme.success }}>
+          <TrendingUp className="w-8 h-8" style={{ color: preferences.theme_primary }} />
+          <div
+            className="flex-1 text-center p-3 rounded-lg"
+            style={{ backgroundColor: `${preferences.theme_primary}20` }}
+          >
+            <div className="text-2xl font-bold" style={{ color: preferences.theme_primary }}>
               Ciclo {(progression?.cycle_number || 0) + 1}
             </div>
             <div className="text-xs text-muted-foreground">Próximo</div>
@@ -111,7 +120,7 @@ export function ProgressionAlert({ userId }: ProgressionAlertProps) {
         <Button
           className="w-full"
           size="lg"
-          style={{ backgroundColor: profile.theme.success }}
+          style={{ backgroundColor: preferences.theme_primary }}
           onClick={handleNewCycle}
         >
           Iniciar Novo Ciclo (Nível {(progression?.difficulty_level || 0) + 1})

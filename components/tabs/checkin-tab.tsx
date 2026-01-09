@@ -5,11 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { CheckCircle2, TrendingUp, Calendar, Activity, Dumbbell, AlertCircle } from "lucide-react"
-import { userProfiles } from "@/lib/user-profiles"
+import { CheckCircle2, TrendingUp, Calendar, Activity, Dumbbell, AlertCircle, Trash2 } from "lucide-react"
+
+interface UserPreferences {
+  theme_primary: string
+  theme_secondary: string
+  theme_accent: string
+}
 
 interface CheckinTabProps {
   userId: string
+  preferences: UserPreferences
 }
 
 interface CheckinStats {
@@ -20,6 +26,7 @@ interface CheckinStats {
     avg_duration: number
   }
   lastWeek: Array<{
+    id: number
     checkin_date: string
     checkin_type: string
     workout_name: string
@@ -27,14 +34,15 @@ interface CheckinStats {
   }>
 }
 
-export function CheckinTab({ userId }: CheckinTabProps) {
+export function CheckinTab({ userId, preferences }: CheckinTabProps) {
   const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState<CheckinStats | null>(null)
   const [showWorkoutSelector, setShowWorkoutSelector] = useState(false)
   const [lastWorkout, setLastWorkout] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [modalContent, setModalContent] = useState({ title: "", message: "", type: "success" as "success" | "warning" })
-  const profile = userProfiles[userId]
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [checkinToDelete, setCheckinToDelete] = useState<number | null>(null)
 
   useEffect(() => {
     loadStats()
@@ -116,12 +124,67 @@ export function CheckinTab({ userId }: CheckinTabProps) {
     }
   }
 
+  const confirmDelete = (checkinId: number) => {
+    setCheckinToDelete(checkinId)
+    setDeleteConfirmOpen(true)
+  }
+
+  const handleDeleteCheckin = async () => {
+    if (!checkinToDelete) return
+
+    console.log("[v0] Deleting checkin:", checkinToDelete)
+    setLoading(true)
+    try {
+      const response = await fetch(`/api/checkin?id=${checkinToDelete}`, {
+        method: "DELETE",
+      })
+
+      const result = await response.json()
+      console.log("[v0] Delete result:", result)
+
+      if (result.success) {
+        setDeleteConfirmOpen(false)
+        setCheckinToDelete(null)
+
+        await loadStats()
+
+        setModalContent({
+          title: "Check-in Excluído!",
+          message: "O registro foi removido com sucesso.",
+          type: "success",
+        })
+        setModalOpen(true)
+      } else {
+        setModalContent({
+          title: "Erro!",
+          message: "Não foi possível excluir o registro.",
+          type: "warning",
+        })
+        setModalOpen(true)
+        setDeleteConfirmOpen(false)
+        setCheckinToDelete(null)
+      }
+    } catch (error) {
+      console.error("[v0] Error deleting checkin:", error)
+      setModalContent({
+        title: "Erro!",
+        message: "Não foi possível excluir o registro.",
+        type: "warning",
+      })
+      setModalOpen(true)
+      setDeleteConfirmOpen(false)
+      setCheckinToDelete(null)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <Card className="border-2" style={{ borderColor: profile.theme.primary }}>
+      <Card className="border-2" style={{ borderColor: preferences.theme_primary }}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CheckCircle2 className="w-6 h-6" style={{ color: profile.theme.primary }} />
+            <CheckCircle2 className="w-6 h-6" style={{ color: preferences.theme_primary }} />
             Check-in de Treino
           </CardTitle>
         </CardHeader>
@@ -129,7 +192,7 @@ export function CheckinTab({ userId }: CheckinTabProps) {
           <Button
             size="lg"
             className="w-full h-20 text-lg font-semibold"
-            style={{ backgroundColor: profile.theme.primary }}
+            style={{ backgroundColor: preferences.theme_primary }}
             onClick={openWorkoutSelector}
             disabled={loading}
           >
@@ -154,7 +217,7 @@ export function CheckinTab({ userId }: CheckinTabProps) {
                 size="lg"
                 className="h-16 text-lg"
                 style={{
-                  backgroundColor: lastWorkout === workout ? "#94a3b8" : profile.theme.primary,
+                  backgroundColor: lastWorkout === workout ? "#94a3b8" : preferences.theme_primary,
                   opacity: lastWorkout === workout ? 0.6 : 1,
                 }}
                 onClick={() => handleWorkoutCheckin(workout)}
@@ -172,15 +235,15 @@ export function CheckinTab({ userId }: CheckinTabProps) {
           <DialogHeader>
             <div className="flex items-center gap-3 mb-2">
               {modalContent.type === "success" ? (
-                <CheckCircle2 className="w-8 h-8" style={{ color: profile.theme.success }} />
+                <CheckCircle2 className="w-8 h-8" style={{ color: preferences.theme_primary }} />
               ) : (
-                <AlertCircle className="w-8 h-8" style={{ color: profile.theme.warning }} />
+                <AlertCircle className="w-8 h-8 text-orange-500" />
               )}
               <DialogTitle className="text-2xl">{modalContent.title}</DialogTitle>
             </div>
             <DialogDescription className="text-lg pt-2">{modalContent.message}</DialogDescription>
           </DialogHeader>
-          <Button size="lg" onClick={() => setModalOpen(false)} style={{ backgroundColor: profile.theme.primary }}>
+          <Button size="lg" onClick={() => setModalOpen(false)} style={{ backgroundColor: preferences.theme_primary }}>
             Entendi!
           </Button>
         </DialogContent>
@@ -188,38 +251,50 @@ export function CheckinTab({ userId }: CheckinTabProps) {
 
       {stats && (
         <>
-          <Card className="border-2" style={{ borderColor: profile.theme.secondary }}>
+          <Card className="border-2" style={{ borderColor: preferences.theme_secondary }}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-6 h-6" style={{ color: profile.theme.secondary }} />
+                <TrendingUp className="w-6 h-6" style={{ color: preferences.theme_secondary }} />
                 Estatísticas do Mês
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 rounded-lg" style={{ backgroundColor: `${profile.theme.primary}20` }}>
-                  <div className="text-3xl font-bold" style={{ color: profile.theme.primary }}>
+                <div
+                  className="text-center p-4 rounded-lg"
+                  style={{ backgroundColor: `${preferences.theme_primary}20` }}
+                >
+                  <div className="text-3xl font-bold" style={{ color: preferences.theme_primary }}>
                     {stats.monthly.workout_count}
                   </div>
                   <div className="text-sm text-muted-foreground">Treinos</div>
                 </div>
 
-                <div className="text-center p-4 rounded-lg" style={{ backgroundColor: `${profile.theme.accent}20` }}>
-                  <div className="text-3xl font-bold" style={{ color: profile.theme.accent }}>
+                <div
+                  className="text-center p-4 rounded-lg"
+                  style={{ backgroundColor: `${preferences.theme_accent}20` }}
+                >
+                  <div className="text-3xl font-bold" style={{ color: preferences.theme_accent }}>
                     {stats.monthly.running_count}
                   </div>
                   <div className="text-sm text-muted-foreground">Corridas</div>
                 </div>
 
-                <div className="text-center p-4 rounded-lg" style={{ backgroundColor: `${profile.theme.success}20` }}>
-                  <div className="text-3xl font-bold" style={{ color: profile.theme.success }}>
+                <div
+                  className="text-center p-4 rounded-lg"
+                  style={{ backgroundColor: `${preferences.theme_primary}20` }}
+                >
+                  <div className="text-3xl font-bold" style={{ color: preferences.theme_primary }}>
                     {Number(stats.monthly.total_distance || 0).toFixed(1)} km
                   </div>
                   <div className="text-sm text-muted-foreground">Distância Total</div>
                 </div>
 
-                <div className="text-center p-4 rounded-lg" style={{ backgroundColor: `${profile.theme.secondary}20` }}>
-                  <div className="text-3xl font-bold" style={{ color: profile.theme.secondary }}>
+                <div
+                  className="text-center p-4 rounded-lg"
+                  style={{ backgroundColor: `${preferences.theme_secondary}20` }}
+                >
+                  <div className="text-3xl font-bold" style={{ color: preferences.theme_secondary }}>
                     {Number(stats.monthly.avg_duration || 0).toFixed(0)} min
                   </div>
                   <div className="text-sm text-muted-foreground">Tempo Médio</div>
@@ -228,10 +303,10 @@ export function CheckinTab({ userId }: CheckinTabProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-2" style={{ borderColor: profile.theme.accent }}>
+          <Card className="border-2" style={{ borderColor: preferences.theme_accent }}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-6 h-6" style={{ color: profile.theme.accent }} />
+                <Calendar className="w-6 h-6" style={{ color: preferences.theme_accent }} />
                 Última Semana
               </CardTitle>
             </CardHeader>
@@ -242,13 +317,13 @@ export function CheckinTab({ userId }: CheckinTabProps) {
                     <div
                       key={idx}
                       className="flex items-center justify-between p-3 rounded-lg"
-                      style={{ backgroundColor: `${profile.theme.primary}10` }}
+                      style={{ backgroundColor: `${preferences.theme_primary}10` }}
                     >
                       <div className="flex items-center gap-3">
                         {checkin.checkin_type === "workout" ? (
-                          <Dumbbell className="w-5 h-5" style={{ color: profile.theme.primary }} />
+                          <Dumbbell className="w-5 h-5" style={{ color: preferences.theme_primary }} />
                         ) : (
-                          <Activity className="w-5 h-5" style={{ color: profile.theme.accent }} />
+                          <Activity className="w-5 h-5" style={{ color: preferences.theme_accent }} />
                         )}
                         <div>
                           <p className="font-medium">
@@ -259,11 +334,22 @@ export function CheckinTab({ userId }: CheckinTabProps) {
                           </p>
                         </div>
                       </div>
-                      {checkin.distance && (
-                        <Badge variant="secondary" style={{ backgroundColor: `${profile.theme.accent}30` }}>
-                          {checkin.distance} km
-                        </Badge>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {checkin.distance && (
+                          <Badge variant="secondary" style={{ backgroundColor: `${preferences.theme_accent}30` }}>
+                            {checkin.distance} km
+                          </Badge>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => confirmDelete(checkin.id)}
+                          disabled={loading}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
                     </div>
                   ))
                 ) : (
@@ -274,6 +360,39 @@ export function CheckinTab({ userId }: CheckinTabProps) {
           </Card>
         </>
       )}
+
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <AlertCircle className="w-8 h-8 text-destructive" />
+              <DialogTitle className="text-2xl">Confirmar Exclusão</DialogTitle>
+            </div>
+            <DialogDescription className="text-lg pt-2">
+              Tem certeza que deseja excluir este check-in? Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-3">
+            <Button
+              size="lg"
+              variant="outline"
+              className="flex-1 bg-transparent"
+              onClick={() => setDeleteConfirmOpen(false)}
+              disabled={loading}
+            >
+              Cancelar
+            </Button>
+            <Button
+              size="lg"
+              className="flex-1 bg-destructive hover:bg-destructive/90"
+              onClick={handleDeleteCheckin}
+              disabled={loading}
+            >
+              {loading ? "Excluindo..." : "Excluir"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

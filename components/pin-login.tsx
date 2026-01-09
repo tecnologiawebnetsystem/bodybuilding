@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Dumbbell, Delete, Check } from "lucide-react"
+import { Dumbbell, Delete } from "lucide-react"
 
 interface PinLoginProps {
   onLogin: (userId: string) => void
@@ -12,6 +12,12 @@ interface PinLoginProps {
 export function PinLogin({ onLogin }: PinLoginProps) {
   const [pin, setPin] = useState<string>("")
   const [error, setError] = useState<string>("")
+
+  useEffect(() => {
+    if (pin.length === 6) {
+      handleLogin()
+    }
+  }, [pin])
 
   const handleNumberClick = (num: string) => {
     if (pin.length < 6) {
@@ -36,6 +42,8 @@ export function PinLogin({ onLogin }: PinLoginProps) {
       onLogin("kleber")
     } else if (pin === "191018") {
       onLogin("pamela")
+    } else if (pin === "862401") {
+      onLogin("juliana")
     } else {
       setError("PIN incorreto! Tente novamente.")
       setPin("")
@@ -117,25 +125,6 @@ export function PinLogin({ onLogin }: PinLoginProps) {
             >
               <Delete className="w-6 h-6" />
             </Button>
-          </div>
-
-          <Button
-            onClick={handleLogin}
-            disabled={pin.length !== 6}
-            className="w-full h-14 text-lg font-bold bg-gradient-to-r from-primary via-secondary to-accent hover:opacity-90 transition-all disabled:opacity-50"
-            size="lg"
-          >
-            <Check className="w-6 h-6 mr-2" />
-            Entrar
-          </Button>
-
-          <div className="text-center space-y-1 pt-4 border-t">
-            <p className="text-xs text-muted-foreground">Perfis cadastrados:</p>
-            <div className="flex justify-center gap-4 text-xs">
-              <span className="font-medium">Kleber Gonçalves</span>
-              <span className="text-muted-foreground">•</span>
-              <span className="font-medium">Pamela Gonçalves</span>
-            </div>
           </div>
         </CardContent>
       </Card>

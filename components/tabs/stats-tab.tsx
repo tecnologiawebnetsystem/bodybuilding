@@ -3,16 +3,21 @@
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Trophy, Flame, Activity, Target, Award, Trash2 } from "lucide-react"
-import { userProfiles } from "@/lib/user-profiles"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 
-interface StatsTabProps {
-  userId: string
+interface UserPreferences {
+  theme_primary: string
+  theme_secondary: string
+  theme_accent: string
 }
 
-export function StatsTab({ userId }: StatsTabProps) {
-  const profile = userProfiles[userId]
+interface StatsTabProps {
+  userId: string
+  preferences: UserPreferences
+}
+
+export function StatsTab({ userId, preferences }: StatsTabProps) {
   const [stats, setStats] = useState<any>(null)
   const [achievements, setAchievements] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -81,9 +86,7 @@ export function StatsTab({ userId }: StatsTabProps) {
       const result = await res.json()
 
       if (result.success) {
-        // Recarregar dados
         await loadData()
-        // Atualizar modal
         if (detailsModal.type === "workouts" || detailsModal.type === "runs") {
           await openDetails(detailsModal.type)
         }
@@ -160,40 +163,40 @@ export function StatsTab({ userId }: StatsTabProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card
           className="p-4 text-center border-2 cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ borderColor: profile.theme.primary + "30" }}
+          style={{ borderColor: preferences.theme_primary + "30" }}
           onClick={() => openDetails("streak")}
         >
-          <Flame className="w-8 h-8 mx-auto mb-2" style={{ color: profile.theme.primary }} />
+          <Flame className="w-8 h-8 mx-auto mb-2" style={{ color: preferences.theme_primary }} />
           <p className="text-3xl font-bold">{stats?.currentStreak || 0}</p>
           <p className="text-sm text-muted-foreground">Dias Seguidos</p>
         </Card>
 
         <Card
           className="p-4 text-center border-2 cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ borderColor: profile.theme.secondary + "30" }}
+          style={{ borderColor: preferences.theme_secondary + "30" }}
           onClick={() => openDetails("workouts")}
         >
-          <Trophy className="w-8 h-8 mx-auto mb-2" style={{ color: profile.theme.secondary }} />
+          <Trophy className="w-8 h-8 mx-auto mb-2" style={{ color: preferences.theme_secondary }} />
           <p className="text-3xl font-bold">{stats?.totalWorkouts || 0}</p>
           <p className="text-sm text-muted-foreground">Treinos</p>
         </Card>
 
         <Card
           className="p-4 text-center border-2 cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ borderColor: profile.theme.accent + "30" }}
+          style={{ borderColor: preferences.theme_accent + "30" }}
           onClick={() => openDetails("runs")}
         >
-          <Activity className="w-8 h-8 mx-auto mb-2" style={{ color: profile.theme.accent }} />
+          <Activity className="w-8 h-8 mx-auto mb-2" style={{ color: preferences.theme_accent }} />
           <p className="text-3xl font-bold">{stats?.totalRuns || 0}</p>
           <p className="text-sm text-muted-foreground">Corridas</p>
         </Card>
 
         <Card
           className="p-4 text-center border-2 cursor-pointer hover:opacity-80 transition-opacity"
-          style={{ borderColor: profile.theme.success + "30" }}
+          style={{ borderColor: preferences.theme_primary + "30" }}
           onClick={() => openDetails("distance")}
         >
-          <Target className="w-8 h-8 mx-auto mb-2" style={{ color: profile.theme.success }} />
+          <Target className="w-8 h-8 mx-auto mb-2" style={{ color: preferences.theme_primary }} />
           <p className="text-3xl font-bold">{Number(stats?.totalDistance || 0).toFixed(1)}km</p>
           <p className="text-sm text-muted-foreground">Distância</p>
         </Card>
@@ -202,7 +205,7 @@ export function StatsTab({ userId }: StatsTabProps) {
       <Dialog open={detailsModal.open} onOpenChange={(open) => setDetailsModal({ ...detailsModal, open })}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle style={{ color: profile.theme.primary }}>
+            <DialogTitle style={{ color: preferences.theme_primary }}>
               {detailsModal.type === "workouts" && "Detalhes dos Treinos"}
               {detailsModal.type === "runs" && "Detalhes das Corridas"}
               {detailsModal.type === "streak" && "Histórico de Check-ins"}
@@ -215,7 +218,11 @@ export function StatsTab({ userId }: StatsTabProps) {
               <p className="text-center text-muted-foreground py-8">Nenhum registro encontrado</p>
             ) : (
               detailsModal.data.map((record: any) => (
-                <Card key={record.id} className="p-4 border-2" style={{ borderColor: profile.theme.primary + "20" }}>
+                <Card
+                  key={record.id}
+                  className="p-4 border-2"
+                  style={{ borderColor: preferences.theme_primary + "20" }}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <p className="font-bold text-lg">{record.workout_name || record.checkin_type || "Corrida"}</p>
@@ -229,7 +236,7 @@ export function StatsTab({ userId }: StatsTabProps) {
                       </p>
                       {record.distance && (
                         <p className="text-sm mt-1">
-                          <span className="font-semibold" style={{ color: profile.theme.accent }}>
+                          <span className="font-semibold" style={{ color: preferences.theme_accent }}>
                             {Number(record.distance).toFixed(2)}km
                           </span>
                           {record.duration && ` • ${record.duration} min`}
@@ -269,7 +276,7 @@ export function StatsTab({ userId }: StatsTabProps) {
                 <span className="font-semibold">{log.weight}kg</span>
                 {idx < stats.weightProgress.length - 1 && (
                   <span
-                    className={`text-sm ${Number.parseFloat(log.weight) < Number.parseFloat(stats.weightProgress[idx + 1].weight) ? "text-success" : "text-destructive"}`}
+                    className={`text-sm ${Number.parseFloat(log.weight) < Number.parseFloat(stats.weightProgress[idx + 1].weight) ? "text-green-600" : "text-red-600"}`}
                   >
                     {(Number.parseFloat(log.weight) - Number.parseFloat(stats.weightProgress[idx + 1].weight)).toFixed(
                       1,
@@ -285,7 +292,7 @@ export function StatsTab({ userId }: StatsTabProps) {
 
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Award className="w-6 h-6" style={{ color: profile.theme.primary }} />
+          <Award className="w-6 h-6" style={{ color: preferences.theme_primary }} />
           <h3 className="text-lg font-bold">Conquistas</h3>
         </div>
         {achievements.length === 0 ? (
@@ -296,7 +303,7 @@ export function StatsTab({ userId }: StatsTabProps) {
               <Card
                 key={achievement.id}
                 className="p-4 text-center border-2"
-                style={{ borderColor: profile.theme.success + "30" }}
+                style={{ borderColor: preferences.theme_primary + "30" }}
               >
                 <div className="text-4xl mb-2">{achievement.icon}</div>
                 <p className="font-bold text-sm mb-1">{achievement.achievement_name}</p>
@@ -310,7 +317,7 @@ export function StatsTab({ userId }: StatsTabProps) {
         )}
       </Card>
 
-      <Card className="p-6" style={{ backgroundColor: profile.theme.primary + "10" }}>
+      <Card className="p-6" style={{ backgroundColor: preferences.theme_primary + "10" }}>
         <h3 className="font-bold mb-2">Próximas Conquistas</h3>
         <div className="space-y-2 text-sm">
           {stats?.currentStreak < 7 && <p>🔥 {7 - stats.currentStreak} dias para "7 Dias Seguidos"</p>}

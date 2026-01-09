@@ -5,16 +5,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle2, Clock, Target, Flame, Calendar, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
-import { userProfiles } from "@/lib/user-profiles"
 import { weeklyCalProgram } from "@/lib/calisthenics-data"
+import { julianaCalProgram } from "@/lib/calisthenics-data-juliana"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+
+interface UserPreferences {
+  theme_primary: string
+  theme_secondary: string
+  theme_accent: string
+}
 
 interface CalisthenicsTabProps {
   userId: string
+  preferences: UserPreferences
 }
 
-export function CalisthenicsTab({ userId }: CalisthenicsTabProps) {
-  const profile = userProfiles[userId]
+export function CalisthenicsTab({ userId, preferences }: CalisthenicsTabProps) {
   const [workoutHistory, setWorkoutHistory] = useState<any[]>([])
   const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay())
   const [showSuccess, setShowSuccess] = useState(false)
@@ -72,7 +78,8 @@ export function CalisthenicsTab({ userId }: CalisthenicsTabProps) {
     }
   }
 
-  const currentWorkout = weeklyCalProgram[adjustedDayIndex]
+  const workoutProgram = userId === "juliana" ? julianaCalProgram : weeklyCalProgram
+  const currentWorkout = workoutProgram[adjustedDayIndex]
   const totalWorkouts = workoutHistory.length
   const totalMinutes = workoutHistory.reduce((sum, w) => sum + (w.duration_minutes || 0), 0)
 
@@ -87,24 +94,24 @@ export function CalisthenicsTab({ userId }: CalisthenicsTabProps) {
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold" style={{ color: profile.theme.warning }}>
-          🔥 Calistenia em Casa
+        <h1 className="text-3xl font-bold" style={{ color: preferences.theme_primary }}>
+          🔥 Treino em Casa
         </h1>
         <p className="text-muted-foreground">Treino exclusivo de 30min no almoço • Seg-Sex: 12h-12h30 • Sáb: 1h</p>
       </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-2 gap-3">
-        <Card style={{ borderColor: profile.theme.warning }}>
+        <Card style={{ borderColor: preferences.theme_primary }}>
           <CardContent className="pt-6 text-center">
-            <Flame className="w-8 h-8 mx-auto mb-2" style={{ color: profile.theme.warning }} />
+            <Flame className="w-8 h-8 mx-auto mb-2" style={{ color: preferences.theme_primary }} />
             <div className="text-2xl font-bold">{totalWorkouts}</div>
             <div className="text-xs text-muted-foreground">Treinos Completos</div>
           </CardContent>
         </Card>
-        <Card style={{ borderColor: profile.theme.accent }}>
+        <Card style={{ borderColor: preferences.theme_accent }}>
           <CardContent className="pt-6 text-center">
-            <Clock className="w-8 h-8 mx-auto mb-2" style={{ color: profile.theme.accent }} />
+            <Clock className="w-8 h-8 mx-auto mb-2" style={{ color: preferences.theme_accent }} />
             <div className="text-2xl font-bold">{totalMinutes}</div>
             <div className="text-xs text-muted-foreground">Minutos Treinados</div>
           </CardContent>
@@ -112,14 +119,14 @@ export function CalisthenicsTab({ userId }: CalisthenicsTabProps) {
       </div>
 
       {/* Day Selector */}
-      <Card style={{ borderColor: profile.theme.warning + "40" }}>
+      <Card style={{ borderColor: preferences.theme_primary + "40" }}>
         <CardContent className="pt-6">
           <div className="flex items-center justify-between mb-4">
             <Button variant="outline" size="sm" onClick={() => changeDay(-1)}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <div className="text-center">
-              <h3 className="text-2xl font-bold" style={{ color: profile.theme.warning }}>
+              <h3 className="text-2xl font-bold" style={{ color: preferences.theme_primary }}>
                 {currentWorkout.day}
               </h3>
               <p className="text-sm text-muted-foreground">{currentWorkout.time}</p>
@@ -131,7 +138,7 @@ export function CalisthenicsTab({ userId }: CalisthenicsTabProps) {
 
           {/* Week Overview */}
           <div className="grid grid-cols-7 gap-1 text-center text-xs">
-            {weeklyCalProgram.map((workout, idx) => {
+            {workoutProgram.map((workout, idx) => {
               const isToday = idx === adjustedDayIndex
               const isRest = workout.duration === "DESCANSO"
               return (
@@ -139,8 +146,8 @@ export function CalisthenicsTab({ userId }: CalisthenicsTabProps) {
                   key={idx}
                   className={`p-2 rounded cursor-pointer transition-colors ${isToday ? "font-bold" : "opacity-50"}`}
                   style={{
-                    backgroundColor: isToday ? profile.theme.warning + "20" : "transparent",
-                    color: isRest ? "#999" : isToday ? profile.theme.warning : "inherit",
+                    backgroundColor: isToday ? preferences.theme_primary + "20" : "transparent",
+                    color: isRest ? "#999" : isToday ? preferences.theme_primary : "inherit",
                   }}
                   onClick={() => setSelectedDayIndex(idx === 6 ? 0 : idx + 1)}
                 >
@@ -187,7 +194,15 @@ export function CalisthenicsTab({ userId }: CalisthenicsTabProps) {
               </h3>
               <div className="flex flex-wrap gap-2">
                 {currentWorkout.focus.map((focus, index) => (
-                  <Badge key={index} variant="secondary" style={{ backgroundColor: profile.theme.warning + "20" }}>
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    style={{
+                      backgroundColor: preferences.theme_primary + "30",
+                      color: preferences.theme_secondary,
+                      fontWeight: "600",
+                    }}
+                  >
                     {focus}
                   </Badge>
                 ))}
@@ -259,7 +274,7 @@ export function CalisthenicsTab({ userId }: CalisthenicsTabProps) {
             <Button
               className="w-full"
               size="lg"
-              style={{ backgroundColor: profile.theme.success }}
+              style={{ backgroundColor: preferences.theme_primary }}
               onClick={() => completeWorkout(currentWorkout)}
             >
               <CheckCircle2 className="w-5 h-5 mr-2" />✅ Marcar {currentWorkout.day} Como Completo
@@ -272,7 +287,7 @@ export function CalisthenicsTab({ userId }: CalisthenicsTabProps) {
       {workoutHistory.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>📊 Histórico de Calistenia</CardTitle>
+            <CardTitle>📊 Histórico de Treinos</CardTitle>
             <CardDescription>Seus treinos em casa registrados</CardDescription>
           </CardHeader>
           <CardContent>
@@ -300,13 +315,13 @@ export function CalisthenicsTab({ userId }: CalisthenicsTabProps) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="text-center text-2xl">
-              <CheckCircle2 className="w-16 h-16 mx-auto mb-4" style={{ color: profile.theme.success }} />
+              <CheckCircle2 className="w-16 h-16 mx-auto mb-4" style={{ color: preferences.theme_primary }} />
               Treino Completo! 🎉
             </DialogTitle>
             <DialogDescription className="text-center text-lg">
-              Excelente trabalho, Kleber! Mais um passo rumo à transformação total.
+              Excelente trabalho! Mais um passo rumo à transformação total.
               <br />
-              <span className="font-bold text-xl mt-2 block" style={{ color: profile.theme.warning }}>
+              <span className="font-bold text-xl mt-2 block" style={{ color: preferences.theme_primary }}>
                 Continue firme! 💪🔥
               </span>
             </DialogDescription>

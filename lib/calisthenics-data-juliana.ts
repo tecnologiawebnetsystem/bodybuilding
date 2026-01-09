@@ -1,0 +1,313 @@
+export interface CalisthenicsExercise {
+  name: string
+  sets: number
+  reps: string
+  rest: string
+  tips: string
+  benefits: string[]
+}
+
+export interface CalisthenicsWorkout {
+  id: string
+  day: string
+  duration: string
+  time: string
+  focus: string[]
+  exercises: CalisthenicsExercise[]
+  warmup: string[]
+  cooldown: string[]
+}
+
+export const julianaCalProgram: CalisthenicsWorkout[] = [
+  {
+    id: "jul_monday",
+    day: "Segunda-feira",
+    duration: "30 minutos",
+    time: "12:00 - 12:30",
+    focus: ["Barriga", "Abdômen", "Core"],
+    warmup: ["Polichinelos - 2 min", "Rotação de tronco - 1 min", "Alongamento dinâmico - 2 min"],
+    exercises: [
+      {
+        name: "Prancha (Plank)",
+        sets: 4,
+        reps: "30-45s",
+        rest: "30s",
+        tips: "Corpo reto, abdômen bem contraído, foco total na barriga",
+        benefits: ["Abdômen completo", "Cintura", "Postura"],
+      },
+      {
+        name: "Leg Raises (Elevação de pernas)",
+        sets: 4,
+        reps: "15-20",
+        rest: "45s",
+        tips: "Deitada, pernas retas até 90 graus - queima barriga inferior",
+        benefits: ["Abdômen inferior", "Barriga baixa"],
+      },
+      {
+        name: "Bicicleta no Ar",
+        sets: 4,
+        reps: "30 (15 cada lado)",
+        rest: "30s",
+        tips: "Cotovelo toca joelho oposto - elimina gordura lateral",
+        benefits: ["Oblíquos", "Cintura", "Barriga lateral"],
+      },
+      {
+        name: "Mountain Climbers",
+        sets: 3,
+        reps: "30 (15 cada perna)",
+        rest: "30s",
+        tips: "Rápido, queima gordura abdominal intensamente",
+        benefits: ["Abdômen", "Cardio", "Queima gordura da barriga"],
+      },
+      {
+        name: "V-Ups",
+        sets: 3,
+        reps: "10-12",
+        rest: "60s",
+        tips: "Forma V com corpo, trabalha toda a região abdominal",
+        benefits: ["Abdômen completo", "Barriga toda"],
+      },
+    ],
+    cooldown: ["Alongamento de abdômen - 2 min", "Respiração profunda - 2 min"],
+  },
+  {
+    id: "jul_tuesday",
+    day: "Terça-feira",
+    duration: "30 minutos",
+    time: "12:00 - 12:30",
+    focus: ["Pernas", "Glúteos", "Coxas"],
+    warmup: ["Corrida estacionária - 2 min", "Agachamento sem peso - 10x", "Mobilidade de quadril - 2 min"],
+    exercises: [
+      {
+        name: "Agachamento Livre",
+        sets: 4,
+        reps: "20-25",
+        rest: "60s",
+        tips: "Desça bem profundo, queima pernas e glúteos intensamente",
+        benefits: ["Coxas", "Glúteos", "Pernas completas"],
+      },
+      {
+        name: "Agachamento Búlgaro",
+        sets: 3,
+        reps: "12-15 cada perna",
+        rest: "60s",
+        tips: "Perna de trás elevada, muito efetivo para pernas e bumbum",
+        benefits: ["Pernas", "Glúteos", "Coxas"],
+      },
+      {
+        name: "Afundo (Lunges)",
+        sets: 4,
+        reps: "15 cada perna",
+        rest: "45s",
+        tips: "Passo largo, desça bem - define e tonifica as pernas",
+        benefits: ["Coxas", "Glúteos", "Pernas"],
+      },
+      {
+        name: "Jump Squats",
+        sets: 3,
+        reps: "15-20",
+        rest: "60s",
+        tips: "Agachamento explosivo - queima gordura das pernas rapidamente",
+        benefits: ["Explosão", "Queima gordura", "Pernas"],
+      },
+      {
+        name: "Ponte (Glute Bridge)",
+        sets: 4,
+        reps: "20-25",
+        rest: "45s",
+        tips: "Deitada, eleve o quadril - fortalece glúteos e coxas",
+        benefits: ["Glúteos", "Posterior de coxa", "Core"],
+      },
+    ],
+    cooldown: ["Alongamento de pernas - 3 min", "Alongamento de glúteos - 2 min"],
+  },
+  {
+    id: "jul_wednesday",
+    day: "Quarta-feira",
+    duration: "30 minutos",
+    time: "12:00 - 12:30",
+    focus: ["Braços", "Tríceps", "Bíceps"],
+    warmup: ["Rotação de braços - 2 min", "Círculos com braços - 1 min", "Aquecimento dinâmico - 2 min"],
+    exercises: [
+      {
+        name: "Flexões Tradicionais",
+        sets: 4,
+        reps: "12-15",
+        rest: "60s",
+        tips: "Trabalha todo o braço, peito e ombros",
+        benefits: ["Braços", "Peito", "Tríceps"],
+      },
+      {
+        name: "Flexões Diamante",
+        sets: 3,
+        reps: "10-12",
+        rest: "60s",
+        tips: "Mãos juntas - foco total nos tríceps (parte de trás do braço)",
+        benefits: ["Tríceps", "Braços"],
+      },
+      {
+        name: "Dips em Cadeira (Tríceps)",
+        sets: 4,
+        reps: "15-20",
+        rest: "45s",
+        tips: "Use uma cadeira - elimina flacidez dos braços",
+        benefits: ["Tríceps", "Braços", "Ombros"],
+      },
+      {
+        name: "Prancha com toque nos ombros",
+        sets: 3,
+        reps: "20 (10 cada lado)",
+        rest: "45s",
+        tips: "Prancha alta, toque ombro oposto - trabalha braços e core",
+        benefits: ["Braços", "Ombros", "Core"],
+      },
+      {
+        name: "Pike Push-ups",
+        sets: 3,
+        reps: "10-12",
+        rest: "60s",
+        tips: "Quadril alto formando V - foco em ombros e braços",
+        benefits: ["Ombros", "Tríceps", "Braços"],
+      },
+    ],
+    cooldown: ["Alongamento de braços - 2 min", "Alongamento de tríceps - 2 min"],
+  },
+  {
+    id: "jul_thursday",
+    day: "Quinta-feira",
+    duration: "DESCANSO",
+    time: "-",
+    focus: ["Recuperação"],
+    warmup: [],
+    exercises: [],
+    cooldown: [],
+  },
+  {
+    id: "jul_friday",
+    day: "Sexta-feira",
+    duration: "30 minutos",
+    time: "12:00 - 12:30",
+    focus: ["Barriga", "Core", "Queima de gordura"],
+    warmup: ["Prancha - 30s", "Bicicleta no ar - 1 min", "Mobilidade - 2 min"],
+    exercises: [
+      {
+        name: "Leg Raises (Elevação de pernas)",
+        sets: 4,
+        reps: "15-20",
+        rest: "45s",
+        tips: "Deitada, pernas retas - abdômen inferior e barriga baixa",
+        benefits: ["Abdômen inferior", "Barriga baixa"],
+      },
+      {
+        name: "Russian Twists (torção russa)",
+        sets: 4,
+        reps: "30 (15 cada lado)",
+        rest: "30s",
+        tips: "Sentada, torça o tronco - elimina gordura da cintura",
+        benefits: ["Oblíquos", "Cintura", "Barriga lateral"],
+      },
+      {
+        name: "Prancha Lateral",
+        sets: 3,
+        reps: "30-40s cada lado",
+        rest: "30s",
+        tips: "Corpo reto de lado - define cintura e barriga lateral",
+        benefits: ["Oblíquos", "Cintura", "Core lateral"],
+      },
+      {
+        name: "Bicicleta no Ar",
+        sets: 4,
+        reps: "40 (20 cada lado)",
+        rest: "30s",
+        tips: "Movimento controlado e intenso",
+        benefits: ["Abdômen completo", "Oblíquos"],
+      },
+      {
+        name: "Burpees",
+        sets: 3,
+        reps: "12-15",
+        rest: "60s",
+        tips: "Máxima intensidade - queima gordura da barriga rapidamente",
+        benefits: ["Cardio", "Queima gordura", "Corpo todo"],
+      },
+    ],
+    cooldown: ["Alongamento completo - 3 min", "Respiração profunda - 2 min"],
+  },
+  {
+    id: "jul_saturday",
+    day: "Sábado",
+    duration: "45 minutos",
+    time: "Horário livre",
+    focus: ["Barriga", "Pernas", "Braços", "Queima máxima"],
+    warmup: ["Polichinelos - 3 min", "Burpees leves - 8x", "Rotação completa - 2 min", "Mobilidade - 2 min"],
+    exercises: [
+      {
+        name: "Prancha (todas variações)",
+        sets: 4,
+        reps: "45s frontal + 30s cada lado",
+        rest: "60s",
+        tips: "Frontal, depois lateral - trabalha toda a barriga",
+        benefits: ["Abdômen completo", "Cintura"],
+      },
+      {
+        name: "Agachamento + Jump Squats",
+        sets: 4,
+        reps: "20 + 10 saltos",
+        rest: "90s",
+        tips: "Combine agachamentos com saltos - pernas completas",
+        benefits: ["Pernas", "Glúteos", "Cardio"],
+      },
+      {
+        name: "Flexões (variações)",
+        sets: 4,
+        reps: "15-20",
+        rest: "60s",
+        tips: "Varie entre tradicional e diamante - braços completos",
+        benefits: ["Braços", "Peito", "Tríceps"],
+      },
+      {
+        name: "Leg Raises + Bicicleta",
+        sets: 3,
+        reps: "20 + 30",
+        rest: "60s",
+        tips: "Combine os dois exercícios - barriga intensa",
+        benefits: ["Abdômen completo"],
+      },
+      {
+        name: "Afundos Caminhando",
+        sets: 3,
+        reps: "20 (10 cada perna)",
+        rest: "60s",
+        tips: "Caminhe fazendo afundos - pernas e glúteos",
+        benefits: ["Pernas", "Glúteos", "Coxas"],
+      },
+      {
+        name: "Dips em Cadeira",
+        sets: 3,
+        reps: "20-25",
+        rest: "60s",
+        tips: "Desça bem profundo - elimina flacidez dos braços",
+        benefits: ["Tríceps", "Braços"],
+      },
+      {
+        name: "Burpees FINALIZADOR",
+        sets: 3,
+        reps: "15-20",
+        rest: "90s",
+        tips: "Máxima intensidade - queima gordura total",
+        benefits: ["Cardio explosivo", "Queima máxima", "Corpo todo"],
+      },
+    ],
+    cooldown: ["Alongamento completo de todo corpo - 5 min", "Respiração e relaxamento - 3 min"],
+  },
+  {
+    id: "jul_sunday",
+    day: "Domingo",
+    duration: "DESCANSO",
+    time: "-",
+    focus: ["Recuperação total", "Caminhada leve 30min (opcional)"],
+    warmup: [],
+    exercises: [],
+    cooldown: [],
+  },
+]

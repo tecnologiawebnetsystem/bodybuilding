@@ -3,10 +3,16 @@
 import { Card } from "@/components/ui/card"
 import { Apple, Droplets, Pill, Flame, UtensilsCrossed, Clock } from "lucide-react"
 import { getSupplementsByUser } from "@/lib/supplements-data"
-import { userProfiles } from "@/lib/user-profiles"
+
+interface UserPreferences {
+  theme_primary: string
+  theme_secondary: string
+  theme_accent: string
+}
 
 interface NutritionTabProps {
   userId: string
+  preferences: UserPreferences
 }
 
 const mealPlans = {
@@ -126,19 +132,82 @@ const mealPlans = {
       calories: 150,
     },
   ],
+  juliana: [
+    {
+      time: "07:00",
+      name: "Café da Manhã",
+      foods: [
+        "2 claras de ovo + 1 ovo inteiro (mexido)",
+        "1 fatia de pão integral",
+        "1 fruta (maçã ou pera)",
+        "Chá verde sem açúcar",
+      ],
+      calories: 280,
+    },
+    {
+      time: "10:00",
+      name: "Lanche da Manhã",
+      foods: ["1 iogurte natural light", "1 porção de frutas vermelhas"],
+      calories: 120,
+    },
+    {
+      time: "12:30",
+      name: "Almoço",
+      foods: [
+        "100g de frango grelhado ou peixe",
+        "1/2 xícara de arroz integral",
+        "Salada verde à vontade (alface, rúcula, tomate)",
+        "Legumes cozidos",
+      ],
+      calories: 380,
+    },
+    {
+      time: "15:30",
+      name: "Lanche da Tarde",
+      foods: ["1 fruta", "10 castanhas"],
+      calories: 150,
+    },
+    {
+      time: "19:00",
+      name: "Jantar",
+      foods: ["120g de peixe ou frango grelhado", "Legumes refogados", "Salada verde à vontade"],
+      calories: 320,
+    },
+    {
+      time: "21:00",
+      name: "Ceia (opcional)",
+      foods: ["1 xícara de chá de camomila", "3 castanhas"],
+      calories: 80,
+    },
+  ],
 }
 
-export function NutritionTab({ userId }: NutritionTabProps) {
+export function NutritionTab({ userId, preferences }: NutritionTabProps) {
   const supplements = getSupplementsByUser(userId)
-  const profile = userProfiles[userId]
-  const meals = mealPlans[userId as keyof typeof mealPlans]
-  const totalCalories = meals.reduce((sum, meal) => sum + meal.calories, 0)
+  const meals = mealPlans[userId as keyof typeof mealPlans] || []
+  const totalCalories = meals.length > 0 ? meals.reduce((sum, meal) => sum + meal.calories, 0) : 0
+
+  const showSupplements = userId !== "juliana"
+
+  if (meals.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Nutrição & Alimentação</h2>
+          <p className="text-muted-foreground">Plano personalizado</p>
+        </div>
+        <Card className="p-6">
+          <p className="text-center text-muted-foreground">Nenhum plano alimentar configurado para este usuário.</p>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-2">Nutrição & Alimentação</h2>
-        <p className="text-muted-foreground">Plano personalizado para {profile.name}</p>
+        <p className="text-muted-foreground">Plano personalizado</p>
       </div>
 
       {/* Daily Targets */}
@@ -146,23 +215,25 @@ export function NutritionTab({ userId }: NutritionTabProps) {
         <h3 className="text-xl font-bold mb-4">Metas Diárias</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <Flame className="w-6 h-6 text-primary mx-auto mb-2" />
+            <Flame className="w-6 h-6 mx-auto mb-2" style={{ color: preferences.theme_primary }} />
             <p className="text-2xl font-bold">{totalCalories}</p>
             <p className="text-sm text-muted-foreground">Calorias</p>
           </div>
           <div className="text-center">
-            <Apple className="w-6 h-6 text-success mx-auto mb-2" />
-            <p className="text-2xl font-bold">{userId === "pamela" ? "130g" : "160g"}</p>
+            <Apple className="w-6 h-6 mx-auto mb-2" style={{ color: preferences.theme_accent }} />
+            <p className="text-2xl font-bold">
+              {userId === "pamela" ? "130g" : userId === "juliana" ? "100g" : "160g"}
+            </p>
             <p className="text-sm text-muted-foreground">Proteína</p>
           </div>
           <div className="text-center">
-            <Droplets className="w-6 h-6 text-accent mx-auto mb-2" />
+            <Droplets className="w-6 h-6 mx-auto mb-2" style={{ color: preferences.theme_accent }} />
             <p className="text-2xl font-bold">3L</p>
             <p className="text-sm text-muted-foreground">Água</p>
           </div>
           <div className="text-center">
-            <Pill className="w-6 h-6 text-primary mx-auto mb-2" />
-            <p className="text-2xl font-bold">{userId === "pamela" ? "45g" : "50g"}</p>
+            <Pill className="w-6 h-6 mx-auto mb-2" style={{ color: preferences.theme_primary }} />
+            <p className="text-2xl font-bold">{userId === "pamela" ? "45g" : userId === "juliana" ? "35g" : "50g"}</p>
             <p className="text-sm text-muted-foreground">Gorduras</p>
           </div>
         </div>
@@ -170,17 +241,23 @@ export function NutritionTab({ userId }: NutritionTabProps) {
 
       <Card className="p-6">
         <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <UtensilsCrossed className="w-6 h-6 text-primary" />
+          <UtensilsCrossed className="w-6 h-6" style={{ color: preferences.theme_primary }} />
           Plano Alimentar Diário
         </h3>
         <div className="space-y-4">
           {meals.map((meal, idx) => (
             <div
               key={idx}
-              className="p-4 rounded-lg border-2 border-primary/20 hover:border-primary/40 transition-colors"
+              className="p-4 rounded-lg border-2 hover:border-primary/40 transition-colors"
+              style={{ borderColor: `${preferences.theme_primary}20` }}
             >
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shrink-0">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                  style={{
+                    background: `linear-gradient(135deg, ${preferences.theme_primary}, ${preferences.theme_accent})`,
+                  }}
+                >
                   <Clock className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1">
@@ -188,13 +265,17 @@ export function NutritionTab({ userId }: NutritionTabProps) {
                   <p className="text-sm text-muted-foreground">{meal.time}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-primary">{meal.calories} kcal</p>
+                  <p className="text-sm font-semibold" style={{ color: preferences.theme_primary }}>
+                    {meal.calories} kcal
+                  </p>
                 </div>
               </div>
               <ul className="space-y-2 ml-2">
                 {meal.foods.map((food, foodIdx) => (
                   <li key={foodIdx} className="text-sm flex items-start gap-2">
-                    <span className="text-primary mt-1">•</span>
+                    <span style={{ color: preferences.theme_primary }} className="mt-1">
+                      •
+                    </span>
                     <span className="flex-1">{food}</span>
                   </li>
                 ))}
@@ -202,39 +283,51 @@ export function NutritionTab({ userId }: NutritionTabProps) {
             </div>
           ))}
         </div>
-        <div className="mt-6 p-4 bg-primary/10 rounded-lg">
+        <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: `${preferences.theme_primary}10` }}>
           <p className="font-bold text-center text-lg">Total Diário: {totalCalories} calorias</p>
         </div>
       </Card>
 
       {/* Supplements */}
-      <Card className="p-6">
-        <h3 className="text-xl font-bold mb-4">Suplementação Recomendada</h3>
-        <div className="space-y-4">
-          {supplements.map((supp, idx) => (
-            <div key={idx} className="p-4 rounded-lg border-2 border-primary/20">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center shrink-0">
-                  <Pill className="w-6 h-6 text-primary-foreground" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-lg mb-1">{supp.name}</h4>
-                  <p className="text-sm text-primary font-medium mb-2">
-                    <strong>Dosagem:</strong> {supp.dosage}
-                  </p>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    <strong>Quando tomar:</strong> {supp.timing}
-                  </p>
-                  <p className="text-sm italic">{supp.purpose}</p>
+      {showSupplements && (
+        <Card className="p-6">
+          <h3 className="text-xl font-bold mb-4">Suplementação Recomendada</h3>
+          <div className="space-y-4">
+            {supplements.map((supp, idx) => (
+              <div
+                key={idx}
+                className="p-4 rounded-lg border-2"
+                style={{ borderColor: `${preferences.theme_primary}20` }}
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: preferences.theme_primary }}
+                  >
+                    <Pill className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-lg mb-1">{supp.name}</h4>
+                    <p className="text-sm font-medium mb-2" style={{ color: preferences.theme_primary }}>
+                      <strong>Dosagem:</strong> {supp.dosage}
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      <strong>Quando tomar:</strong> {supp.timing}
+                    </p>
+                    <p className="text-sm italic">{supp.purpose}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* Important Notes */}
-      <Card className="p-6 bg-accent/10 border-accent/20">
+      <Card
+        className="p-6"
+        style={{ backgroundColor: `${preferences.theme_accent}10`, borderColor: `${preferences.theme_accent}20` }}
+      >
         <h3 className="text-lg font-bold mb-3">⚠️ Notas Importantes</h3>
         <ul className="space-y-2 text-sm text-muted-foreground">
           <li>• Beba pelo menos 3 litros de água por dia</li>
