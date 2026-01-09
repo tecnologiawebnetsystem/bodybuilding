@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { UserPlus, Edit, Trash2, LogOut } from "lucide-react"
+import { UserPlus, Edit, Trash2, LogOut, Settings } from "lucide-react"
+import { AdminUserConfig } from "@/components/admin-user-config"
 
 interface User {
   user_id: string
@@ -43,6 +44,7 @@ export function AdminPanel({ adminUsername, onLogout }: { adminUsername: string;
   const [showUserDialog, setShowUserDialog] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [formData, setFormData] = useState<Partial<User>>({})
+  const [configuringUserId, setConfiguringUserId] = useState<string | null>(null)
 
   useEffect(() => {
     loadUsers()
@@ -183,6 +185,9 @@ export function AdminPanel({ adminUsername, onLogout }: { adminUsername: string;
                   <p className="text-sm text-slate-600">@{user.user_id}</p>
                 </div>
                 <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setConfiguringUserId(user.user_id)}>
+                    <Settings className="w-4 h-4" />
+                  </Button>
                   <Button size="sm" variant="outline" onClick={() => handleEditUser(user)}>
                     <Edit className="w-4 h-4" />
                   </Button>
@@ -487,6 +492,16 @@ export function AdminPanel({ adminUsername, onLogout }: { adminUsername: string;
             </div>
           </DialogContent>
         </Dialog>
+
+        {configuringUserId && (
+          <AdminUserConfig
+            userId={configuringUserId}
+            onClose={() => {
+              setConfiguringUserId(null)
+              loadUsers()
+            }}
+          />
+        )}
       </div>
     </div>
   )
