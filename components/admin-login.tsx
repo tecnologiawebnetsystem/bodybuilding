@@ -59,7 +59,7 @@ export function AdminLogin({ onLogin }: { onLogin: (username: string) => void })
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="admin"
+              placeholder="kgoncalves"
               required
             />
           </div>
@@ -82,7 +82,7 @@ export function AdminLogin({ onLogin }: { onLogin: (username: string) => void })
           </Button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-slate-500">Credenciais padrão: admin / admin123</div>
+        <div className="mt-6 text-center text-sm text-slate-500">Sistema de administração FitTransform</div>
       </Card>
     </div>
   )
