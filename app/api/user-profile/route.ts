@@ -53,3 +53,34 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "Erro ao atualizar perfil" }, { status: 500 })
   }
 }
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { userId, pin } = body
+
+    if (!userId || !pin) {
+      return NextResponse.json({ error: "userId e pin são obrigatórios" }, { status: 400 })
+    }
+
+    if (pin.length !== 4) {
+      return NextResponse.json({ error: "PIN deve ter 4 dígitos" }, { status: 400 })
+    }
+
+    const result = await sql`
+      UPDATE users
+      SET pin = ${pin}
+      WHERE user_id = ${userId}
+      RETURNING user_id, name
+    `
+
+    if (result.length === 0) {
+      return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
+    }
+
+    return NextResponse.json({ success: true, data: result[0] })
+  } catch (error) {
+    console.error("[v0] Error updating PIN:", error)
+    return NextResponse.json({ error: "Erro ao atualizar PIN" }, { status: 500 })
+  }
+}
