@@ -1,19 +1,25 @@
+"use client"
+
 import { SocialFeed } from "@/components/social-feed"
+import { PageLayout } from "@/components/page-layout"
+import { PageContainer } from "@/components/page-container"
+import { useEffect, useState } from "react"
 
 export default function SocialPage() {
-  // Em produção, pegar o userId do contexto de autenticação
-  const userId = "kleber"
+  const [userId, setUserId] = useState("")
+
+  useEffect(() => {
+    const currentUser = sessionStorage.getItem("currentUser")
+    if (currentUser) {
+      setUserId(currentUser)
+    }
+  }, [])
 
   return (
-    <main className="min-h-screen bg-background p-4 pb-24">
-      <div className="max-w-2xl mx-auto space-y-4">
-        <div>
-          <h1 className="text-3xl font-bold">Feed Social</h1>
-          <p className="text-muted-foreground">Veja o que seus amigos estão fazendo</p>
-        </div>
-
+    <PageLayout title="Feed Social" backTo="more">
+      <PageContainer title="Feed Social" subtitle="Veja o que seus amigos estão fazendo" maxWidth="lg">
         <SocialFeed userId={userId} />
-      </div>
-    </main>
+      </PageContainer>
+    </PageLayout>
   )
 }

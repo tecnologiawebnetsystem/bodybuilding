@@ -1,17 +1,22 @@
+"use client"
+
 import TrainerDashboard from "@/components/trainer-dashboard"
+import { PageLayout } from "@/components/page-layout"
+import { PageContainer } from "@/components/page-container"
 
 export default function TrainerPage() {
-  // Em produção, o trainerId viria da sessão/autenticação
   const trainerId = "pt_carlos"
 
   return (
-    <main className="container mx-auto p-4 md:p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Painel Personal Trainer</h1>
-        <p className="text-muted-foreground mt-1">Gerencie seus alunos e acompanhe o progresso</p>
-      </div>
-
-      <TrainerDashboard trainerId={trainerId} />
-    </main>
+    <PageLayout title="Painel Personal Trainer" backTo="more">
+      <PageContainer
+        title="Painel Personal Trainer"
+        subtitle="Gerencie seus alunos e acompanhe o progresso"
+        badge="Pro"
+        maxWidth="full"
+      >
+        <TrainerDashboard trainerId={trainerId} />
+      </PageContainer>
+    </PageLayout>
   )
 }

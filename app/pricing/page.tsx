@@ -1,19 +1,25 @@
+"use client"
+
 import { SubscriptionPlans } from "@/components/subscription-plans"
+import { PageLayout } from "@/components/page-layout"
+import { PageContainer } from "@/components/page-container"
+import { useEffect, useState } from "react"
 
 export default function PricingPage() {
-  // TODO: Get userId from session/auth
-  const userId = "kleber" // Placeholder
+  const [userId, setUserId] = useState("")
+
+  useEffect(() => {
+    const currentUser = sessionStorage.getItem("currentUser")
+    if (currentUser) {
+      setUserId(currentUser)
+    }
+  }, [])
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold">Escolha seu Plano</h1>
-          <p className="text-xl text-muted-foreground">Planos flexíveis para todos os objetivos</p>
-        </div>
-
+    <PageLayout title="Escolha seu Plano" backTo="more">
+      <PageContainer title="Escolha seu Plano" subtitle="Planos flexíveis para todos os objetivos" maxWidth="full">
         <SubscriptionPlans userId={userId} />
-      </div>
-    </div>
+      </PageContainer>
+    </PageLayout>
   )
 }

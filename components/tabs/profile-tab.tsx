@@ -1,11 +1,13 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { UserIcon, Bell, Lock, Mail, Trophy, TrendingUp, Dumbbell, Calendar, Award } from "lucide-react"
+import { UserIcon, Bell, Lock, Mail, Trophy, TrendingUp, Dumbbell, Calendar, Award, Camera } from "lucide-react"
 import { NotificationSettings } from "@/components/notification-settings"
 import { GymBadge } from "@/components/gym-badge"
 import {
@@ -39,7 +41,10 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
   const [loading, setLoading] = useState(true)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
+  const [changeEmailOpen, setChangeEmailOpen] = useState(false)
+  const [newEmail, setNewEmail] = useState("")
   const [newPin, setNewPin] = useState("")
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -90,6 +95,79 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
     }
   }
 
+  const handleChangeEmail = async () => {
+    if (!newEmail || !newEmail.includes("@")) {
+      alert("Digite um e-mail válido")
+      return
+    }
+
+    try {
+      const response = await fetch("/api/user-profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, email: newEmail }),
+      })
+
+      if (response.ok) {
+        alert("E-mail alterado com sucesso!")
+        setChangeEmailOpen(false)
+        setNewEmail("")
+        loadData() // Recarrega os dados para mostrar o novo e-mail
+      } else {
+        alert("Erro ao alterar e-mail")
+      }
+    } catch (error) {
+      console.error("[v0] Error changing email:", error)
+      alert("Erro ao alterar e-mail")
+    }
+  }
+
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validar tamanho (máx 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert("A foto deve ter no máximo 2MB")
+      return
+    }
+
+    // Validar tipo
+    if (!file.type.startsWith("image/")) {
+      alert("Selecione uma imagem válida")
+      return
+    }
+
+    setUploadingPhoto(true)
+
+    try {
+      // Converter para base64
+      const reader = new FileReader()
+      reader.onloadend = async () => {
+        const base64String = reader.result as string
+
+        const response = await fetch("/api/user-profile", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, profilePhoto: base64String }),
+        })
+
+        if (response.ok) {
+          await loadData() // Recarregar para mostrar nova foto
+          alert("Foto atualizada com sucesso!")
+        } else {
+          alert("Erro ao atualizar foto")
+        }
+        setUploadingPhoto(false)
+      }
+      reader.readAsDataURL(file)
+    } catch (error) {
+      console.error("[v0] Error uploading photo:", error)
+      alert("Erro ao fazer upload da foto")
+      setUploadingPhoto(false)
+    }
+  }
+
   if (loading) {
     return <p className="text-center py-8">Carregando...</p>
   }
@@ -113,11 +191,41 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
       <Card className="p-6 bg-gradient-to-br from-primary/10 to-accent/10">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
-              style={{ backgroundColor: preferences.theme_primary }}
-            >
-              <UserIcon className="w-10 h-10 text-white" />
+            <div className="relative">
+              <div
+                className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg overflow-hidden"
+                style={{ backgroundColor: preferences.theme_primary }}
+              >
+                {userProfile.profile_photo_url ? (
+                  <img
+                    src={userProfile.profile_photo_url || "/placeholder.svg"}
+                    alt="Foto de perfil"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <UserIcon className="w-10 h-10 text-white" />
+                )}
+              </div>
+              <label htmlFor="photo-upload" className="absolute -bottom-1 -right-1 cursor-pointer">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
+                  style={{ backgroundColor: preferences.theme_primary }}
+                >
+                  {uploadingPhoto ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Camera className="w-4 h-4 text-white" />
+                  )}
+                </div>
+                <input
+                  id="photo-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                  disabled={uploadingPhoto}
+                />
+              </label>
             </div>
             <div>
               <h3 className="text-2xl font-bold">{userProfile.name}</h3>
@@ -171,17 +279,49 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
       <div>
         <h3 className="text-lg font-semibold mb-3">Configurações de Conta</h3>
         <div className="space-y-3">
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-muted-foreground" />
-                <div>
-                  <p className="font-medium">Email</p>
-                  <p className="text-sm text-muted-foreground">{userProfile.email || "Não cadastrado"}</p>
+          <Dialog open={changeEmailOpen} onOpenChange={setChangeEmailOpen}>
+            <DialogTrigger asChild>
+              <Card className="p-4 cursor-pointer hover:bg-accent/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">Email</p>
+                      <p className="text-sm text-muted-foreground">{userProfile.email || "Não cadastrado"}</p>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    Editar
+                  </Button>
                 </div>
+              </Card>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Alterar E-mail</DialogTitle>
+                <DialogDescription>Digite seu novo endereço de e-mail</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="new-email">Novo E-mail</Label>
+                  <Input
+                    id="new-email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                  />
+                </div>
+                <Button
+                  onClick={handleChangeEmail}
+                  className="w-full"
+                  style={{ backgroundColor: preferences.theme_primary }}
+                >
+                  Confirmar Alteração
+                </Button>
               </div>
-            </div>
-          </Card>
+            </DialogContent>
+          </Dialog>
 
           <Dialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen}>
             <DialogTrigger asChild>

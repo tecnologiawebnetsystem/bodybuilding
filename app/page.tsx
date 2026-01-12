@@ -1,18 +1,38 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { PinLogin } from "@/components/pin-login"
 import { Dashboard } from "@/components/dashboard"
 
 export default function Page() {
   const [currentUser, setCurrentUser] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Verificar se há um usuário logado no sessionStorage
+    const storedUser = sessionStorage.getItem("currentUser")
+    if (storedUser) {
+      setCurrentUser(storedUser)
+    }
+    setLoading(false)
+  }, [])
 
   const handleLogin = (userId: string) => {
     setCurrentUser(userId)
+    sessionStorage.setItem("currentUser", userId)
   }
 
   const handleLogout = () => {
     setCurrentUser(null)
+    sessionStorage.removeItem("currentUser")
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      </div>
+    )
   }
 
   if (!currentUser) {

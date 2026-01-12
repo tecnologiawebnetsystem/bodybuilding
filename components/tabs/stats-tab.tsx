@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
-import { Trophy, Flame, Activity, Target, Award, Trash2 } from "lucide-react"
+import { Trophy, Flame, Activity, Target, Trash2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 
@@ -158,7 +158,7 @@ export function StatsTab({ userId, preferences }: StatsTabProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Estatísticas e Conquistas</h2>
+      <h2 className="text-2xl font-bold">Estatísticas</h2>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card
@@ -289,42 +289,6 @@ export function StatsTab({ userId, preferences }: StatsTabProps) {
           </div>
         </Card>
       )}
-
-      <Card className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Award className="w-6 h-6" style={{ color: preferences.theme_primary }} />
-          <h3 className="text-lg font-bold">Conquistas</h3>
-        </div>
-        {achievements.length === 0 ? (
-          <p className="text-center text-muted-foreground py-8">Continue treinando para desbloquear conquistas!</p>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {achievements.map((achievement) => (
-              <Card
-                key={achievement.id}
-                className="p-4 text-center border-2"
-                style={{ borderColor: preferences.theme_primary + "30" }}
-              >
-                <div className="text-4xl mb-2">{achievement.icon}</div>
-                <p className="font-bold text-sm mb-1">{achievement.achievement_name}</p>
-                <p className="text-xs text-muted-foreground">{achievement.achievement_description}</p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {new Date(achievement.earned_date).toLocaleDateString("pt-BR")}
-                </p>
-              </Card>
-            ))}
-          </div>
-        )}
-      </Card>
-
-      <Card className="p-6" style={{ backgroundColor: preferences.theme_primary + "10" }}>
-        <h3 className="font-bold mb-2">Próximas Conquistas</h3>
-        <div className="space-y-2 text-sm">
-          {stats?.currentStreak < 7 && <p>🔥 {7 - stats.currentStreak} dias para "7 Dias Seguidos"</p>}
-          {stats?.totalWorkouts < 50 && <p>💪 {50 - stats.totalWorkouts} treinos para "50 Treinos"</p>}
-          {stats?.totalDistance < 100 && <p>🏃 {(100 - stats.totalDistance).toFixed(1)}km para "100km Rodados"</p>}
-        </div>
-      </Card>
     </div>
   )
 }

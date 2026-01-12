@@ -2,7 +2,19 @@
 
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Home, Dumbbell, Activity, BookOpen, User, CheckCircle2, Ruler, Droplet, BarChart3, Zap } from "lucide-react"
+import {
+  Home,
+  Dumbbell,
+  Activity,
+  BookOpen,
+  User,
+  CheckCircle2,
+  Ruler,
+  Droplet,
+  BarChart3,
+  Zap,
+  MoreHorizontal,
+} from "lucide-react"
 import { HomeTab } from "@/components/tabs/home-tab"
 import { WorkoutsTab } from "@/components/tabs/workouts-tab"
 import { RunningTab } from "@/components/tabs/running-tab"
@@ -13,6 +25,7 @@ import { MeasurementsTab } from "@/components/tabs/measurements-tab"
 import { HydrationTab } from "@/components/tabs/hydration-tab"
 import { StatsTab } from "@/components/tabs/stats-tab"
 import { CalisthenicsTab } from "@/components/tabs/calisthenics-tab"
+import { MoreTab } from "@/components/tabs/more-tab"
 
 interface DashboardProps {
   userId: string
@@ -99,7 +112,16 @@ const getUserPreferences = (userId: string): UserPreferences => {
 }
 
 export function Dashboard({ userId, onLogout }: DashboardProps) {
-  const [activeTab, setActiveTab] = useState("home")
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== "undefined") {
+      const savedTab = sessionStorage.getItem("activeTab")
+      if (savedTab) {
+        sessionStorage.removeItem("activeTab") // Limpar depois de usar
+        return savedTab
+      }
+    }
+    return "home"
+  })
   const preferences = getUserPreferences(userId)
 
   const tabs = [
@@ -160,6 +182,7 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
       color: preferences.theme_primary,
       enabled: preferences.enable_home_workouts,
     },
+    { id: "more", label: "Mais", icon: MoreHorizontal, color: preferences.theme_accent, enabled: true },
     { id: "profile", label: "Perfil", icon: User, color: preferences.theme_primary, enabled: true },
   ].filter((tab) => tab.enabled)
 
@@ -242,6 +265,9 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
               <CalisthenicsTab userId={userId} preferences={preferences} />
             </TabsContent>
           )}
+          <TabsContent value="more" className="mt-0">
+            <MoreTab userId={userId} preferences={preferences} />
+          </TabsContent>
           <TabsContent value="profile" className="mt-0">
             <ProfileTab userId={userId} onLogout={onLogout} preferences={preferences} />
           </TabsContent>

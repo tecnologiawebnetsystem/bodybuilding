@@ -7,13 +7,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card } from "@/components/ui/card"
-import { Shield } from "lucide-react"
+import { Shield, ArrowLeft } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function AdminLogin({ onLogin }: { onLogin: (username: string) => void }) {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,7 +44,16 @@ export function AdminLogin({ onLogin }: { onLogin: (username: string) => void })
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4 relative">
+      <Button
+        variant="ghost"
+        className="absolute top-4 left-4 text-white hover:bg-white/10"
+        onClick={() => router.push("/")}
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Voltar para Login
+      </Button>
+
       <Card className="w-full max-w-md p-8">
         <div className="flex flex-col items-center mb-8">
           <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center mb-4">
@@ -59,7 +70,7 @@ export function AdminLogin({ onLogin }: { onLogin: (username: string) => void })
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="kgoncalves"
+              placeholder="Digite seu usuário"
               required
             />
           </div>
@@ -70,7 +81,7 @@ export function AdminLogin({ onLogin }: { onLogin: (username: string) => void })
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="Digite sua senha"
               required
             />
           </div>

@@ -14,16 +14,33 @@ export async function GET(request: NextRequest) {
 
     const clients = await sql`
       SELECT 
-        u.*,
+        u.user_id,
+        u.pin,
+        u.name,
+        u.age,
+        u.gender,
+        u.height,
+        u.current_weight,
+        u.initial_weight,
+        u.target_weight,
+        u.partner_gym_id,
+        u.subscription_status,
+        u.subscription_plan_id,
+        u.personal_trainer_id,
+        u.created_at,
         tc.status as client_status,
         tc.started_at,
-        COUNT(DISTINCT w.id) as total_workouts,
-        MAX(w.created_at) as last_workout_date
+        COUNT(DISTINCT wc.id) as total_workouts,
+        MAX(wc.created_at) as last_workout_date
       FROM trainer_clients tc
       JOIN users u ON tc.client_user_id = u.user_id
-      LEFT JOIN workouts w ON u.user_id = w.user_id
+      LEFT JOIN workout_checkins wc ON u.user_id = wc.user_id
       WHERE tc.trainer_id = ${trainerId} AND tc.status = 'active'
-      GROUP BY u.user_id, tc.status, tc.started_at
+      GROUP BY 
+        u.user_id, u.pin, u.name, u.age, u.gender, u.height, 
+        u.current_weight, u.initial_weight, u.target_weight, u.partner_gym_id,
+        u.subscription_status, u.subscription_plan_id, u.personal_trainer_id, u.created_at,
+        tc.status, tc.started_at
       ORDER BY tc.started_at DESC
     `
 

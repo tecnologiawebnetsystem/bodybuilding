@@ -34,9 +34,10 @@ export function SocialFeed({ userId }: { userId: string }) {
       setLoading(true)
       const response = await fetch(`/api/social/posts?userId=${userId}&feedType=${feedType}`)
       const data = await response.json()
-      setPosts(data)
+      setPosts(Array.isArray(data) ? data : [])
     } catch (error) {
       console.error("Error fetching posts:", error)
+      setPosts([])
     } finally {
       setLoading(false)
     }

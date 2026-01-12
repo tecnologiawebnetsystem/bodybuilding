@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const users = await sql`
-      SELECT user_id, name, pin, height, target_weight, current_weight, gender, age, initial_weight, start_date 
+      SELECT user_id, name, pin, height, target_weight, current_weight, gender, age, initial_weight, start_date, email, profile_photo_url 
       FROM users
       WHERE user_id = ${userId}
     `
@@ -57,30 +57,64 @@ export async function PUT(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json()
-    const { userId, pin } = body
+    const { userId, pin, email, profilePhoto } = body
 
-    if (!userId || !pin) {
-      return NextResponse.json({ error: "userId e pin são obrigatórios" }, { status: 400 })
+    if (!userId) {
+      return NextResponse.json({ error: "userId é obrigatório" }, { status: 400 })
     }
 
-    if (pin.length !== 4) {
-      return NextResponse.json({ error: "PIN deve ter 4 dígitos" }, { status: 400 })
+    if (pin) {
+      if (pin.length !== 4) {
+        return NextResponse.json({ error: "PIN deve ter 4 dígitos" }, { status: 400 })
+      }
+
+      const result = await sql`
+        UPDATE users
+        SET pin = ${pin}
+        WHERE user_id = ${userId}
+        RETURNING user_id, name
+      `
+
+      if (result.length === 0) {
+        return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
+      }
+
+      return NextResponse.json({ success: true, data: result[0] })
     }
 
-    const result = await sql`
-      UPDATE users
-      SET pin = ${pin}
-      WHERE user_id = ${userId}
-      RETURNING user_id, name
-    `
+    if (email !== undefined) {
+      const result = await sql`
+        UPDATE users
+        SET email = ${email}
+        WHERE user_id = ${userId}
+        RETURNING user_id, name, email
+      `
 
-    if (result.length === 0) {
-      return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
+      if (result.length === 0) {
+        return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
+      }
+
+      return NextResponse.json({ success: true, data: result[0] })
     }
 
-    return NextResponse.json({ success: true, data: result[0] })
+    if (profilePhoto !== undefined) {
+      const result = await sql`
+        UPDATE users
+        SET profile_photo_url = ${profilePhoto}
+        WHERE user_id = ${userId}
+        RETURNING user_id, name, profile_photo_url
+      `
+
+      if (result.length === 0) {
+        return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
+      }
+
+      return NextResponse.json({ success: true, data: result[0] })
+    }
+
+    return NextResponse.json({ error: "Nenhum campo para atualizar" }, { status: 400 })
   } catch (error) {
-    console.error("[v0] Error updating PIN:", error)
-    return NextResponse.json({ error: "Erro ao atualizar PIN" }, { status: 500 })
+    console.error("[v0] Error updating user:", error)
+    return NextResponse.json({ error: "Erro ao atualizar usuário" }, { status: 500 })
   }
 }

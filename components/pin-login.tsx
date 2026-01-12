@@ -41,10 +41,13 @@ export function PinLogin({ onLogin }: PinLoginProps) {
 
   const handleLogin = () => {
     if (pin === "080754") {
+      sessionStorage.setItem("userId", "kleber")
       onLogin("kleber")
     } else if (pin === "191018") {
+      sessionStorage.setItem("userId", "pamela")
       onLogin("pamela")
     } else if (pin === "862401") {
+      sessionStorage.setItem("userId", "juliana")
       onLogin("juliana")
     } else {
       setError("PIN incorreto! Tente novamente.")
@@ -58,10 +61,11 @@ export function PinLogin({ onLogin }: PinLoginProps) {
 
       <button
         onClick={() => router.push("/admin")}
-        className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-background/20 hover:bg-background/40 backdrop-blur-sm flex items-center justify-center transition-all opacity-30 hover:opacity-100"
+        className="absolute top-4 right-4 z-20 px-4 py-2 rounded-lg bg-slate-900/80 hover:bg-slate-900 backdrop-blur-sm flex items-center gap-2 transition-all text-white shadow-lg hover:shadow-xl"
         aria-label="Admin"
       >
-        <Settings className="w-4 h-4 text-white/70" />
+        <Settings className="w-4 h-4" />
+        <span className="text-sm font-medium">Admin</span>
       </button>
 
       <Card className="w-full max-w-md relative z-10 bg-background/95 backdrop-blur border-4 border-primary/30 shadow-2xl">

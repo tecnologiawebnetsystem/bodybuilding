@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       posts = await sql`
         SELECT 
           sp.*,
-          u.user_id, u.name as user_name, u.weight, u.height,
+          u.user_id, u.name as user_name, u.current_weight, u.height,
           EXISTS(SELECT 1 FROM post_likes WHERE post_id = sp.id AND user_id = ${userId}) as user_liked
         FROM social_posts sp
         JOIN users u ON sp.user_id = u.user_id
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       posts = await sql`
         SELECT 
           sp.*,
-          u.user_id, u.name as user_name, u.weight, u.height,
+          u.user_id, u.name as user_name, u.current_weight, u.height,
           EXISTS(SELECT 1 FROM post_likes WHERE post_id = sp.id AND user_id = ${userId}) as user_liked
         FROM social_posts sp
         JOIN users u ON sp.user_id = u.user_id
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       posts = await sql`
         SELECT 
           sp.*,
-          u.user_id, u.name as user_name, u.weight, u.height,
+          u.user_id, u.name as user_name, u.current_weight, u.height,
           ${userId ? sql`EXISTS(SELECT 1 FROM post_likes WHERE post_id = sp.id AND user_id = ${userId})` : sql`false`} as user_liked
         FROM social_posts sp
         JOIN users u ON sp.user_id = u.user_id
