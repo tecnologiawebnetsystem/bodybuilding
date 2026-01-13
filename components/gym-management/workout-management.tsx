@@ -201,15 +201,15 @@ export function WorkoutManagement() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Gestão de Treinos</h2>
-          <p className="text-muted-foreground mt-1">Crie, edite e gerencie os treinos detalhados de cada aluno</p>
+          <p className="text-muted-foreground mt-2">Crie, edite e gerencie os treinos detalhados de cada aluno</p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <Button variant="outline" onClick={handleGenerateWithAI} disabled={!selectedStudent || isGenerating}>
             <Sparkles className="h-4 w-4 mr-2" />
             {isGenerating ? "Gerando..." : "Gerar com IA"}
@@ -219,11 +219,11 @@ export function WorkoutManagement() {
 
       {/* Seleção de Aluno */}
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-4">
           <CardTitle>Selecione o Aluno</CardTitle>
           <CardDescription>Escolha o aluno para visualizar e editar seus treinos</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-2">
           <Select value={selectedStudent} onValueChange={setSelectedStudent}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Selecione um aluno..." />
@@ -241,31 +241,33 @@ export function WorkoutManagement() {
 
       {/* Plano de Treinos */}
       {selectedStudent && (
-        <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-6">
           {DAYS_OF_WEEK.map((dayName, dayIndex) => {
             const dayWorkout = workoutPlan.find((w) => w.day_of_week === dayIndex)
 
             return (
-              <Card key={dayIndex} className="relative">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium">{dayName}</CardTitle>
+              <Card key={dayIndex} className="relative hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-base font-semibold">{dayName}</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
+                <CardContent className="space-y-3">
                   {dayWorkout ? (
                     <>
-                      <div className="space-y-1">
+                      <div className="space-y-2">
                         <p className="font-semibold text-sm">{dayWorkout.workout_name}</p>
                         <p className="text-xs text-muted-foreground line-clamp-2">{dayWorkout.description}</p>
                       </div>
 
                       {dayWorkout.exercises && dayWorkout.exercises.length > 0 && (
-                        <div className="text-xs text-muted-foreground">{dayWorkout.exercises.length} exercícios</div>
+                        <div className="text-xs text-muted-foreground bg-slate-50 px-2 py-1 rounded">
+                          {dayWorkout.exercises.length} exercícios
+                        </div>
                       )}
 
                       <Button
                         variant="outline"
                         size="sm"
-                        className="w-full mt-2 bg-transparent"
+                        className="w-full mt-3 bg-transparent hover:bg-slate-50"
                         onClick={() => handleEditDay(dayWorkout)}
                       >
                         <Edit className="h-3 w-3 mr-1" />

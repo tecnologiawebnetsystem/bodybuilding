@@ -29,6 +29,22 @@ import { EmployeesManagementTable } from "@/components/gym-management/employees-
 import { ExpensesManagementTable } from "@/components/gym-management/expenses-management-table"
 import { AttendanceManagementTable } from "@/components/gym-management/attendance-management-table"
 import { WorkoutManagement } from "@/components/gym-management/workout-management" // Importando componente de treinos
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Building2, User, Lock, Palette, FileText, Download, Upload } from "lucide-react"
+import {
+  GymDataDialog,
+  ChangePasswordDialog,
+  AutoMessagesDialog,
+  ExportReportsDialog,
+} from "@/components/gym-management/settings-dialogs"
+import { toast } from "@/components/ui/use-toast"
 
 type MenuOption =
   | "dashboard"
@@ -44,6 +60,12 @@ type MenuOption =
 export function AdminPanel({ adminUsername, onLogout }: { adminUsername: string; onLogout: () => void }) {
   const [activeMenu, setActiveMenu] = useState<MenuOption>("dashboard")
   const [notifications, setNotifications] = useState(3)
+  const [settingsDialogOpen, setSettingsDialogOpen] = useState(false)
+
+  const [gymDataDialogOpen, setGymDataDialogOpen] = useState(false)
+  const [changePasswordDialogOpen, setChangePasswordDialogOpen] = useState(false)
+  const [autoMessagesDialogOpen, setAutoMessagesDialogOpen] = useState(false)
+  const [exportReportsDialogOpen, setExportReportsDialogOpen] = useState(false)
 
   const menuSections = [
     {
@@ -107,9 +129,90 @@ export function AdminPanel({ adminUsername, onLogout }: { adminUsername: string;
             )}
           </Button>
 
-          <Button variant="ghost" size="icon">
-            <Settings className="w-5 h-5 text-slate-600" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Settings className="w-5 h-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuLabel>Configurações da Academia</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem className="cursor-pointer" onClick={() => setGymDataDialogOpen(true)}>
+                <Building2 className="mr-2 h-4 w-4" />
+                <span>Dados da Academia</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => {
+                  toast({
+                    title: "Funcionalidade em Desenvolvimento",
+                    description: "Em breve você poderá editar seu perfil completo de administrador.",
+                  })
+                }}
+              >
+                <User className="mr-2 h-4 w-4" />
+                <span>Meu Perfil</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem className="cursor-pointer" onClick={() => setChangePasswordDialogOpen(true)}>
+                <Lock className="mr-2 h-4 w-4" />
+                <span>Alterar Senha/PIN</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Personalização</DropdownMenuLabel>
+
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => {
+                  toast({
+                    title: "Personalização de Tema",
+                    description: "Em breve você poderá personalizar cores e tema do sistema.",
+                  })
+                }}
+              >
+                <Palette className="mr-2 h-4 w-4" />
+                <span>Tema e Cores</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => {
+                  toast({
+                    title: "Termos de Contrato",
+                    description: "Em breve você poderá configurar os termos de contrato personalizados.",
+                  })
+                }}
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                <span>Termos de Contrato</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Dados</DropdownMenuLabel>
+
+              <DropdownMenuItem className="cursor-pointer" onClick={() => setExportReportsDialogOpen(true)}>
+                <Download className="mr-2 h-4 w-4" />
+                <span>Exportar Relatórios</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => {
+                  toast({
+                    title: "Importar Dados",
+                    description: "Em breve você poderá importar alunos e dados em massa via Excel.",
+                  })
+                }}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                <span>Importar Dados</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
             <Avatar className="w-9 h-9">
@@ -186,10 +289,10 @@ export function AdminPanel({ adminUsername, onLogout }: { adminUsername: string;
         </aside>
 
         <main className="flex-1 overflow-auto">
-          <div className="min-h-full">
+          <div className="p-8 min-h-full">
             {activeMenu === "dashboard" && <GymDashboard />}
             {activeMenu === "students" && <StudentsManagementTable />}
-            {activeMenu === "workouts" && <WorkoutManagement />} // Renderizando componente de treinos
+            {activeMenu === "workouts" && <WorkoutManagement />}
             {activeMenu === "plans" && <PlansManagementTable />}
             {activeMenu === "payment-methods" && <PaymentMethodsManagementTable />}
             {activeMenu === "student-payments" && <StudentPaymentsManagementTable />}
@@ -220,6 +323,11 @@ export function AdminPanel({ adminUsername, onLogout }: { adminUsername: string;
           </footer>
         </main>
       </div>
+
+      <GymDataDialog open={gymDataDialogOpen} onOpenChange={setGymDataDialogOpen} />
+      <ChangePasswordDialog open={changePasswordDialogOpen} onOpenChange={setChangePasswordDialogOpen} />
+      <AutoMessagesDialog open={autoMessagesDialogOpen} onOpenChange={setAutoMessagesDialogOpen} />
+      <ExportReportsDialog open={exportReportsDialogOpen} onOpenChange={setExportReportsDialogOpen} />
     </div>
   )
 }
