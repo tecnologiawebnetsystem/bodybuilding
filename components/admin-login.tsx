@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card"
 import { Shield, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
 
-export function AdminLogin({ onLogin }: { onLogin: (username: string) => void }) {
+export function AdminLogin({ onLogin }: { onLogin: (userData: any) => void }) {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -32,7 +32,7 @@ export function AdminLogin({ onLogin }: { onLogin: (username: string) => void })
       const data = await response.json()
 
       if (response.ok) {
-        onLogin(data.admin.username)
+        onLogin(data)
       } else {
         setError(data.error || "Erro ao fazer login")
       }

@@ -2,25 +2,41 @@
 
 import { useState } from "react"
 import { AdminLogin } from "@/components/admin-login"
+import { WelcomeDashboard } from "@/components/welcome-dashboard"
 import { AdminPanel } from "@/components/admin-panel"
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [adminUsername, setAdminUsername] = useState("")
+  const [showWelcome, setShowWelcome] = useState(false)
+  const [userData, setUserData] = useState<any>(null)
 
-  const handleLogin = (username: string) => {
-    setAdminUsername(username)
+  const handleLogin = (data: any) => {
+    setUserData(data)
+    setShowWelcome(true)
+  }
+
+  const handleContinue = () => {
+    setShowWelcome(false)
     setIsAuthenticated(true)
   }
 
   const handleLogout = () => {
     setIsAuthenticated(false)
-    setAdminUsername("")
+    setShowWelcome(false)
+    setUserData(null)
   }
 
-  if (!isAuthenticated) {
+  if (!userData) {
     return <AdminLogin onLogin={handleLogin} />
   }
 
-  return <AdminPanel adminUsername={adminUsername} onLogout={handleLogout} />
+  if (showWelcome) {
+    return <WelcomeDashboard userData={userData} onContinue={handleContinue} />
+  }
+
+  if (isAuthenticated) {
+    return <AdminPanel adminUsername={userData.user.name} onLogout={handleLogout} />
+  }
+
+  return null
 }
