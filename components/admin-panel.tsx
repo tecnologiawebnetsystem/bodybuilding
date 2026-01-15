@@ -18,6 +18,12 @@ import {
   Search,
   Dumbbell,
   ChevronRight,
+  QrCode,
+  UserPlus,
+  Megaphone,
+  CalendarCheck,
+  Package,
+  TrendingUp,
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { GymDashboard } from "@/components/gym-management/gym-dashboard"
@@ -29,6 +35,13 @@ import { EmployeesManagementTable } from "@/components/gym-management/employees-
 import { ExpensesManagementTable } from "@/components/gym-management/expenses-management-table"
 import { AttendanceManagementTable } from "@/components/gym-management/attendance-management-table"
 import { WorkoutManagement } from "@/components/gym-management/workout-management" // Importando componente de treinos
+import { LeadsCRM } from "@/components/gym-management/leads-crm"
+import { ClassesManagement } from "@/components/gym-management/classes-management"
+import { MarketingCampaigns } from "@/components/gym-management/marketing-campaigns"
+import { ContractsManagement } from "@/components/gym-management/contracts-management"
+import { FinancialReports } from "@/components/gym-management/financial-reports"
+import { BillingAutomation } from "@/components/gym-management/billing-automation"
+import { QRCodeCheckin } from "@/components/gym-management/qr-code-checkin"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,13 +62,20 @@ import { toast } from "@/components/ui/use-toast"
 type MenuOption =
   | "dashboard"
   | "students"
-  | "workouts" // Adicionando opção de treinos
+  | "workouts"
   | "plans"
   | "payment-methods"
   | "student-payments"
   | "employees"
   | "expenses"
   | "attendance"
+  | "leads"
+  | "classes"
+  | "marketing"
+  | "contracts"
+  | "financial-reports" // Adicionando relatórios financeiros
+  | "billing" // Adicionando cobrança automatizada
+  | "checkin" // Adicionando checkin QR Code
 
 export function AdminPanel({ adminUsername, onLogout }: { adminUsername: string; onLogout: () => void }) {
   const [activeMenu, setActiveMenu] = useState<MenuOption>("dashboard")
@@ -69,28 +89,42 @@ export function AdminPanel({ adminUsername, onLogout }: { adminUsername: string;
 
   const menuSections = [
     {
-      title: "Visão Geral",
-      items: [{ id: "dashboard" as MenuOption, label: "Dashboard", icon: LayoutDashboard }],
-    },
-    {
-      title: "Gestão de Membros",
+      title: "VISÃO GERAL",
       items: [
-        { id: "students" as MenuOption, label: "Alunos", icon: Users },
-        { id: "workouts" as MenuOption, label: "Treinos", icon: Dumbbell },
-        { id: "attendance" as MenuOption, label: "Frequência", icon: Calendar },
+        { id: "dashboard" as MenuOption, label: "Dashboard", icon: LayoutDashboard },
+        { id: "checkin" as MenuOption, label: "Check-in QR Code", icon: QrCode }, // Novo menu
       ],
     },
     {
-      title: "Financeiro",
+      title: "CRM & VENDAS",
       items: [
-        { id: "plans" as MenuOption, label: "Planos", icon: CreditCard },
+        { id: "leads" as MenuOption, label: "Leads & Prospects", icon: UserPlus },
+        { id: "marketing" as MenuOption, label: "Campanhas Marketing", icon: Megaphone },
+        { id: "contracts" as MenuOption, label: "Contratos Digitais", icon: FileText },
+      ],
+    },
+    {
+      title: "GESTÃO DE MEMBROS",
+      items: [
+        { id: "students" as MenuOption, label: "Alunos", icon: Users },
+        { id: "workouts" as MenuOption, label: "Treinos", icon: Dumbbell },
+        { id: "classes" as MenuOption, label: "Aulas Coletivas", icon: Calendar },
+        { id: "attendance" as MenuOption, label: "Frequência", icon: CalendarCheck },
+      ],
+    },
+    {
+      title: "FINANCEIRO",
+      items: [
+        { id: "financial-reports" as MenuOption, label: "Relatórios Financeiros", icon: TrendingUp }, // Novo menu
+        { id: "billing" as MenuOption, label: "Cobrança Automatizada", icon: CreditCard }, // Novo menu
+        { id: "plans" as MenuOption, label: "Planos", icon: Package },
         { id: "student-payments" as MenuOption, label: "Pagamentos Alunos", icon: Receipt },
         { id: "payment-methods" as MenuOption, label: "Formas de Pagamento", icon: Wallet },
         { id: "expenses" as MenuOption, label: "Despesas", icon: TrendingDown },
       ],
     },
     {
-      title: "Recursos Humanos",
+      title: "RECURSOS HUMANOS",
       items: [{ id: "employees" as MenuOption, label: "Funcionários", icon: Briefcase }],
     },
   ]
@@ -293,12 +327,19 @@ export function AdminPanel({ adminUsername, onLogout }: { adminUsername: string;
             {activeMenu === "dashboard" && <GymDashboard />}
             {activeMenu === "students" && <StudentsManagementTable />}
             {activeMenu === "workouts" && <WorkoutManagement />}
+            {activeMenu === "leads" && <LeadsCRM />}
+            {activeMenu === "classes" && <ClassesManagement />}
+            {activeMenu === "marketing" && <MarketingCampaigns />}
+            {activeMenu === "contracts" && <ContractsManagement />}
             {activeMenu === "plans" && <PlansManagementTable />}
             {activeMenu === "payment-methods" && <PaymentMethodsManagementTable />}
             {activeMenu === "student-payments" && <StudentPaymentsManagementTable />}
             {activeMenu === "employees" && <EmployeesManagementTable />}
             {activeMenu === "expenses" && <ExpensesManagementTable />}
             {activeMenu === "attendance" && <AttendanceManagementTable />}
+            {activeMenu === "financial-reports" && <FinancialReports />}
+            {activeMenu === "billing" && <BillingAutomation />}
+            {activeMenu === "checkin" && <QRCodeCheckin />}
           </div>
 
           <footer className="bg-white border-t border-slate-200 px-8 py-4 mt-auto">
