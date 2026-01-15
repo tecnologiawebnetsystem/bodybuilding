@@ -16,16 +16,16 @@ export default function HomePage() {
           </div>
           <nav className="hidden md:flex items-center gap-8">
             <Link href="#features" className="text-gray-300 hover:text-white transition">
-              Features
+              Funcionalidades
             </Link>
             <Link href="#pricing" className="text-gray-300 hover:text-white transition">
-              Pricing
+              Planos
             </Link>
-            <Link href="/admin" className="text-gray-300 hover:text-white transition">
-              Login Admin
+            <Link href="/login" className="text-gray-300 hover:text-white transition">
+              Fazer Login
             </Link>
             <Button size="sm" className="bg-gradient-to-r from-red-600 to-orange-500">
-              <Link href="/app-mobile">Try App</Link>
+              <Link href="/app-mobile">Experimentar App</Link>
             </Button>
           </nav>
         </div>
@@ -34,25 +34,25 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-6 py-24 text-center">
         <div className="inline-block mb-4 px-4 py-2 bg-white/5 rounded-full border border-white/10">
-          <span className="text-sm text-gray-300">🚀 Complete Gym Management System</span>
+          <span className="text-sm text-gray-300">🚀 Sistema Completo de Gestão para Academias</span>
         </div>
 
         <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 leading-tight">
-          Transform Your <br />
+          Transforme a <br />
           <span className="bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">
-            Gym Management
+            Gestão da Sua Academia
           </span>
         </h1>
 
         <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-          Complete CRM system for gyms and personal trainers. Manage members, workouts, payments, and grow your business
-          all in one place.
+          Sistema CRM completo para academias e personal trainers. Gerencie alunos, treinos, pagamentos e expanda seu
+          negócio em um só lugar.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-6">
             <Link href="/app-mobile" className="flex items-center gap-2">
-              Get Started Free <ArrowRight className="w-5 h-5" />
+              Começar Grátis <ArrowRight className="w-5 h-5" />
             </Link>
           </Button>
           <Button
@@ -60,13 +60,13 @@ export default function HomePage() {
             variant="outline"
             className="border-white/20 text-white hover:bg-white/5 text-lg px-8 py-6 bg-transparent"
           >
-            <Link href="#features">View Features</Link>
+            <Link href="#features">Ver Funcionalidades</Link>
           </Button>
         </div>
 
         {/* App Download Buttons */}
         <div className="flex flex-col items-center gap-4 mb-8">
-          <p className="text-gray-400 text-sm">Download Mobile App</p>
+          <p className="text-gray-400 text-sm">Baixe o Aplicativo Mobile</p>
           <div className="flex gap-4">
             <Link
               href="/app-mobile"
@@ -74,7 +74,7 @@ export default function HomePage() {
             >
               <Smartphone className="w-6 h-6 text-white" />
               <div className="text-left">
-                <p className="text-xs text-gray-400">Download on</p>
+                <p className="text-xs text-gray-400">Disponível no</p>
                 <p className="text-sm font-semibold text-white">Google Play</p>
               </div>
             </Link>
@@ -84,7 +84,7 @@ export default function HomePage() {
             >
               <Smartphone className="w-6 h-6 text-white" />
               <div className="text-left">
-                <p className="text-xs text-gray-400">Download on</p>
+                <p className="text-xs text-gray-400">Disponível na</p>
                 <p className="text-sm font-semibold text-white">App Store</p>
               </div>
             </Link>
@@ -95,41 +95,41 @@ export default function HomePage() {
       {/* Features Section */}
       <section id="features" className="max-w-7xl mx-auto px-6 py-24">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-white mb-4">Everything You Need</h2>
-          <p className="text-gray-400 text-lg">Complete gym management in one powerful platform</p>
+          <h2 className="text-4xl font-bold text-white mb-4">Tudo que Você Precisa</h2>
+          <p className="text-gray-400 text-lg">Gestão completa de academia em uma plataforma poderosa</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[
             {
               icon: Users,
-              title: "Member Management",
-              desc: "Complete CRM with lead tracking, contracts, and automated communications",
+              title: "Gestão de Alunos",
+              desc: "CRM completo com acompanhamento de leads, contratos e comunicações automatizadas",
             },
             {
               icon: Dumbbell,
-              title: "Workout Planning",
-              desc: "AI-powered workout generation and detailed exercise tracking for every member",
+              title: "Planejamento de Treinos",
+              desc: "Geração de treinos com IA e acompanhamento detalhado de exercícios para cada aluno",
             },
             {
               icon: TrendingUp,
-              title: "Financial Reports",
-              desc: "Advanced analytics with revenue tracking, expenses, and profit analysis",
+              title: "Relatórios Financeiros",
+              desc: "Análises avançadas com acompanhamento de receitas, despesas e análise de lucro",
             },
             {
               icon: Calendar,
-              title: "Class Scheduling",
-              desc: "Group classes management with booking system and capacity control",
+              title: "Agendamento de Aulas",
+              desc: "Gestão de aulas coletivas com sistema de reservas e controle de capacidade",
             },
             {
               icon: CheckCircle,
-              title: "QR Code Check-in",
-              desc: "Fast member check-in with QR code scanning and attendance tracking",
+              title: "Check-in QR Code",
+              desc: "Check-in rápido de alunos com leitura de QR code e rastreamento de frequência",
             },
             {
               icon: Smartphone,
-              title: "Mobile App",
-              desc: "Native iOS and Android apps for members to track progress anywhere",
+              title: "App Mobile",
+              desc: "Aplicativos nativos iOS e Android para alunos acompanharem progresso em qualquer lugar",
             },
           ].map((feature, i) => (
             <div key={i} className="p-8 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition">
@@ -144,23 +144,27 @@ export default function HomePage() {
       {/* Pricing Section */}
       <section id="pricing" className="max-w-7xl mx-auto px-6 py-24">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-white mb-4">Simple Pricing</h2>
-          <p className="text-gray-400 text-lg">Start free, upgrade as you grow</p>
+          <h2 className="text-4xl font-bold text-white mb-4">Planos Simples</h2>
+          <p className="text-gray-400 text-lg">Comece grátis, evolua conforme cresce</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {[
-            { name: "Starter", price: "Free", features: ["Up to 50 members", "Basic features", "Mobile app access"] },
             {
-              name: "Pro",
-              price: "$49",
-              features: ["Unlimited members", "All features", "Priority support", "Custom branding"],
+              name: "Iniciante",
+              price: "Grátis",
+              features: ["Até 50 alunos", "Funcionalidades básicas", "Acesso ao app mobile"],
+            },
+            {
+              name: "Profissional",
+              price: "R$ 149",
+              features: ["Alunos ilimitados", "Todas as funcionalidades", "Suporte prioritário", "Marca personalizada"],
               popular: true,
             },
             {
-              name: "Enterprise",
-              price: "Custom",
-              features: ["Multiple locations", "Dedicated support", "Custom integrations"],
+              name: "Empresarial",
+              price: "Personalizado",
+              features: ["Múltiplas unidades", "Suporte dedicado", "Integrações personalizadas"],
             },
           ].map((plan, i) => (
             <div
@@ -169,13 +173,15 @@ export default function HomePage() {
             >
               {plan.popular && (
                 <span className="inline-block px-3 py-1 bg-orange-500 text-white text-xs font-semibold rounded-full mb-4">
-                  Most Popular
+                  Mais Popular
                 </span>
               )}
               <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
               <div className="mb-6">
                 <span className="text-4xl font-bold text-white">{plan.price}</span>
-                {plan.price !== "Custom" && <span className="text-gray-400">/month</span>}
+                {plan.price !== "Personalizado" && plan.price !== "Grátis" && (
+                  <span className="text-gray-400">/mês</span>
+                )}
               </div>
               <ul className="space-y-3 mb-8">
                 {plan.features.map((feature, j) => (
@@ -186,7 +192,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <Button className="w-full" variant={plan.popular ? "default" : "outline"}>
-                <Link href="/app-mobile">Get Started</Link>
+                <Link href="/app-mobile">Começar Agora</Link>
               </Button>
             </div>
           ))}
@@ -202,7 +208,7 @@ export default function HomePage() {
             </div>
             <span className="text-xl font-bold text-white">FitTransform</span>
           </div>
-          <p className="text-gray-400 text-sm">© 2026 FitTransform. All rights reserved.</p>
+          <p className="text-gray-400 text-sm">© 2026 FitTransform. Todos os direitos reservados.</p>
         </div>
       </footer>
     </div>
