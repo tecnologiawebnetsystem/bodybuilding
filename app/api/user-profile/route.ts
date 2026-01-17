@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const users = await sql`
-      SELECT user_id, name, pin, height, target_weight, current_weight, gender, age, initial_weight, start_date, email, profile_photo_url 
+      SELECT user_id, name, pin, height, target_weight, current_weight, gender, age, initial_weight, start_date, email, profile_photo_url, cpf
       FROM users
       WHERE user_id = ${userId}
     `
@@ -57,15 +57,31 @@ export async function PUT(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json()
-    const { userId, pin, email, profilePhoto } = body
+    const { userId, pin, email, profilePhoto, cpf, currentPin } = body
 
     if (!userId) {
       return NextResponse.json({ error: "userId é obrigatório" }, { status: 400 })
     }
 
     if (pin) {
-      if (pin.length !== 4) {
-        return NextResponse.json({ error: "PIN deve ter 4 dígitos" }, { status: 400 })
+      if (!currentPin) {
+        return NextResponse.json({ error: "PIN atual é obrigatório", success: false }, { status: 400 })
+      }
+
+      if (pin.length !== 6) {
+        return NextResponse.json({ error: "Novo PIN deve ter 6 dígitos", success: false }, { status: 400 })
+      }
+
+      // Verificar PIN atual
+      const userCheck = await sql`
+        SELECT user_id FROM users WHERE user_id = ${userId} AND pin = ${currentPin}
+      `
+
+      if (userCheck.length === 0) {
+        return NextResponse.json(
+          { error: "PIN atual incorreto", success: false, message: "PIN atual incorreto" },
+          { status: 401 },
+        )
       }
 
       const result = await sql`
@@ -76,7 +92,42 @@ export async function PATCH(request: NextRequest) {
       `
 
       if (result.length === 0) {
-        return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
+        return NextResponse.json({ error: "Usuário não encontrado", success: false }, { status: 404 })
+      }
+
+      return NextResponse.json({ success: true, data: result[0] })
+    }
+
+    if (cpf !== undefined) {
+      if (!currentPin) {
+        return NextResponse.json({ error: "PIN atual é obrigatório", success: false }, { status: 400 })
+      }
+
+      // Verificar PIN atual
+      const userCheck = await sql`
+        SELECT user_id FROM users WHERE user_id = ${userId} AND pin = ${currentPin}
+      `
+
+      if (userCheck.length === 0) {
+        return NextResponse.json(
+          {
+            error: "PIN atual incorreto",
+            success: false,
+            message: "PIN atual incorreto",
+          },
+          { status: 401 },
+        )
+      }
+
+      const result = await sql`
+        UPDATE users
+        SET cpf = ${cpf}
+        WHERE user_id = ${userId}
+        RETURNING user_id, name, cpf
+      `
+
+      if (result.length === 0) {
+        return NextResponse.json({ error: "Usuário não encontrado", success: false }, { status: 404 })
       }
 
       return NextResponse.json({ success: true, data: result[0] })

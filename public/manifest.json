@@ -2,12 +2,12 @@
   "name": "FitTransform - Academia e Fitness",
   "short_name": "FitTransform",
   "description": "Sistema completo de treinos, corrida, nutrição e acompanhamento personalizado",
-  "start_url": "/",
+  "start_url": "/app-mobile",
   "display": "standalone",
   "background_color": "#0a0a0a",
-  "theme_color": "#3b82f6",
+  "theme_color": "#f97316",
   "orientation": "portrait-primary",
-  "scope": "/",
+  "scope": "/app-mobile",
   "categories": ["health", "fitness", "lifestyle"],
   "icons": [
     {

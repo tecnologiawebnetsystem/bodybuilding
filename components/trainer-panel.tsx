@@ -40,55 +40,55 @@ export function TrainerPanel({
   ]
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-white border-b border-slate-200 h-16 flex items-center px-6 sticky top-0 z-50 shadow-sm">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 flex flex-col">
+      <header className="bg-black/40 backdrop-blur-sm border-b border-white/10 h-16 flex items-center px-6 sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
             <Dumbbell className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-slate-900">Portal Personal Trainer</h1>
-            <p className="text-xs text-slate-600">Gestão de Clientes</p>
+            <h1 className="text-lg font-bold text-white">Portal Personal Trainer</h1>
+            <p className="text-xs text-gray-400">Gestão de Clientes</p>
           </div>
         </div>
 
         <div className="flex-1 max-w-xl mx-auto px-8">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
               type="search"
               placeholder="Buscar alunos, treinos..."
-              className="pl-10 bg-slate-50 border-slate-200"
+              className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-gray-400"
             />
           </div>
         </div>
 
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="w-5 h-5 text-slate-600" />
+          <Button variant="ghost" size="icon" className="relative hover:bg-white/10">
+            <Bell className="w-5 h-5 text-gray-300" />
             {notifications > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 bg-blue-500 rounded-full text-[10px] text-white flex items-center justify-center">
+              <span className="absolute top-1 right-1 w-4 h-4 bg-gradient-to-r from-orange-500 to-red-600 rounded-full text-[10px] text-white flex items-center justify-center">
                 {notifications}
               </span>
             )}
           </Button>
 
-          <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
+          <div className="flex items-center gap-3 pl-4 border-l border-white/10">
             <Avatar className="w-9 h-9">
-              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+              <AvatarFallback className="bg-gradient-to-br from-orange-500 to-red-600 text-white">
                 {trainerName.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="text-sm">
-              <p className="font-medium text-slate-900">{trainerName}</p>
-              <p className="text-xs text-slate-600">Personal Trainer</p>
+              <p className="font-medium text-white">{trainerName}</p>
+              <p className="text-xs text-gray-400">Personal Trainer</p>
             </div>
           </div>
         </div>
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <aside className="w-64 bg-white border-r border-slate-200 flex flex-col shadow-sm">
+        <aside className="w-72 bg-black/40 backdrop-blur-sm border-r border-white/10 flex flex-col">
           <nav className="flex-1 p-4 overflow-y-auto">
             <div className="space-y-1">
               {menuItems.map((item) => {
@@ -100,18 +100,18 @@ export function TrainerPanel({
                     onClick={() => setActiveMenu(item.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all group relative ${
                       isActive
-                        ? "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-600 font-medium shadow-sm"
-                        : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                        ? "bg-gradient-to-r from-orange-500/20 to-red-600/20 text-white font-medium border border-orange-500/30"
+                        : "text-gray-300 hover:bg-white/5 hover:text-white"
                     }`}
                   >
                     <Icon
-                      className={`w-5 h-5 transition-transform group-hover:scale-110 flex-shrink-0 ${isActive ? "text-blue-600" : "text-slate-500"}`}
+                      className={`w-5 h-5 transition-transform group-hover:scale-110 flex-shrink-0 ${isActive ? "text-orange-500" : "text-gray-400"}`}
                     />
                     <span className="text-sm flex-1">{item.label}</span>
                     {isActive && (
                       <>
-                        <ChevronRight className="w-4 h-4 text-blue-600" />
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-600 rounded-r-full"></div>
+                        <ChevronRight className="w-4 h-4 text-orange-500" />
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-orange-500 to-red-600 rounded-r-full"></div>
                       </>
                     )}
                   </button>
@@ -120,10 +120,10 @@ export function TrainerPanel({
             </div>
           </nav>
 
-          <div className="p-4 border-t border-slate-200">
+          <div className="p-4 border-t border-white/10">
             <Button
               variant="outline"
-              className="w-full bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors"
+              className="w-full bg-white/5 hover:bg-white/10 text-white border-white/20 hover:border-white/30 transition-colors"
               onClick={onLogout}
             >
               <LogOut className="w-4 h-4 mr-2" />

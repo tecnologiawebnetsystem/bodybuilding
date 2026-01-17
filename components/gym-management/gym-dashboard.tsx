@@ -2,10 +2,20 @@
 
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
-import { Users, DollarSign, TrendingUp, TrendingDown, Calendar, Briefcase, UserCheck } from "lucide-react"
+import {
+  Users,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  Briefcase,
+  UserCheck,
+  ArrowUpRight,
+  ArrowDownRight,
+} from "lucide-react"
 
 interface DashboardStats {
-  totalStudents: number // Adicionado total de alunos
+  totalStudents: number
   activeStudents: number
   totalRevenue: number
   totalExpenses: number
@@ -56,77 +66,100 @@ export function GymDashboard() {
       value: stats.totalStudents,
       icon: Users,
       color: "from-indigo-500 to-indigo-600",
-      textColor: "text-indigo-600",
+      change: "+5%",
+      up: true,
     },
     {
       title: "Alunos Ativos",
       value: stats.activeStudents,
       icon: UserCheck,
       color: "from-blue-500 to-blue-600",
-      textColor: "text-blue-600",
+      change: "+12%",
+      up: true,
     },
     {
       title: "Receita Mensal",
       value: `R$ ${stats.totalRevenue.toFixed(2)}`,
       icon: TrendingUp,
       color: "from-green-500 to-green-600",
-      textColor: "text-green-600",
+      change: "+8%",
+      up: true,
     },
     {
       title: "Despesas Mensais",
       value: `R$ ${stats.totalExpenses.toFixed(2)}`,
       icon: TrendingDown,
       color: "from-red-500 to-red-600",
-      textColor: "text-red-600",
+      change: "-3%",
+      up: false,
     },
     {
       title: "Pagamentos Pendentes",
       value: stats.pendingPayments,
       icon: DollarSign,
       color: "from-yellow-500 to-yellow-600",
-      textColor: "text-yellow-600",
+      change: "+2",
+      up: false,
     },
     {
       title: "Funcionários",
       value: stats.employees,
       icon: Briefcase,
       color: "from-purple-500 to-purple-600",
-      textColor: "text-purple-600",
+      change: "0",
+      up: true,
     },
     {
       title: "Frequência Semanal",
       value: `${stats.weeklyAttendance.toFixed(0)}%`,
       icon: Calendar,
       color: "from-cyan-500 to-cyan-600",
-      textColor: "text-cyan-600",
+      change: "+4%",
+      up: true,
     },
   ]
 
   if (loading) {
-    return <div className="p-8">Carregando...</div>
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+      </div>
+    )
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-slate-900">Dashboard</h2>
-        <p className="text-slate-600">Visão geral da academia</p>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-white">Visão Geral</h2>
+        <p className="text-gray-400 text-sm">Resumo da performance da academia</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {statsCards.map((stat, index) => {
           const Icon = stat.icon
           return (
-            <Card key={index} className="p-6 hover:shadow-lg transition-shadow">
+            <Card
+              key={index}
+              className="bg-white/[0.03] border-white/[0.08] p-5 hover:bg-white/[0.05] transition-colors"
+            >
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-slate-600 mb-1">{stat.title}</p>
-                  <p className="text-3xl font-bold text-slate-900">{stat.value}</p>
+                  <p className="text-xs text-gray-400 mb-1">{stat.title}</p>
+                  <p className="text-2xl font-bold text-white">{stat.value}</p>
+                  <div className="flex items-center gap-1 mt-2">
+                    {stat.up ? (
+                      <ArrowUpRight className="w-3 h-3 text-green-400" />
+                    ) : (
+                      <ArrowDownRight className="w-3 h-3 text-red-400" />
+                    )}
+                    <span className={`text-xs ${stat.up ? "text-green-400" : "text-red-400"}`}>{stat.change}</span>
+                    <span className="text-xs text-gray-500">vs mês anterior</span>
+                  </div>
                 </div>
                 <div
-                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center`}
+                  className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg`}
                 >
-                  <Icon className="w-6 h-6 text-white" />
+                  <Icon className="w-5 h-5 text-white" />
                 </div>
               </div>
             </Card>
@@ -134,28 +167,88 @@ export function GymDashboard() {
         })}
       </div>
 
-      {/* Financial Summary */}
-      <Card className="mt-8 p-6">
-        <h3 className="text-xl font-bold text-slate-900 mb-4">Resumo Financeiro</h3>
+      <Card className="bg-white/[0.03] border-white/[0.08] p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Resumo Financeiro</h3>
         <div className="space-y-4">
-          <div className="flex justify-between items-center pb-4 border-b border-slate-200">
-            <span className="text-slate-600">Receita Total</span>
-            <span className="text-lg font-bold text-green-600">R$ {stats.totalRevenue.toFixed(2)}</span>
+          <div className="flex justify-between items-center pb-4 border-b border-white/[0.08]">
+            <span className="text-gray-400">Receita Total</span>
+            <span className="text-lg font-bold text-green-400">R$ {stats.totalRevenue.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between items-center pb-4 border-b border-slate-200">
-            <span className="text-slate-600">Despesas Totais</span>
-            <span className="text-lg font-bold text-red-600">R$ {stats.totalExpenses.toFixed(2)}</span>
+          <div className="flex justify-between items-center pb-4 border-b border-white/[0.08]">
+            <span className="text-gray-400">Despesas Totais</span>
+            <span className="text-lg font-bold text-red-400">R$ {stats.totalExpenses.toFixed(2)}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-slate-900 font-medium">Saldo</span>
+            <span className="text-white font-medium">Saldo</span>
             <span
-              className={`text-xl font-bold ${stats.totalRevenue - stats.totalExpenses >= 0 ? "text-green-600" : "text-red-600"}`}
+              className={`text-xl font-bold ${stats.totalRevenue - stats.totalExpenses >= 0 ? "text-green-400" : "text-red-400"}`}
             >
               R$ {(stats.totalRevenue - stats.totalExpenses).toFixed(2)}
             </span>
           </div>
         </div>
       </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card className="bg-white/[0.03] border-white/[0.08] p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Atividade Recente</h3>
+          <div className="space-y-3">
+            {[
+              { action: "Novo aluno matriculado", time: "há 2 horas", type: "success" },
+              { action: "Pagamento recebido - R$ 149,90", time: "há 3 horas", type: "success" },
+              { action: "Check-in realizado", time: "há 4 horas", type: "info" },
+              { action: "Aluno cancelou matrícula", time: "há 1 dia", type: "warning" },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between py-2 border-b border-white/[0.05] last:border-0"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      item.type === "success"
+                        ? "bg-green-400"
+                        : item.type === "warning"
+                          ? "bg-yellow-400"
+                          : "bg-blue-400"
+                    }`}
+                  />
+                  <span className="text-sm text-gray-300">{item.action}</span>
+                </div>
+                <span className="text-xs text-gray-500">{item.time}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="bg-white/[0.03] border-white/[0.08] p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Metas do Mês</h3>
+          <div className="space-y-4">
+            {[
+              { label: "Novos Alunos", current: 12, target: 20, color: "bg-orange-500" },
+              { label: "Receita", current: 42500, target: 50000, color: "bg-green-500", isMoney: true },
+              { label: "Retenção", current: 85, target: 90, color: "bg-blue-500", isPercent: true },
+            ].map((goal, i) => (
+              <div key={i}>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-400">{goal.label}</span>
+                  <span className="text-white">
+                    {goal.isMoney ? `R$ ${goal.current.toLocaleString()}` : goal.current}
+                    {goal.isPercent && "%"} / {goal.isMoney ? `R$ ${goal.target.toLocaleString()}` : goal.target}
+                    {goal.isPercent && "%"}
+                  </span>
+                </div>
+                <div className="w-full bg-white/[0.1] rounded-full h-2">
+                  <div
+                    className={`${goal.color} h-2 rounded-full transition-all`}
+                    style={{ width: `${Math.min((goal.current / goal.target) * 100, 100)}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
     </div>
   )
 }

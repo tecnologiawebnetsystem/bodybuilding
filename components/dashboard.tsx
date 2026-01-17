@@ -50,9 +50,9 @@ interface UserPreferences {
 const getUserPreferences = (userId: string): UserPreferences => {
   const preferencesMap: Record<string, UserPreferences> = {
     kleber: {
-      theme_primary: "#3b82f6",
-      theme_secondary: "#1e40af",
-      theme_accent: "#06b6d4",
+      theme_primary: "#ef4444",
+      theme_secondary: "#f97316",
+      theme_accent: "#fb923c",
       enable_gym_checkin: true,
       enable_gym_workouts: true,
       enable_running: true,
@@ -64,9 +64,9 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_stats: true,
     },
     pamela: {
-      theme_primary: "#ec4899",
-      theme_secondary: "#be185d",
-      theme_accent: "#f472b6",
+      theme_primary: "#ef4444",
+      theme_secondary: "#f97316",
+      theme_accent: "#fb923c",
       enable_gym_checkin: true,
       enable_gym_workouts: true,
       enable_running: true,
@@ -78,9 +78,9 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_stats: true,
     },
     juliana: {
-      theme_primary: "#84cc16",
-      theme_secondary: "#65a30d",
-      theme_accent: "#a3e635",
+      theme_primary: "#ef4444",
+      theme_secondary: "#f97316",
+      theme_accent: "#fb923c",
       enable_gym_checkin: false,
       enable_gym_workouts: false,
       enable_running: true,
@@ -95,9 +95,9 @@ const getUserPreferences = (userId: string): UserPreferences => {
 
   return (
     preferencesMap[userId.toLowerCase()] || {
-      theme_primary: "#3b82f6",
-      theme_secondary: "#1e40af",
-      theme_accent: "#06b6d4",
+      theme_primary: "#ef4444",
+      theme_secondary: "#f97316",
+      theme_accent: "#fb923c",
       enable_gym_checkin: true,
       enable_gym_workouts: true,
       enable_running: true,
@@ -116,7 +116,7 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
     if (typeof window !== "undefined") {
       const savedTab = sessionStorage.getItem("activeTab")
       if (savedTab) {
-        sessionStorage.removeItem("activeTab") // Limpar depois de usar
+        sessionStorage.removeItem("activeTab")
         return savedTab
       }
     }
@@ -187,14 +187,9 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
   ].filter((tab) => tab.enabled)
 
   return (
-    <div
-      className="min-h-screen pb-20"
-      style={{
-        background: `linear-gradient(135deg, ${preferences.theme_primary}10 0%, ${preferences.theme_secondary}10 50%, ${preferences.theme_accent}10 100%)`,
-      }}
-    >
+    <div className="min-h-screen pb-20 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b-2 border-primary/20">
+        <div className="sticky top-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/10">
           <div className="max-w-7xl mx-auto px-2">
             <TabsList
               className="w-full h-16 bg-transparent gap-1 p-1"
@@ -206,11 +201,7 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
                   <TabsTrigger
                     key={tab.id}
                     value={tab.id}
-                    className="flex-col gap-1 text-xs px-1"
-                    style={{
-                      color: activeTab === tab.id ? tab.color : undefined,
-                      backgroundColor: activeTab === tab.id ? `${tab.color}20` : undefined,
-                    }}
+                    className="flex-col gap-1 text-xs px-1 text-gray-400 data-[state=active]:text-white data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600/20 data-[state=active]:to-orange-500/20 data-[state=active]:border data-[state=active]:border-orange-500/30"
                   >
                     <Icon className="w-4 h-4" />
                     <span className="text-[10px]">{tab.label}</span>

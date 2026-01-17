@@ -158,47 +158,47 @@ export function StatsTab({ userId, preferences }: StatsTabProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Estatísticas</h2>
+      <h2 className="text-2xl font-bold text-white">Estatísticas</h2>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card
-          className="p-4 text-center border-2 cursor-pointer hover:opacity-80 transition-opacity"
+          className="p-4 text-center border-2 cursor-pointer hover:opacity-80 transition-opacity bg-white/5"
           style={{ borderColor: preferences.theme_primary + "30" }}
           onClick={() => openDetails("streak")}
         >
           <Flame className="w-8 h-8 mx-auto mb-2" style={{ color: preferences.theme_primary }} />
-          <p className="text-3xl font-bold">{stats?.currentStreak || 0}</p>
-          <p className="text-sm text-muted-foreground">Dias Seguidos</p>
+          <p className="text-3xl font-bold text-white">{stats?.currentStreak || 0}</p>
+          <p className="text-sm text-gray-300">Dias Seguidos</p>
         </Card>
 
         <Card
-          className="p-4 text-center border-2 cursor-pointer hover:opacity-80 transition-opacity"
+          className="p-4 text-center border-2 cursor-pointer hover:opacity-80 transition-opacity bg-white/5"
           style={{ borderColor: preferences.theme_secondary + "30" }}
           onClick={() => openDetails("workouts")}
         >
           <Trophy className="w-8 h-8 mx-auto mb-2" style={{ color: preferences.theme_secondary }} />
-          <p className="text-3xl font-bold">{stats?.totalWorkouts || 0}</p>
-          <p className="text-sm text-muted-foreground">Treinos</p>
+          <p className="text-3xl font-bold text-white">{stats?.totalWorkouts || 0}</p>
+          <p className="text-sm text-gray-300">Treinos</p>
         </Card>
 
         <Card
-          className="p-4 text-center border-2 cursor-pointer hover:opacity-80 transition-opacity"
+          className="p-4 text-center border-2 cursor-pointer hover:opacity-80 transition-opacity bg-white/5"
           style={{ borderColor: preferences.theme_accent + "30" }}
           onClick={() => openDetails("runs")}
         >
           <Activity className="w-8 h-8 mx-auto mb-2" style={{ color: preferences.theme_accent }} />
-          <p className="text-3xl font-bold">{stats?.totalRuns || 0}</p>
-          <p className="text-sm text-muted-foreground">Corridas</p>
+          <p className="text-3xl font-bold text-white">{stats?.totalRuns || 0}</p>
+          <p className="text-sm text-gray-300">Corridas</p>
         </Card>
 
         <Card
-          className="p-4 text-center border-2 cursor-pointer hover:opacity-80 transition-opacity"
+          className="p-4 text-center border-2 cursor-pointer hover:opacity-80 transition-opacity bg-white/5"
           style={{ borderColor: preferences.theme_primary + "30" }}
           onClick={() => openDetails("distance")}
         >
           <Target className="w-8 h-8 mx-auto mb-2" style={{ color: preferences.theme_primary }} />
-          <p className="text-3xl font-bold">{Number(stats?.totalDistance || 0).toFixed(1)}km</p>
-          <p className="text-sm text-muted-foreground">Distância</p>
+          <p className="text-3xl font-bold text-white">{Number(stats?.totalDistance || 0).toFixed(1)}km</p>
+          <p className="text-sm text-gray-300">Distância</p>
         </Card>
       </div>
 
@@ -265,15 +265,13 @@ export function StatsTab({ userId, preferences }: StatsTabProps) {
       </Dialog>
 
       {stats?.weightProgress && stats.weightProgress.length > 0 && (
-        <Card className="p-6">
-          <h3 className="text-lg font-bold mb-4">Evolução do Peso</h3>
+        <Card className="p-6 bg-white/5 border-white/10">
+          <h3 className="text-lg font-bold text-white mb-4">Evolução do Peso</h3>
           <div className="space-y-3">
             {stats.weightProgress.slice(0, 10).map((log: any, idx: number) => (
               <div key={idx} className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  {new Date(log.log_date).toLocaleDateString("pt-BR")}
-                </span>
-                <span className="font-semibold">{log.weight}kg</span>
+                <span className="text-sm text-gray-300">{new Date(log.log_date).toLocaleDateString("pt-BR")}</span>
+                <span className="font-semibold text-white">{log.weight}kg</span>
                 {idx < stats.weightProgress.length - 1 && (
                   <span
                     className={`text-sm ${Number.parseFloat(log.weight) < Number.parseFloat(stats.weightProgress[idx + 1].weight) ? "text-green-600" : "text-red-600"}`}

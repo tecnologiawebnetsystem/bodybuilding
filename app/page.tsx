@@ -6,7 +6,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
       {/* Header */}
-      <header className="border-b border-white/10 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-white/10 backdrop-blur-sm sticky top-0 z-50 bg-gray-950/80">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-orange-500 flex items-center justify-center">
@@ -14,12 +14,18 @@ export default function HomePage() {
             </div>
             <span className="text-2xl font-bold text-white">FitTransform</span>
           </div>
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-6">
             <Link href="#features" className="text-gray-300 hover:text-white transition">
               Funcionalidades
             </Link>
-            <Link href="#pricing" className="text-gray-300 hover:text-white transition">
-              Planos
+            <Link href="/blog" className="text-gray-300 hover:text-white transition">
+              Blog
+            </Link>
+            <Link href="/sobre-nos" className="text-gray-300 hover:text-white transition">
+              Sobre Nós
+            </Link>
+            <Link href="/contato" className="text-gray-300 hover:text-white transition">
+              Contato
             </Link>
             <Link href="/login" className="text-gray-300 hover:text-white transition">
               Fazer Login
@@ -51,8 +57,8 @@ export default function HomePage() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
           <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-6">
-            <Link href="/app-mobile" className="flex items-center gap-2">
-              Começar Grátis <ArrowRight className="w-5 h-5" />
+            <Link href="/get-started" className="flex items-center gap-2">
+              Começar Agora <ArrowRight className="w-5 h-5" />
             </Link>
           </Button>
           <Button
@@ -141,74 +147,166 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="max-w-7xl mx-auto px-6 py-24">
+      {/* About the App Section */}
+      <section className="max-w-7xl mx-auto px-6 py-24 bg-white/5 rounded-3xl my-12">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-white mb-4">Planos Simples</h2>
-          <p className="text-gray-400 text-lg">Comece grátis, evolua conforme cresce</p>
+          <h2 className="text-4xl font-bold text-white mb-4">Sobre o FitTransform</h2>
+          <p className="text-gray-400 text-lg max-w-3xl mx-auto">
+            O FitTransform é uma plataforma completa de gestão para academias, criada para simplificar e otimizar todos
+            os aspectos do seu negócio fitness
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {[
-            {
-              name: "Iniciante",
-              price: "Grátis",
-              features: ["Até 50 alunos", "Funcionalidades básicas", "Acesso ao app mobile"],
-            },
-            {
-              name: "Profissional",
-              price: "R$ 149",
-              features: ["Alunos ilimitados", "Todas as funcionalidades", "Suporte prioritário", "Marca personalizada"],
-              popular: true,
-            },
-            {
-              name: "Empresarial",
-              price: "Personalizado",
-              features: ["Múltiplas unidades", "Suporte dedicado", "Integrações personalizadas"],
-            },
-          ].map((plan, i) => (
-            <div
-              key={i}
-              className={`p-8 rounded-2xl border ${plan.popular ? "bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500" : "bg-white/5 border-white/10"}`}
-            >
-              {plan.popular && (
-                <span className="inline-block px-3 py-1 bg-orange-500 text-white text-xs font-semibold rounded-full mb-4">
-                  Mais Popular
-                </span>
-              )}
-              <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-white">{plan.price}</span>
-                {plan.price !== "Personalizado" && plan.price !== "Grátis" && (
-                  <span className="text-gray-400">/mês</span>
-                )}
-              </div>
-              <ul className="space-y-3 mb-8">
-                {plan.features.map((feature, j) => (
-                  <li key={j} className="flex items-center gap-2 text-gray-300">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <Button className="w-full" variant={plan.popular ? "default" : "outline"}>
-                <Link href="/app-mobile">Começar Agora</Link>
-              </Button>
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-2xl font-bold text-white mb-3">🎯 Para Donos de Academia</h3>
+              <p className="text-gray-400">
+                Gerencie múltiplas unidades, controle financeiro completo, relatórios avançados, gestão de equipe e
+                muito mais. Tudo em um só lugar com interface intuitiva e moderna.
+              </p>
             </div>
-          ))}
+
+            <div>
+              <h3 className="text-2xl font-bold text-white mb-3">💪 Para Personal Trainers</h3>
+              <p className="text-gray-400">
+                Portal exclusivo para criar treinos personalizados com IA, acompanhar evolução dos alunos, gerenciar
+                horários e receber pagamentos de forma automatizada.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-2xl font-bold text-white mb-3">📱 Para Alunos</h3>
+              <p className="text-gray-400">
+                App mobile completo para visualizar treinos, marcar presença com QR code, reservar aulas coletivas e
+                acompanhar progresso físico em tempo real.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="p-6 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-xl">
+              <h4 className="text-lg font-semibold text-white mb-2">✅ Sistema Multi-Tenant</h4>
+              <p className="text-gray-300 text-sm">Perfeito para redes com várias unidades</p>
+            </div>
+
+            <div className="p-6 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-xl">
+              <h4 className="text-lg font-semibold text-white mb-2">🤖 Inteligência Artificial</h4>
+              <p className="text-gray-300 text-sm">Geração automática de treinos personalizados</p>
+            </div>
+
+            <div className="p-6 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-xl">
+              <h4 className="text-lg font-semibold text-white mb-2">💳 Pagamentos Integrados</h4>
+              <p className="text-gray-300 text-sm">Cobrança automatizada com boletos e PIX</p>
+            </div>
+
+            <div className="p-6 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-xl">
+              <h4 className="text-lg font-semibold text-white mb-2">📊 Analytics Completo</h4>
+              <p className="text-gray-300 text-sm">Dashboards e relatórios financeiros detalhados</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-16 text-center">
+          <Button
+            size="lg"
+            className="bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 text-white text-lg px-12 py-6"
+          >
+            <Link href="/get-started" className="flex items-center gap-2">
+              Começar Agora <ArrowRight className="w-5 h-5" />
+            </Link>
+          </Button>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-white/10 py-12">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-orange-500 flex items-center justify-center">
-              <Dumbbell className="w-5 h-5 text-white" />
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-orange-500 flex items-center justify-center">
+                  <Dumbbell className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-bold text-white">FitTransform</span>
+              </div>
+              <p className="text-gray-400 text-sm">Sistema completo de gestão para academias e personal trainers.</p>
             </div>
-            <span className="text-xl font-bold text-white">FitTransform</span>
+
+            <div>
+              <h4 className="text-white font-semibold mb-4">Plataforma</h4>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="#features" className="text-gray-400 hover:text-white transition text-sm">
+                    Funcionalidades
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/get-started" className="text-gray-400 hover:text-white transition text-sm">
+                    Começar Agora
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/app-mobile" className="text-gray-400 hover:text-white transition text-sm">
+                    App Mobile
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-white font-semibold mb-4">Conteúdo</h4>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/blog" className="text-gray-400 hover:text-white transition text-sm">
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/blog?categoria=academia-treino"
+                    className="text-gray-400 hover:text-white transition text-sm"
+                  >
+                    Dicas de Treino
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/blog?categoria=alimentacao"
+                    className="text-gray-400 hover:text-white transition text-sm"
+                  >
+                    Nutrição
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-white font-semibold mb-4">Empresa</h4>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/sobre-nos" className="text-gray-400 hover:text-white transition text-sm">
+                    Sobre Nós
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contato" className="text-gray-400 hover:text-white transition text-sm">
+                    Contato
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
-          <p className="text-gray-400 text-sm">© 2026 FitTransform. Todos os direitos reservados.</p>
+
+          <div className="border-t border-white/10 pt-8 text-center">
+            <p className="text-gray-400 text-sm">© 2026 FitTransform. Todos os direitos reservados.</p>
+            <p className="text-gray-500 text-xs mt-2">
+              Desenvolvido por{" "}
+              <Link href="/sobre-nos" className="text-orange-500 hover:text-orange-400">
+                Web NetSystem
+              </Link>
+            </p>
+          </div>
         </div>
       </footer>
     </div>

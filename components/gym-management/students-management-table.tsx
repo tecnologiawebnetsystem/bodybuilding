@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Search, MoreVertical, Edit, Trash2, Eye, UserX, UserCheck, FileText, Filter } from "lucide-react"
+import { Plus, Search, MoreVertical, Edit, Trash2, Eye, UserX, UserCheck, Filter } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface Student {
@@ -175,12 +175,7 @@ export function StudentsManagementTable() {
   }
 
   const handleDelete = async (student: Student) => {
-    if (
-      !confirm(
-        `ATENÇÃO: Deseja realmente excluir ${student.student_name}? Esta ação não pode ser desfeita e todos os dados do aluno serão perdidos.`,
-      )
-    )
-      return
+    if (!confirm(`ATENÇÃO: Deseja realmente excluir ${student.student_name}? Esta ação não pode ser desfeita.`)) return
 
     try {
       const response = await fetch(`/api/gym-admin/enrollments/${student.user_id}`, {
@@ -203,56 +198,6 @@ export function StudentsManagementTable() {
         variant: "destructive",
       })
     }
-  }
-
-  const handlePrintReceipt = (student: Student) => {
-    const printWindow = window.open("", "_blank")
-    if (!printWindow) return
-
-    const receiptHTML = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Boleto - ${student.student_name}</title>
-          <style>
-            body { font-family: Arial, sans-serif; padding: 40px; }
-            .header { text-align: center; margin-bottom: 30px; }
-            .info { margin: 20px 0; }
-            .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd; }
-            .label { font-weight: bold; }
-            @media print { button { display: none; } }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1>FitTransform Academia</h1>
-            <h2>Boleto de Mensalidade</h2>
-          </div>
-          <div class="info">
-            <div class="info-row">
-              <span class="label">Aluno:</span>
-              <span>${student.student_name}</span>
-            </div>
-            <div class="info-row">
-              <span class="label">Plano:</span>
-              <span>${student.plan_name || "N/A"}</span>
-            </div>
-            <div class="info-row">
-              <span class="label">Valor:</span>
-              <span>R$ ${Number(student.monthly_value || 0).toFixed(2)}</span>
-            </div>
-            <div class="info-row">
-              <span class="label">Vencimento:</span>
-              <span>${student.end_date ? new Date(student.end_date).toLocaleDateString("pt-BR") : "N/A"}</span>
-            </div>
-          </div>
-          <button onclick="window.print()" style="margin-top: 30px; padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;">Imprimir</button>
-        </body>
-      </html>
-    `
-
-    printWindow.document.write(receiptHTML)
-    printWindow.document.close()
   }
 
   const handleAddStudent = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -292,172 +237,149 @@ export function StudentsManagementTable() {
     }
   }
 
-  const handleEditStudent = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-
-    try {
-      const response = await fetch(`/api/gym-admin/students/${selectedStudent?.user_id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.get("name"),
-          email: formData.get("email"),
-          gender: formData.get("gender"),
-          height: Number(formData.get("height")),
-          current_weight: Number(formData.get("weight")),
-          target_weight: Number(formData.get("target_weight")),
-          pin: formData.get("pin"),
-          age: Number(formData.get("age")),
-          profile_photo_url: formData.get("profile_photo_url"),
-          gym_member_id: formData.get("gym_member_id"),
-          partner_gym_id: formData.get("partner_gym_id"),
-          subscription_status: formData.get("subscription_status"),
-          subscription_plan_id: formData.get("subscription_plan_id"),
-          personal_trainer_id: formData.get("personal_trainer_id"),
-          user_role: formData.get("user_role"),
-        }),
-      })
-
-      if (response.ok) {
-        toast({
-          title: "Aluno atualizado",
-          description: "Os dados do aluno foram atualizados com sucesso.",
-        })
-        setEditDialog(false)
-        loadStudents()
-      }
-    } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Não foi possível atualizar o aluno.",
-        variant: "destructive",
-      })
-    }
-  }
-
   return (
-    <div className="p-8">
-      <div className="mb-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold text-slate-900">Gestão de Alunos</h2>
-            <p className="text-slate-600 mt-1">Gerencie todos os alunos matriculados na academia</p>
-          </div>
-          <Button
-            onClick={() => setAddDialog(true)}
-            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Aluno
-          </Button>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-white">Gestão de Alunos</h2>
+          <p className="text-gray-400 text-sm">Gerencie todos os alunos matriculados</p>
         </div>
-
-        <div className="flex gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <Input
-              placeholder="Buscar por nome ou email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <Filter className="w-4 h-4 mr-2" />
-                Filtrar Status
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setStatusFilter("all")}>Todos</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("active")}>Ativos</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("inactive")}>Inativos</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <Button
+          onClick={() => setAddDialog(true)}
+          className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Novo Aluno
+        </Button>
       </div>
 
-      <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
+      <div className="flex gap-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <Input
+            placeholder="Buscar por nome ou email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 bg-white/[0.05] border-white/[0.1] text-white placeholder:text-gray-500"
+          />
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="border-white/[0.1] text-gray-300 hover:bg-white/[0.05] bg-transparent">
+              <Filter className="w-4 h-4 mr-2" />
+              Filtrar Status
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-[#141414] border-white/[0.1]">
+            <DropdownMenuItem onClick={() => setStatusFilter("all")} className="text-gray-300 hover:bg-white/[0.05]">
+              Todos
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setStatusFilter("active")} className="text-gray-300 hover:bg-white/[0.05]">
+              Ativos
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => setStatusFilter("inactive")}
+              className="text-gray-300 hover:bg-white/[0.05]"
+            >
+              Inativos
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <div className="bg-white/[0.03] rounded-xl border border-white/[0.08] overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-slate-50">
-              <TableHead className="font-semibold">Nome</TableHead>
-              <TableHead className="font-semibold">Email</TableHead>
-              <TableHead className="font-semibold">Plano</TableHead>
-              <TableHead className="font-semibold">Valor Mensal</TableHead>
-              <TableHead className="font-semibold">Status</TableHead>
-              <TableHead className="font-semibold">Validade</TableHead>
-              <TableHead className="font-semibold text-right">Ações</TableHead>
+            <TableRow className="border-white/[0.08] hover:bg-transparent">
+              <TableHead className="text-gray-400 font-medium">Nome</TableHead>
+              <TableHead className="text-gray-400 font-medium">Email</TableHead>
+              <TableHead className="text-gray-400 font-medium">Plano</TableHead>
+              <TableHead className="text-gray-400 font-medium">Valor</TableHead>
+              <TableHead className="text-gray-400 font-medium">Status</TableHead>
+              <TableHead className="text-gray-400 font-medium">Validade</TableHead>
+              <TableHead className="text-gray-400 font-medium text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredStudents.map((student) => (
-              <TableRow key={student.user_id} className="hover:bg-slate-50">
-                <TableCell className="font-medium">{student.student_name}</TableCell>
-                <TableCell className="text-slate-600">{student.email || "-"}</TableCell>
+              <TableRow key={student.user_id} className="border-white/[0.08] hover:bg-white/[0.03]">
+                <TableCell className="font-medium text-white">{student.student_name}</TableCell>
+                <TableCell className="text-gray-400">{student.email || "-"}</TableCell>
                 <TableCell>
                   {student.plan_name ? (
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                    <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/30">
                       {student.plan_name}
                     </Badge>
                   ) : (
-                    <span className="text-slate-400">Sem plano</span>
+                    <span className="text-gray-500">Sem plano</span>
                   )}
                 </TableCell>
-                <TableCell className="font-medium">
+                <TableCell className="font-medium text-white">
                   {student.monthly_value ? `R$ ${Number(student.monthly_value).toFixed(2)}` : "-"}
                 </TableCell>
                 <TableCell>
                   {student.status === "active" ? (
-                    <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Ativo</Badge>
+                    <Badge className="bg-green-500/10 text-green-400 border-green-500/30">Ativo</Badge>
                   ) : student.status === "inactive" ? (
-                    <Badge variant="secondary">Inativo</Badge>
+                    <Badge className="bg-gray-500/10 text-gray-400 border-gray-500/30">Inativo</Badge>
                   ) : (
-                    <Badge variant="outline">Sem matrícula</Badge>
+                    <Badge variant="outline" className="text-gray-500">
+                      Sem matrícula
+                    </Badge>
                   )}
                 </TableCell>
-                <TableCell className="text-slate-600">
+                <TableCell className="text-gray-400">
                   {student.end_date ? new Date(student.end_date).toLocaleDateString("pt-BR") : "-"}
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-gray-400 hover:text-white hover:bg-white/[0.05]"
+                      >
                         <MoreVertical className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => handleView(student)}>
+                    <DropdownMenuContent align="end" className="w-48 bg-[#141414] border-white/[0.1]">
+                      <DropdownMenuLabel className="text-gray-400 text-xs">Ações</DropdownMenuLabel>
+                      <DropdownMenuSeparator className="bg-white/[0.08]" />
+                      <DropdownMenuItem
+                        onClick={() => handleView(student)}
+                        className="text-gray-300 hover:bg-white/[0.05]"
+                      >
                         <Eye className="w-4 h-4 mr-2" />
                         Visualizar
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleEdit(student)}>
+                      <DropdownMenuItem
+                        onClick={() => handleEdit(student)}
+                        className="text-gray-300 hover:bg-white/[0.05]"
+                      >
                         <Edit className="w-4 h-4 mr-2" />
                         Editar
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handlePrintReceipt(student)}>
-                        <FileText className="w-4 h-4 mr-2" />
-                        Imprimir Boleto
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
+                      <DropdownMenuSeparator className="bg-white/[0.08]" />
                       {student.status === "active" ? (
-                        <DropdownMenuItem onClick={() => handleDeactivate(student)}>
+                        <DropdownMenuItem
+                          onClick={() => handleDeactivate(student)}
+                          className="text-yellow-400 hover:bg-white/[0.05]"
+                        >
                           <UserX className="w-4 h-4 mr-2" />
                           Desativar
                         </DropdownMenuItem>
                       ) : (
-                        <DropdownMenuItem onClick={() => handleReactivate(student)}>
+                        <DropdownMenuItem
+                          onClick={() => handleReactivate(student)}
+                          className="text-green-400 hover:bg-white/[0.05]"
+                        >
                           <UserCheck className="w-4 h-4 mr-2" />
                           Reativar
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem
-                        className="text-red-600 focus:text-red-600"
                         onClick={() => handleDelete(student)}
+                        className="text-red-400 hover:bg-white/[0.05]"
                       >
                         <Trash2 className="w-4 h-4 mr-2" />
                         Excluir
@@ -471,294 +393,124 @@ export function StudentsManagementTable() {
         </Table>
       </div>
 
-      <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
+      <div className="flex items-center justify-between text-sm text-gray-500">
         <span>
           Exibindo {filteredStudents.length} de {students.length} alunos
         </span>
-        <span>Total de alunos cadastrados: {students.length}</span>
+        <span>Total cadastrado: {students.length}</span>
       </div>
 
       <Dialog open={viewDialog} onOpenChange={setViewDialog}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl bg-[#0a0a0a] border-white/[0.1]">
           <DialogHeader>
-            <DialogTitle>Detalhes do Aluno</DialogTitle>
-            <DialogDescription>Informações completas do aluno</DialogDescription>
+            <DialogTitle className="text-white">Detalhes do Aluno</DialogTitle>
+            <DialogDescription className="text-gray-400">Informações completas</DialogDescription>
           </DialogHeader>
           {selectedStudent && (
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-slate-600">Nome</Label>
-                <p className="font-medium">{selectedStudent.student_name}</p>
-              </div>
-              <div>
-                <Label className="text-slate-600">Email</Label>
-                <p className="font-medium">{selectedStudent.email || "Não informado"}</p>
-              </div>
-              <div>
-                <Label className="text-slate-600">Gênero</Label>
-                <p className="font-medium">{selectedStudent.gender}</p>
-              </div>
-              <div>
-                <Label className="text-slate-600">Altura</Label>
-                <p className="font-medium">{selectedStudent.height}cm</p>
-              </div>
-              <div>
-                <Label className="text-slate-600">Peso Atual</Label>
-                <p className="font-medium">{selectedStudent.current_weight}kg</p>
-              </div>
-              <div>
-                <Label className="text-slate-600">Peso Meta</Label>
-                <p className="font-medium">{selectedStudent.target_weight}kg</p>
-              </div>
-              <div>
-                <Label className="text-slate-600">Plano</Label>
-                <p className="font-medium">{selectedStudent.plan_name || "Sem plano"}</p>
-              </div>
-              <div>
-                <Label className="text-slate-600">Valor Mensal</Label>
-                <p className="font-medium">R$ {Number(selectedStudent.monthly_value || 0).toFixed(2)}</p>
-              </div>
-              <div>
-                <Label className="text-slate-600">Status</Label>
-                <Badge className={selectedStudent.status === "active" ? "bg-green-100 text-green-700" : ""}>
-                  {selectedStudent.status === "active" ? "Ativo" : "Inativo"}
-                </Badge>
-              </div>
-              <div>
-                <Label className="text-slate-600">Validade</Label>
-                <p className="font-medium">
-                  {selectedStudent.end_date ? new Date(selectedStudent.end_date).toLocaleDateString("pt-BR") : "N/A"}
-                </p>
-              </div>
+              {[
+                { label: "Nome", value: selectedStudent.student_name },
+                { label: "Email", value: selectedStudent.email || "Não informado" },
+                { label: "Gênero", value: selectedStudent.gender },
+                { label: "Altura", value: `${selectedStudent.height}cm` },
+                { label: "Peso Atual", value: `${selectedStudent.current_weight}kg` },
+                { label: "Peso Meta", value: `${selectedStudent.target_weight}kg` },
+                { label: "Plano", value: selectedStudent.plan_name || "Sem plano" },
+                { label: "Valor", value: `R$ ${Number(selectedStudent.monthly_value || 0).toFixed(2)}` },
+              ].map((item, i) => (
+                <div key={i}>
+                  <Label className="text-gray-400 text-xs">{item.label}</Label>
+                  <p className="font-medium text-white">{item.value}</p>
+                </div>
+              ))}
             </div>
           )}
         </DialogContent>
       </Dialog>
 
-      <Dialog open={editDialog} onOpenChange={setEditDialog}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Editar Aluno - Informações Completas</DialogTitle>
-            <DialogDescription>Atualize todas as informações do aluno cadastrado</DialogDescription>
-          </DialogHeader>
-          {selectedStudent && (
-            <form onSubmit={handleEditStudent}>
-              {/* Seção: Dados Pessoais */}
-              <div className="border-l-4 border-blue-500 pl-4">
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">Dados Pessoais</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Nome Completo *</Label>
-                    <Input name="name" defaultValue={selectedStudent.student_name} required />
-                  </div>
-                  <div>
-                    <Label>Email</Label>
-                    <Input name="email" type="email" defaultValue={selectedStudent.email || ""} />
-                  </div>
-                  <div>
-                    <Label>PIN de Acesso</Label>
-                    <Input name="pin" defaultValue={""} placeholder="Digite para alterar" maxLength={6} />
-                  </div>
-                  <div>
-                    <Label>Idade *</Label>
-                    <Input name="age" type="number" defaultValue={""} required />
-                  </div>
-                  <div>
-                    <Label>Gênero *</Label>
-                    <Select name="gender" defaultValue={selectedStudent.gender}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Masculino">Masculino</SelectItem>
-                        <SelectItem value="Feminino">Feminino</SelectItem>
-                        <SelectItem value="Outro">Outro</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>URL Foto de Perfil</Label>
-                    <Input name="profile_photo_url" type="url" defaultValue={""} placeholder="https://..." />
-                  </div>
-                </div>
-              </div>
-
-              {/* Seção: Dados Físicos e Metas */}
-              <div className="border-l-4 border-green-500 pl-4">
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">Dados Físicos e Objetivos</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <Label>Altura (cm) *</Label>
-                    <Input name="height" type="number" defaultValue={selectedStudent.height} required />
-                  </div>
-                  <div>
-                    <Label>Peso Inicial (kg) *</Label>
-                    <Input name="initial_weight" type="number" step="0.1" defaultValue={""} required />
-                  </div>
-                  <div>
-                    <Label>Peso Atual (kg) *</Label>
-                    <Input
-                      name="current_weight"
-                      type="number"
-                      step="0.1"
-                      defaultValue={selectedStudent.current_weight}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label>Peso Meta (kg) *</Label>
-                    <Input
-                      name="target_weight"
-                      type="number"
-                      step="0.1"
-                      defaultValue={selectedStudent.target_weight}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label>Data de Início</Label>
-                    <Input name="start_date" type="date" defaultValue={""} />
-                  </div>
-                  <div>
-                    <Label>Membro Desde</Label>
-                    <Input name="gym_member_since" type="date" defaultValue={""} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Seção: Informações da Academia */}
-              <div className="border-l-4 border-purple-500 pl-4">
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">Informações da Academia</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>ID de Membro da Academia</Label>
-                    <Input name="gym_member_id" defaultValue={""} placeholder="Ex: FIT-2024-001" />
-                  </div>
-                  <div>
-                    <Label>ID Academia Parceira</Label>
-                    <Input name="partner_gym_id" defaultValue={""} />
-                  </div>
-                  <div>
-                    <Label>Status da Assinatura</Label>
-                    <Select name="subscription_status" defaultValue="">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="active">Ativo</SelectItem>
-                        <SelectItem value="inactive">Inativo</SelectItem>
-                        <SelectItem value="suspended">Suspenso</SelectItem>
-                        <SelectItem value="pending">Pendente</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>ID Plano de Assinatura</Label>
-                    <Input name="subscription_plan_id" defaultValue={""} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Seção: Personal Trainer e Papel */}
-              <div className="border-l-4 border-orange-500 pl-4">
-                <h3 className="text-lg font-semibold text-slate-900 mb-3">Personal Trainer e Papel</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>ID Personal Trainer</Label>
-                    <Input name="personal_trainer_id" defaultValue={""} placeholder="ID do trainer" />
-                  </div>
-                  <div>
-                    <Label>Papel do Usuário</Label>
-                    <Select name="user_role" defaultValue="">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="student">Aluno</SelectItem>
-                        <SelectItem value="trainer">Personal Trainer</SelectItem>
-                        <SelectItem value="gym_admin">Admin Academia</SelectItem>
-                        <SelectItem value="super_admin">Super Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-
-              <DialogFooter className="mt-6">
-                <Button type="button" variant="outline" onClick={() => setEditDialog(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" className="bg-gradient-to-r from-blue-500 to-blue-600">
-                  Salvar Alterações
-                </Button>
-              </DialogFooter>
-            </form>
-          )}
-        </DialogContent>
-      </Dialog>
-
       <Dialog open={addDialog} onOpenChange={setAddDialog}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-lg bg-[#0a0a0a] border-white/[0.1]">
           <DialogHeader>
-            <DialogTitle>Adicionar Novo Aluno</DialogTitle>
-            <DialogDescription>Preencha os dados do novo aluno</DialogDescription>
+            <DialogTitle className="text-white">Novo Aluno</DialogTitle>
+            <DialogDescription className="text-gray-400">Cadastre um novo aluno</DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleAddStudent}>
-            <div className="grid grid-cols-2 gap-4 mb-4">
+          <form onSubmit={handleAddStudent} className="space-y-4">
+            <div>
+              <Label className="text-gray-300">Nome Completo</Label>
+              <Input name="name" required className="bg-white/[0.05] border-white/[0.1] text-white" />
+            </div>
+            <div>
+              <Label className="text-gray-300">Email</Label>
+              <Input name="email" type="email" className="bg-white/[0.05] border-white/[0.1] text-white" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Nome Completo</Label>
-                <Input name="name" required />
-              </div>
-              <div>
-                <Label>Email</Label>
-                <Input name="email" type="email" />
-              </div>
-              <div>
-                <Label>Gênero</Label>
-                <Select name="gender" required>
-                  <SelectTrigger>
+                <Label className="text-gray-300">Gênero</Label>
+                <Select name="gender">
+                  <SelectTrigger className="bg-white/[0.05] border-white/[0.1] text-white">
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Masculino">Masculino</SelectItem>
-                    <SelectItem value="Feminino">Feminino</SelectItem>
+                  <SelectContent className="bg-[#141414] border-white/[0.1]">
+                    <SelectItem value="M" className="text-gray-300">
+                      Masculino
+                    </SelectItem>
+                    <SelectItem value="F" className="text-gray-300">
+                      Feminino
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Altura (cm)</Label>
-                <Input name="height" type="number" required />
-              </div>
-              <div>
-                <Label>Peso Atual (kg)</Label>
-                <Input name="weight" type="number" step="0.1" required />
-              </div>
-              <div>
-                <Label>Peso Meta (kg)</Label>
-                <Input name="target_weight" type="number" step="0.1" required />
-              </div>
-              <div className="col-span-2">
-                <Label>Plano</Label>
-                <Select name="plan_id" required>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um plano" />
+                <Label className="text-gray-300">Plano</Label>
+                <Select name="plan_id">
+                  <SelectTrigger className="bg-white/[0.05] border-white/[0.1] text-white">
+                    <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-[#141414] border-white/[0.1]">
                     {plans.map((plan) => (
-                      <SelectItem key={plan.id} value={String(plan.id)}>
-                        {plan.plan_name} - R$ {Number(plan.price).toFixed(2)}
+                      <SelectItem key={plan.id} value={String(plan.id)} className="text-gray-300">
+                        {plan.name} - R$ {plan.monthly_price}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
             </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label className="text-gray-300">Altura (cm)</Label>
+                <Input name="height" type="number" className="bg-white/[0.05] border-white/[0.1] text-white" />
+              </div>
+              <div>
+                <Label className="text-gray-300">Peso Atual</Label>
+                <Input
+                  name="weight"
+                  type="number"
+                  step="0.1"
+                  className="bg-white/[0.05] border-white/[0.1] text-white"
+                />
+              </div>
+              <div>
+                <Label className="text-gray-300">Peso Meta</Label>
+                <Input
+                  name="target_weight"
+                  type="number"
+                  step="0.1"
+                  className="bg-white/[0.05] border-white/[0.1] text-white"
+                />
+              </div>
+            </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setAddDialog(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setAddDialog(false)}
+                className="border-white/[0.1] text-gray-300"
+              >
                 Cancelar
               </Button>
-              <Button type="submit" className="bg-gradient-to-r from-red-500 to-red-600">
-                Adicionar Aluno
+              <Button type="submit" className="bg-gradient-to-r from-orange-500 to-red-600">
+                Cadastrar
               </Button>
             </DialogFooter>
           </form>

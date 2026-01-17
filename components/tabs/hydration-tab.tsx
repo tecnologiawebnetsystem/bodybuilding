@@ -77,15 +77,13 @@ export function HydrationTab({ userId, preferences }: HydrationTabProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Hidratação Diária</h2>
+      <h2 className="text-2xl font-bold text-white">Hidratação Diária</h2>
 
-      <Card className="p-8 border-2" style={{ borderColor: preferences.theme_accent + "30" }}>
+      <Card className="p-8 border-2 bg-white/5" style={{ borderColor: preferences.theme_accent + "30" }}>
         <div className="text-center mb-6">
           <Droplet className="w-16 h-16 mx-auto mb-4" style={{ color: preferences.theme_accent }} />
-          <p className="text-6xl font-bold mb-2" style={{ color: preferences.theme_primary }}>
-            {waterIntake}ml
-          </p>
-          <p className="text-muted-foreground">de {goal}ml</p>
+          <p className="text-6xl font-bold mb-2 text-white">{waterIntake}ml</p>
+          <p className="text-gray-300">de {goal}ml</p>
         </div>
 
         <Progress value={progressPercent} className="h-4 mb-6" />
@@ -126,33 +124,36 @@ export function HydrationTab({ userId, preferences }: HydrationTabProps) {
         </div>
 
         {progressPercent >= 100 && (
-          <div className="mt-6 p-4 bg-green-500/20 rounded-lg text-center">
-            <p className="font-bold text-green-600">Parabéns! Meta de hidratação alcançada hoje!</p>
+          <div className="mt-6 p-4 bg-green-500/30 rounded-lg text-center border border-green-500/50">
+            <p className="font-bold text-green-400">Parabéns! Meta de hidratação alcançada hoje!</p>
           </div>
         )}
       </Card>
 
-      <Card className="p-6" style={{ backgroundColor: preferences.theme_accent + "10" }}>
-        <h3 className="font-bold mb-4">Por que hidratar?</h3>
-        <ul className="space-y-2 text-sm">
+      <Card
+        className="p-6 border"
+        style={{ backgroundColor: preferences.theme_accent + "10", borderColor: preferences.theme_accent + "30" }}
+      >
+        <h3 className="font-bold text-white mb-4">Por que hidratar?</h3>
+        <ul className="space-y-2 text-sm text-gray-200">
           <li className="flex items-start gap-2">
-            <span className="text-green-600">✓</span>
+            <span className="text-green-400">✓</span>
             <span>Melhora o desempenho nos treinos</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-green-600">✓</span>
+            <span className="text-green-400">✓</span>
             <span>Acelera a recuperação muscular</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-green-600">✓</span>
+            <span className="text-green-400">✓</span>
             <span>Auxilia na queima de gordura</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-green-600">✓</span>
+            <span className="text-green-400">✓</span>
             <span>Melhora a digestão e absorção de nutrientes</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-green-600">✓</span>
+            <span className="text-green-400">✓</span>
             <span>Reduz retenção de líquidos</span>
           </li>
         </ul>

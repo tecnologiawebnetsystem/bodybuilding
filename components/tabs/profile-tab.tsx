@@ -42,8 +42,11 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
   const [changeEmailOpen, setChangeEmailOpen] = useState(false)
+  const [changeCpfOpen, setChangeCpfOpen] = useState(false)
   const [newEmail, setNewEmail] = useState("")
   const [newPin, setNewPin] = useState("")
+  const [currentPin, setCurrentPin] = useState("")
+  const [newCpf, setNewCpf] = useState("")
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
 
   useEffect(() => {
@@ -73,8 +76,13 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
   }
 
   const handleChangePassword = async () => {
-    if (!newPin || newPin.length !== 4) {
-      alert("PIN deve ter 4 dígitos")
+    if (!currentPin || currentPin.length !== 6) {
+      alert("Digite seu PIN atual (6 dígitos)")
+      return
+    }
+
+    if (!newPin || newPin.length !== 6) {
+      alert("O novo PIN deve ter 6 dígitos")
       return
     }
 
@@ -82,16 +90,22 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
       const response = await fetch("/api/user-profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, pin: newPin }),
+        body: JSON.stringify({ userId, pin: newPin, currentPin }),
       })
 
-      if (response.ok) {
+      const data = await response.json()
+
+      if (response.ok && data.success) {
         alert("PIN alterado com sucesso!")
         setChangePasswordOpen(false)
         setNewPin("")
+        setCurrentPin("")
+      } else {
+        alert(data.message || "PIN atual incorreto")
       }
     } catch (error) {
       console.error("[v0] Error changing PIN:", error)
+      alert("Erro ao alterar PIN")
     }
   }
 
@@ -119,6 +133,44 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
     } catch (error) {
       console.error("[v0] Error changing email:", error)
       alert("Erro ao alterar e-mail")
+    }
+  }
+
+  const handleChangeCpf = async () => {
+    if (!currentPin || currentPin.length !== 6) {
+      alert("Digite seu PIN atual (6 dígitos) para confirmar")
+      return
+    }
+
+    // Remove formatação do CPF
+    const cleanCpf = newCpf.replace(/\D/g, "")
+
+    if (!cleanCpf || cleanCpf.length !== 11) {
+      alert("Digite um CPF válido (11 dígitos)")
+      return
+    }
+
+    try {
+      const response = await fetch("/api/user-profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, cpf: newCpf, currentPin }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        alert("CPF alterado com sucesso! Use o novo CPF no próximo login.")
+        setChangeCpfOpen(false)
+        setNewCpf("")
+        setCurrentPin("")
+        loadData()
+      } else {
+        alert(data.message || "Erro ao alterar CPF. Verifique seu PIN.")
+      }
+    } catch (error) {
+      console.error("[v0] Error changing CPF:", error)
+      alert("Erro ao alterar CPF")
     }
   }
 
@@ -166,6 +218,17 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
       alert("Erro ao fazer upload da foto")
       setUploadingPhoto(false)
     }
+  }
+
+  const formatCpf = (value: string) => {
+    const numbers = value.replace(/\D/g, "")
+    if (numbers.length <= 11) {
+      return numbers
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{1,2})/, "$1-$2")
+    }
+    return value
   }
 
   if (loading) {
@@ -279,6 +342,62 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
       <div>
         <h3 className="text-lg font-semibold mb-3">Configurações de Conta</h3>
         <div className="space-y-3">
+          <Dialog open={changeCpfOpen} onOpenChange={setChangeCpfOpen}>
+            <DialogTrigger asChild>
+              <Card className="p-4 cursor-pointer hover:bg-accent/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <UserIcon className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">CPF</p>
+                      <p className="text-sm text-muted-foreground">{userProfile.cpf || "Não cadastrado"}</p>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    Editar
+                  </Button>
+                </div>
+              </Card>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Alterar CPF</DialogTitle>
+                <DialogDescription>Digite seu novo CPF e confirme com seu PIN atual</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="new-cpf">Novo CPF</Label>
+                  <Input
+                    id="new-cpf"
+                    type="text"
+                    maxLength={14}
+                    placeholder="000.000.000-00"
+                    value={newCpf}
+                    onChange={(e) => setNewCpf(formatCpf(e.target.value))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="current-pin-cpf">PIN Atual (6 dígitos)</Label>
+                  <Input
+                    id="current-pin-cpf"
+                    type="password"
+                    maxLength={6}
+                    placeholder="Digite seu PIN atual"
+                    value={currentPin}
+                    onChange={(e) => setCurrentPin(e.target.value.replace(/\D/g, ""))}
+                  />
+                </div>
+                <Button
+                  onClick={handleChangeCpf}
+                  className="w-full"
+                  style={{ backgroundColor: preferences.theme_primary }}
+                >
+                  Confirmar Alteração
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
           <Dialog open={changeEmailOpen} onOpenChange={setChangeEmailOpen}>
             <DialogTrigger asChild>
               <Card className="p-4 cursor-pointer hover:bg-accent/50 transition-colors">
@@ -331,7 +450,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
                     <Lock className="w-5 h-5 text-muted-foreground" />
                     <div>
                       <p className="font-medium">Alterar PIN</p>
-                      <p className="text-sm text-muted-foreground">Trocar senha de acesso</p>
+                      <p className="text-sm text-muted-foreground">Trocar senha de acesso (6 dígitos)</p>
                     </div>
                   </div>
                   <Button variant="ghost" size="sm">
@@ -343,16 +462,27 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Alterar PIN de Acesso</DialogTitle>
-                <DialogDescription>Digite o novo PIN de 4 dígitos</DialogDescription>
+                <DialogDescription>Digite seu PIN atual e o novo PIN de 6 dígitos</DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="new-pin">Novo PIN</Label>
+                  <Label htmlFor="current-pin">PIN Atual (6 dígitos)</Label>
+                  <Input
+                    id="current-pin"
+                    type="password"
+                    maxLength={6}
+                    placeholder="Digite seu PIN atual"
+                    value={currentPin}
+                    onChange={(e) => setCurrentPin(e.target.value.replace(/\D/g, ""))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="new-pin">Novo PIN (6 dígitos)</Label>
                   <Input
                     id="new-pin"
                     type="password"
-                    maxLength={4}
-                    placeholder="Digite 4 dígitos"
+                    maxLength={6}
+                    placeholder="Digite 6 dígitos"
                     value={newPin}
                     onChange={(e) => setNewPin(e.target.value.replace(/\D/g, ""))}
                   />

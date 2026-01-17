@@ -89,17 +89,23 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between bg-black p-4">
         <div>
-          <h2 className="text-2xl font-bold">Seus Treinos</h2>
-          <p className="text-muted-foreground">Plano ABC personalizado</p>
+          <h2 className="text-2xl font-bold text-white">Seus Treinos</h2>
+          <p className="text-gray-300">Plano ABC personalizado</p>
         </div>
-        <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={generatingPDF === "Plano Completo"}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExportPDF}
+          disabled={generatingPDF === "Plano Completo"}
+          className="text-white bg-transparent"
+        >
           {generatingPDF === "Plano Completo" ? (
             <>Gerando...</>
           ) : (
             <>
-              <Share2 className="w-4 h-4 mr-2" />
+              <Share2 className="w-4 h-4 mr-2 text-white" />
               Compartilhar Plano Completo
             </>
           )}
@@ -107,33 +113,34 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
       </div>
 
       {/* Pre-workout cardio */}
-      <Card className="p-6 bg-accent/10 border-accent/20">
+      <Card className="p-6 bg-white/5 border-white/10">
         <div className="flex items-center gap-3 mb-2">
-          <Clock className="w-5 h-5 text-accent" />
-          <h3 className="text-lg font-bold">Aquecimento</h3>
+          <Clock className="w-5 h-5 text-orange-500" />
+          <h3 className="text-lg font-bold text-white">Aquecimento</h3>
         </div>
-        <p className="text-muted-foreground">
-          <strong>Esteira - 10 minutos</strong> em ritmo moderado (6-7 km/h) antes de cada treino para preparar o corpo
+        <p className="text-gray-300">
+          <strong className="text-white">Esteira - 10 minutos</strong> em ritmo moderado (6-7 km/h) antes de cada treino
+          para preparar o corpo
         </p>
       </Card>
 
       {workoutPlans.map((workout) => (
-        <Card key={workout.name} className="overflow-hidden">
+        <Card key={workout.name} className="overflow-hidden bg-white/5 border-white/10">
           <div className="p-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
-                    <Dumbbell className="w-6 h-6 text-primary-foreground" />
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-red-600 to-orange-500 flex items-center justify-center">
+                    <Dumbbell className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold">{workout.name}</h3>
-                    <p className="text-sm text-muted-foreground">{workout.focus}</p>
+                    <h3 className="text-xl font-bold text-white">{workout.name}</h3>
+                    <p className="text-sm text-gray-300">{workout.focus}</p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {workout.muscleGroups.map((muscle) => (
-                    <Badge key={muscle} variant="secondary">
+                    <Badge key={muscle} variant="secondary" className="text-white">
                       {muscle}
                     </Badge>
                   ))}
@@ -145,18 +152,20 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
                   size="sm"
                   onClick={() => handleExportSingleWorkout(workout)}
                   disabled={generatingPDF === workout.name}
+                  className="text-white"
                 >
                   {generatingPDF === workout.name ? (
                     <>Gerando...</>
                   ) : (
                     <>
-                      <Share2 className="w-4 h-4" />
+                      <Share2 className="w-4 h-4 text-white" />
                     </>
                   )}
                 </Button>
                 <Button
                   variant={expandedWorkout === workout.name ? "secondary" : "outline"}
                   onClick={() => setExpandedWorkout(expandedWorkout === workout.name ? null : workout.name)}
+                  className="text-white"
                 >
                   {expandedWorkout === workout.name ? "Fechar" : "Ver Exercícios"}
                 </Button>
@@ -164,12 +173,12 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
             </div>
 
             {expandedWorkout === workout.name && (
-              <div className="space-y-3 mt-6 pt-6 border-t">
+              <div className="space-y-3 mt-6 pt-6 border-t border-white/10">
                 {workout.exercises.map((exercise, idx) => (
-                  <div key={idx} className="p-4 rounded-lg bg-muted/50">
-                    <h4 className="font-semibold mb-1">{exercise.name}</h4>
-                    <p className="text-sm text-primary font-medium mb-2">{exercise.sets}</p>
-                    {exercise.notes && <p className="text-sm text-muted-foreground italic">{exercise.notes}</p>}
+                  <div key={idx} className="p-4 rounded-lg bg-white/5">
+                    <h4 className="font-semibold mb-1 text-white">{exercise.name}</h4>
+                    <p className="text-sm text-orange-400 font-medium mb-2">{exercise.sets}</p>
+                    {exercise.notes && <p className="text-sm text-gray-300 italic">{exercise.notes}</p>}
                   </div>
                 ))}
               </div>
@@ -179,14 +188,14 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
       ))}
 
       {/* Post-workout cardio */}
-      <Card className="p-6 bg-accent/10 border-accent/20">
+      <Card className="p-6 bg-white/5 border-white/10">
         <div className="flex items-center gap-3 mb-2">
-          <Clock className="w-5 h-5 text-accent" />
-          <h3 className="text-lg font-bold">Finalização</h3>
+          <Clock className="w-5 h-5 text-orange-500" />
+          <h3 className="text-lg font-bold text-white">Finalização</h3>
         </div>
-        <p className="text-muted-foreground">
-          <strong>Esteira - 15 minutos</strong> em ritmo leve-moderado (5-6 km/h) após cada treino para queima de
-          gordura
+        <p className="text-gray-300">
+          <strong className="text-white">Esteira - 15 minutos</strong> em ritmo leve-moderado (5-6 km/h) após cada
+          treino para queima de gordura
         </p>
       </Card>
     </div>

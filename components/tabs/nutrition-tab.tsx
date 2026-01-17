@@ -240,8 +240,8 @@ export function NutritionTab({ userId, preferences }: NutritionTabProps) {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-bold mb-2">Nutrição & Alimentação</h2>
-          <p className="text-muted-foreground">Plano personalizado</p>
+          <h2 className="text-2xl font-bold text-white mb-2">Nutrição & Alimentação</h2>
+          <p className="text-gray-300">Plano personalizado</p>
         </div>
         <Card className="p-6">
           <p className="text-center text-muted-foreground">Nenhum plano alimentar configurado para este usuário.</p>
@@ -254,8 +254,8 @@ export function NutritionTab({ userId, preferences }: NutritionTabProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-2">Nutrição & Alimentação</h2>
-          <p className="text-muted-foreground">Plano personalizado</p>
+          <h2 className="text-2xl font-bold text-white mb-2">Nutrição & Alimentação</h2>
+          <p className="text-gray-300">Plano personalizado</p>
         </div>
         <Button variant="outline" size="sm" onClick={handleExportNutritionPDF} disabled={isGeneratingNutritionPDF}>
           {isGeneratingNutritionPDF ? (
@@ -269,36 +269,38 @@ export function NutritionTab({ userId, preferences }: NutritionTabProps) {
         </Button>
       </div>
 
-      <Card className="p-6 bg-gradient-to-br from-primary/10 to-accent/10">
-        <h3 className="text-xl font-bold mb-4">Metas Diárias</h3>
+      <Card className="p-6 bg-gradient-to-br from-white/10 to-white/5 border-white/10">
+        <h3 className="text-xl font-bold text-white mb-4">Metas Diárias</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
             <Flame className="w-6 h-6 mx-auto mb-2" style={{ color: preferences.theme_primary }} />
-            <p className="text-2xl font-bold">{totalCalories}</p>
-            <p className="text-sm text-muted-foreground">Calorias</p>
+            <p className="text-2xl font-bold text-white">{totalCalories}</p>
+            <p className="text-sm text-gray-300">Calorias</p>
           </div>
           <div className="text-center">
             <Apple className="w-6 h-6 mx-auto mb-2" style={{ color: preferences.theme_accent }} />
-            <p className="text-2xl font-bold">
+            <p className="text-2xl font-bold text-white">
               {userId === "pamela" ? "130g" : userId === "juliana" ? "100g" : "160g"}
             </p>
-            <p className="text-sm text-muted-foreground">Proteína</p>
+            <p className="text-sm text-gray-300">Proteína</p>
           </div>
           <div className="text-center">
             <Droplets className="w-6 h-6 mx-auto mb-2" style={{ color: preferences.theme_accent }} />
-            <p className="text-2xl font-bold">3L</p>
-            <p className="text-sm text-muted-foreground">Água</p>
+            <p className="text-2xl font-bold text-white">3L</p>
+            <p className="text-sm text-gray-300">Água</p>
           </div>
           <div className="text-center">
             <Pill className="w-6 h-6 mx-auto mb-2" style={{ color: preferences.theme_primary }} />
-            <p className="text-2xl font-bold">{userId === "pamela" ? "45g" : userId === "juliana" ? "35g" : "50g"}</p>
-            <p className="text-sm text-muted-foreground">Gorduras</p>
+            <p className="text-2xl font-bold text-white">
+              {userId === "pamela" ? "45g" : userId === "juliana" ? "35g" : "50g"}
+            </p>
+            <p className="text-sm text-gray-300">Gorduras</p>
           </div>
         </div>
       </Card>
 
-      <Card className="p-6">
-        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+      <Card className="p-6 bg-white/5 border-white/10">
+        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
           <UtensilsCrossed className="w-6 h-6" style={{ color: preferences.theme_primary }} />
           Plano Alimentar Diário
         </h3>
@@ -306,8 +308,8 @@ export function NutritionTab({ userId, preferences }: NutritionTabProps) {
           {meals.map((meal, idx) => (
             <div
               key={idx}
-              className="p-4 rounded-lg border-2 hover:border-primary/40 transition-colors"
-              style={{ borderColor: `${preferences.theme_primary}20` }}
+              className="p-4 rounded-lg border-2 hover:border-opacity-60 transition-all bg-white/5"
+              style={{ borderColor: `${preferences.theme_primary}40` }}
             >
               <div className="flex items-center gap-3 mb-3">
                 <div
@@ -319,8 +321,8 @@ export function NutritionTab({ userId, preferences }: NutritionTabProps) {
                   <Clock className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-bold text-lg">{meal.name}</h4>
-                  <p className="text-sm text-muted-foreground">{meal.time}</p>
+                  <h4 className="font-bold text-lg text-white">{meal.name}</h4>
+                  <p className="text-sm text-gray-300">{meal.time}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold" style={{ color: preferences.theme_primary }}>
@@ -334,15 +336,15 @@ export function NutritionTab({ userId, preferences }: NutritionTabProps) {
                     <span style={{ color: preferences.theme_primary }} className="mt-1">
                       •
                     </span>
-                    <span className="flex-1">{food}</span>
+                    <span className="flex-1 text-gray-200">{food}</span>
                   </li>
                 ))}
               </ul>
             </div>
           ))}
         </div>
-        <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: `${preferences.theme_primary}10` }}>
-          <p className="font-bold text-center text-lg">Total Diário: {totalCalories} calorias</p>
+        <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: `${preferences.theme_primary}20` }}>
+          <p className="font-bold text-center text-lg text-white">Total Diário: {totalCalories} calorias</p>
         </div>
       </Card>
 
@@ -398,11 +400,11 @@ export function NutritionTab({ userId, preferences }: NutritionTabProps) {
       )}
 
       <Card
-        className="p-6"
-        style={{ backgroundColor: `${preferences.theme_accent}10`, borderColor: `${preferences.theme_accent}20` }}
+        className="p-6 border"
+        style={{ backgroundColor: `${preferences.theme_accent}10`, borderColor: `${preferences.theme_accent}30` }}
       >
-        <h3 className="text-lg font-bold mb-3">⚠️ Notas Importantes</h3>
-        <ul className="space-y-2 text-sm text-muted-foreground">
+        <h3 className="text-lg font-bold text-white mb-3">⚠️ Notas Importantes</h3>
+        <ul className="space-y-2 text-sm text-gray-300">
           <li>• Beba pelo menos 3 litros de água por dia</li>
           <li>• Evite carboidratos simples (açúcar, pão branco, refrigerantes)</li>
           <li>• Priorize proteínas magras em todas as refeições</li>
@@ -410,9 +412,7 @@ export function NutritionTab({ userId, preferences }: NutritionTabProps) {
           <li>• Use temperos naturais (alho, cebola, ervas) ao invés de sal</li>
           <li>• Ajuste as porções conforme sua fome e energia</li>
           <li>• Consulte um nutricionista para personalizar seu plano</li>
-          <li>
-            • <strong>IMPORTANTE:</strong> Este é um plano base, ajuste conforme necessário
-          </li>
+          <li className="text-white font-semibold">• IMPORTANTE: Este é um plano base, ajuste conforme necessário</li>
         </ul>
       </Card>
     </div>
