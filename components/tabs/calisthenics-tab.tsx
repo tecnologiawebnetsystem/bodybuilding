@@ -142,9 +142,9 @@ export function CalisthenicsTab({ userId, preferences }: CalisthenicsTabProps) {
       {/* Header */}
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold" style={{ color: preferences.theme_primary }}>
-          🔥 Treino em Casa
+          Calistenia Militar
         </h1>
-        <p className="text-muted-foreground">Treino exclusivo de 30min no almoço • Seg-Sex: 12h-12h30 • Sáb: 1h</p>
+        <p className="text-muted-foreground">Treino exclusivo de alta intensidade • Disciplina e Resistencia</p>
         <Button
           variant="outline"
           size="sm"

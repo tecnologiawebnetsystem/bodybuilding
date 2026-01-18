@@ -14,6 +14,7 @@ import {
   BarChart3,
   Zap,
   MoreHorizontal,
+  Sparkles,
 } from "lucide-react"
 import { HomeTab } from "@/components/tabs/home-tab"
 import { WorkoutsTab } from "@/components/tabs/workouts-tab"
@@ -26,6 +27,8 @@ import { HydrationTab } from "@/components/tabs/hydration-tab"
 import { StatsTab } from "@/components/tabs/stats-tab"
 import { CalisthenicsTab } from "@/components/tabs/calisthenics-tab"
 import { MoreTab } from "@/components/tabs/more-tab"
+import { AiTab } from "@/components/tabs/ai-tab"
+import { Chatbot } from "@/components/ai/chatbot"
 
 interface DashboardProps {
   userId: string
@@ -48,6 +51,9 @@ interface UserPreferences {
 }
 
 const getUserPreferences = (userId: string): UserPreferences => {
+  // Calistenia Militar apenas para Kleber
+  const isKleber = userId.toLowerCase() === 'kleber'
+  
   const preferencesMap: Record<string, UserPreferences> = {
     kleber: {
       theme_primary: "#ef4444",
@@ -56,7 +62,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_gym_checkin: true,
       enable_gym_workouts: true,
       enable_running: true,
-      enable_home_workouts: true,
+      enable_home_workouts: true, // Calistenia Militar - APENAS Kleber
       enable_nutrition: true,
       enable_supplements: true,
       enable_measurements: true,
@@ -70,7 +76,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_gym_checkin: true,
       enable_gym_workouts: true,
       enable_running: true,
-      enable_home_workouts: true,
+      enable_home_workouts: false, // SEM Calistenia
       enable_nutrition: true,
       enable_supplements: true,
       enable_measurements: true,
@@ -84,7 +90,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_gym_checkin: false,
       enable_gym_workouts: false,
       enable_running: true,
-      enable_home_workouts: true,
+      enable_home_workouts: false, // SEM Calistenia
       enable_nutrition: true,
       enable_supplements: false,
       enable_measurements: true,
@@ -101,7 +107,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_gym_checkin: true,
       enable_gym_workouts: true,
       enable_running: true,
-      enable_home_workouts: true,
+      enable_home_workouts: false, // Novos usuários SEM Calistenia por padrão
       enable_nutrition: true,
       enable_supplements: true,
       enable_measurements: true,
@@ -177,17 +183,21 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
     },
     {
       id: "calisthenics",
-      label: "Casa",
+      label: "Calistenia",
       icon: Zap,
       color: preferences.theme_primary,
       enabled: preferences.enable_home_workouts,
     },
+    { id: "ai", label: "IA", icon: Sparkles, color: "#a855f7", enabled: true },
     { id: "more", label: "Mais", icon: MoreHorizontal, color: preferences.theme_accent, enabled: true },
     { id: "profile", label: "Perfil", icon: User, color: preferences.theme_primary, enabled: true },
   ].filter((tab) => tab.enabled)
 
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
+      {/* Chatbot flutuante */}
+      <Chatbot context={`Usuario: ${userId}`} userName={userId} />
+      
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="sticky top-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/10">
           <div className="max-w-7xl mx-auto px-2">
@@ -256,6 +266,9 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
               <CalisthenicsTab userId={userId} preferences={preferences} />
             </TabsContent>
           )}
+          <TabsContent value="ai" className="mt-0">
+            <AiTab userId={userId} preferences={preferences} />
+          </TabsContent>
           <TabsContent value="more" className="mt-0">
             <MoreTab userId={userId} preferences={preferences} />
           </TabsContent>
