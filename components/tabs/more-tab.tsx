@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CreditCard, Shield, Trophy, Users, Building2, DumbbellIcon, Sparkles, ArrowRight } from "lucide-react"
+import { Shield, Trophy, Building2, DumbbellIcon, Sparkles, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import type { UserRole } from "@/lib/user-roles"
@@ -38,34 +38,12 @@ export function MoreTab({ userId, preferences }: MoreTabProps) {
 
   const allFeatures = [
     {
-      id: "subscription",
-      title: "Planos e Assinatura",
-      description: "Upgrade para Premium e desbloqueie recursos avançados",
-      icon: CreditCard,
-      gradient: "from-emerald-500 to-teal-600",
-      link: "/pricing",
-      badge: "Popular",
-      badgeColor: "bg-emerald-100 text-emerald-700",
-      roles: ["student", "trainer", "gym_owner"] as UserRole[], // Não aparece para admin
-    },
-    {
       id: "achievements",
       title: "Conquistas e Badges",
       description: "Veja suas conquistas e badges desbloqueados",
       icon: Trophy,
       gradient: "from-amber-500 to-orange-600",
       link: "/achievements",
-      roles: ["student", "trainer", "gym_owner", "admin"] as UserRole[],
-    },
-    {
-      id: "social",
-      title: "Feed Social",
-      description: "Compartilhe seus treinos e conecte-se com amigos",
-      icon: Users,
-      gradient: "from-blue-500 to-indigo-600",
-      link: "/social",
-      badge: "Novo",
-      badgeColor: "bg-blue-100 text-blue-700",
       roles: ["student", "trainer", "gym_owner", "admin"] as UserRole[],
     },
     {
