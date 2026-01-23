@@ -31,9 +31,10 @@ const workoutSchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const { goal, level, equipment, duration, restrictions, focusArea } = await req.json();
+  try {
+    const { goal, level, equipment, duration, restrictions, focusArea } = await req.json();
 
-  const prompt = `Voce e um personal trainer especialista. Crie um treino personalizado com as seguintes caracteristicas:
+    const prompt = `Voce e um personal trainer especialista brasileiro. Crie um treino personalizado com as seguintes caracteristicas:
 
 OBJETIVO: ${goal || 'Condicionamento geral'}
 NIVEL: ${level || 'Intermediario'}
@@ -42,7 +43,7 @@ DURACAO DESEJADA: ${duration || '60'} minutos
 RESTRICOES/LESOES: ${restrictions || 'Nenhuma'}
 AREA DE FOCO: ${focusArea || 'Corpo inteiro'}
 
-Crie um treino completo, seguro e eficiente. Inclua:
+Crie um treino completo, seguro e eficiente em portugues. Inclua:
 - Aquecimento adequado (5-10 min)
 - Exercicios principais com series, repeticoes e descanso
 - Volta a calma/alongamento
@@ -50,13 +51,20 @@ Crie um treino completo, seguro e eficiente. Inclua:
 
 Seja especifico nas instrucoes e adapte para o nivel do aluno.`;
 
-  const { object } = await generateObject({
-    model: 'openai/gpt-4o',
-    schema: workoutSchema,
-    prompt,
-    maxOutputTokens: 4000,
-    temperature: 0.7,
-  });
+    const { object } = await generateObject({
+      model: 'openai/gpt-5-mini',
+      schema: workoutSchema,
+      prompt,
+      maxTokens: 4000,
+      temperature: 0.7,
+    });
 
-  return Response.json({ workout: object });
+    return Response.json({ workout: object });
+  } catch (error) {
+    console.error('[v0] Erro ao gerar treino:', error);
+    return Response.json(
+      { error: 'Erro ao gerar treino. Tente novamente.' },
+      { status: 500 }
+    );
+  }
 }

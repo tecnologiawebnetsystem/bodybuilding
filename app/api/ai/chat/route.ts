@@ -1,9 +1,4 @@
-import {
-  consumeStream,
-  convertToModelMessages,
-  streamText,
-  UIMessage,
-} from 'ai';
+import { streamText } from 'ai';
 
 export const maxDuration = 30;
 
@@ -28,7 +23,7 @@ Funcionalidades da FitTransform que voce conhece:
 - Painel administrativo para academias (alunos, financeiro, relatorios)
 - Portal do personal trainer (agenda, alunos, treinos personalizados)
 - Geracao de treinos com IA
-- Controle de pagamentos e cobranças automaticas
+- Controle de pagamentos e cobrancas automaticas
 - Check-in por QR Code
 - Acompanhamento de evolucao fisica
 
@@ -41,29 +36,27 @@ Voce pode ajudar com:
 - Esclarecimentos sobre planos e pagamentos`;
 
 export async function POST(req: Request) {
-  const { messages, context }: { messages: UIMessage[], context?: string } = await req.json();
+  try {
+    const { messages, context } = await req.json();
 
-  const systemMessage = context 
-    ? `${SYSTEM_PROMPT}\n\nContexto adicional do usuario: ${context}`
-    : SYSTEM_PROMPT;
+    const systemMessage = context 
+      ? `${SYSTEM_PROMPT}\n\nContexto adicional do usuario: ${context}`
+      : SYSTEM_PROMPT;
 
-  const prompt = convertToModelMessages(messages);
+    const result = streamText({
+      model: 'openai/gpt-5-mini',
+      system: systemMessage,
+      messages,
+      maxTokens: 1500,
+      temperature: 0.7,
+    });
 
-  const result = streamText({
-    model: 'openai/gpt-4o-mini',
-    system: systemMessage,
-    messages: prompt,
-    maxOutputTokens: 1500,
-    temperature: 0.7,
-    abortSignal: req.signal,
-  });
-
-  return result.toUIMessageStreamResponse({
-    onFinish: async ({ isAborted }) => {
-      if (isAborted) {
-        console.log('Chat aborted');
-      }
-    },
-    consumeSseStream: consumeStream,
-  });
+    return result.toDataStreamResponse();
+  } catch (error) {
+    console.error('[v0] Erro no chat:', error);
+    return Response.json(
+      { error: 'Erro ao processar mensagem. Tente novamente.' },
+      { status: 500 }
+    );
+  }
 }

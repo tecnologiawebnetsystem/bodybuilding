@@ -2,41 +2,99 @@ import { neon } from "@neondatabase/serverless"
 
 const sql = neon(process.env.DATABASE_URL!)
 
-// POST - Criar novo aluno com matrícula
+// POST - Criar novo aluno com cadastro completo
 export async function POST(request: Request) {
   try {
-    const { name, email, gender, height, current_weight, target_weight, plan_id, gym_id } = await request.json()
+    const data = await request.json()
 
-    // Gerar user_id único baseado no nome
-    const user_id = name.toLowerCase().replace(/\s+/g, "") + Math.random().toString(36).substring(7)
+    // Gerar user_id unico
+    const user_id = data.name.toLowerCase().replace(/\s+/g, "_").substring(0, 20) + "_" + Date.now().toString().slice(-6)
+    
+    // Usar PIN fornecido ou gerar aleatorio de 6 digitos
+    const pin = data.pin && data.pin.length === 6 ? data.pin : Math.floor(100000 + Math.random() * 900000).toString()
 
-    // Criar usuário
+    // Criar usuario
     await sql`
-      INSERT INTO users (user_id, name, email, gender, height, current_weight, target_weight, initial_weight, gym_id, role, start_date, pin, age)
-      VALUES (${user_id}, ${name}, ${email}, ${gender}, ${height}, ${current_weight}, ${target_weight}, ${current_weight}, ${gym_id}, 'student', CURRENT_DATE, '000000', 25)
+      INSERT INTO users (
+        user_id, name, cpf, email, pin, role, gym_id,
+        age, gender, height, initial_weight, target_weight, current_weight,
+        start_date
+      ) VALUES (
+        ${user_id},
+        ${data.name},
+        ${data.cpf || '000.000.000-00'},
+        ${data.email || null},
+        ${pin},
+        'student',
+        1,
+        ${data.age || 25},
+        ${data.gender || 'Masculino'},
+        ${data.height || 170},
+        ${data.currentWeight || 70},
+        ${data.targetWeight || 70},
+        ${data.currentWeight || 70},
+        CURRENT_DATE
+      )
     `
 
-    // Buscar plano para calcular datas
-    const plan = await sql`SELECT duration_months, price FROM gym_membership_plans WHERE id = ${plan_id}`
+    // Salvar preferencias do aluno
+    await sql`
+      INSERT INTO user_preferences (
+        user_id,
+        enable_calisthenics,
+        enable_running,
+        enable_supplements,
+        enable_nutrition,
+        enable_home_workouts,
+        gym_frequency,
+        preferred_split,
+        session_duration,
+        primary_goal,
+        training_experience
+      ) VALUES (
+        ${user_id},
+        ${data.includeHomeWorkouts || false},
+        ${data.includeRunning || false},
+        ${data.includeSupplements || false},
+        ${data.includeNutrition || false},
+        ${data.includeHomeWorkouts || false},
+        ${data.gymFrequency || 4},
+        ${data.preferredSplit || 'abc'},
+        ${data.sessionDuration || 60},
+        ${data.primaryGoal || 'gain_muscle'},
+        ${data.trainingExperience || 'beginner'}
+      )
+      ON CONFLICT (user_id) DO UPDATE SET
+        enable_calisthenics = EXCLUDED.enable_calisthenics,
+        enable_running = EXCLUDED.enable_running,
+        enable_supplements = EXCLUDED.enable_supplements,
+        enable_nutrition = EXCLUDED.enable_nutrition,
+        enable_home_workouts = EXCLUDED.enable_home_workouts,
+        gym_frequency = EXCLUDED.gym_frequency,
+        preferred_split = EXCLUDED.preferred_split,
+        session_duration = EXCLUDED.session_duration,
+        primary_goal = EXCLUDED.primary_goal,
+        training_experience = EXCLUDED.training_experience
+    `
 
-    if (plan.length > 0) {
-      const duration_months = plan[0].duration_months
-      const monthly_value = plan[0].price
-
-      const startDate = new Date()
-      const endDate = new Date(startDate)
-      endDate.setMonth(endDate.getMonth() + duration_months)
-
-      // Criar matrícula
-      await sql`
-        INSERT INTO student_enrollments (user_id, plan_id, start_date, end_date, monthly_value, status, gym_id)
-        VALUES (${user_id}, ${plan_id}, ${startDate.toISOString().split("T")[0]}, ${endDate.toISOString().split("T")[0]}, ${monthly_value}, 'active', ${gym_id})
-      `
+    // Salvar suplementos se houver
+    if (data.includeSupplements && data.supplements?.length > 0) {
+      for (const supp of data.supplements) {
+        await sql`
+          INSERT INTO user_supplements (user_id, supplement_name, active)
+          VALUES (${user_id}, ${supp}, true)
+        `
+      }
     }
 
-    return Response.json({ success: true, user_id })
-  } catch (error) {
+    return Response.json({ 
+      success: true, 
+      user_id, 
+      pin,
+      message: "Aluno cadastrado com sucesso! PIN: " + pin
+    })
+  } catch (error: any) {
     console.error("[v0] Erro ao criar aluno:", error)
-    return Response.json({ error: "Erro ao criar aluno" }, { status: 500 })
+    return Response.json({ error: "Erro ao criar aluno", message: error.message }, { status: 500 })
   }
 }

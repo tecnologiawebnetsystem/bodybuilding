@@ -210,7 +210,11 @@ export function WorkoutManagement() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="outline" onClick={handleGenerateWithAI} disabled={!selectedStudent || isGenerating}>
+          <Button 
+            onClick={handleGenerateWithAI} 
+            disabled={!selectedStudent || isGenerating}
+            className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white border-0"
+          >
             <Sparkles className="h-4 w-4 mr-2" />
             {isGenerating ? "Gerando..." : "Gerar com IA"}
           </Button>
@@ -231,7 +235,7 @@ export function WorkoutManagement() {
             <SelectContent>
               {students.map((student) => (
                 <SelectItem key={student.user_id} value={student.user_id}>
-                  {student.student_name} ({student.email})
+                  {student.student_name}
                 </SelectItem>
               ))}
             </SelectContent>

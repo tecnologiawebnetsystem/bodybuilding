@@ -84,7 +84,7 @@ type MenuOption =
   | "checkin"
   | "financial-complete"
 
-export function AdminPanel({ adminUsername, onLogout }: { adminUsername: string; onLogout: () => void }) {
+export function AdminPanel({ adminUsername, onLogout, gymId }: { adminUsername: string; onLogout: () => void; gymId?: string | null }) {
   const [activeMenu, setActiveMenu] = useState<MenuOption>("dashboard")
   const [notifications, setNotifications] = useState(3)
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -313,24 +313,96 @@ export function AdminPanel({ adminUsername, onLogout }: { adminUsername: string;
 
             {/* Quick Actions */}
             <div className="flex items-center gap-1 pl-3 border-l border-white/[0.08]">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-9 h-9 text-gray-400 hover:text-white hover:bg-white/[0.04]"
-              >
-                <HelpCircle className="w-4 h-4" />
-              </Button>
+              {/* Botao Ajuda */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-9 h-9 text-gray-400 hover:text-white hover:bg-white/[0.04]"
+                  >
+                    <HelpCircle className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64 bg-[#141414] border-white/[0.08]">
+                  <DropdownMenuLabel className="text-gray-400 text-xs">Central de Ajuda</DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-white/[0.08]" />
+                  <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-white/[0.04] cursor-pointer" onClick={() => window.open('https://wa.me/5511999999999?text=Preciso%20de%20ajuda%20com%20o%20sistema', '_blank')}>
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    Suporte via WhatsApp
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-white/[0.04] cursor-pointer" onClick={() => window.open('mailto:suporte@academia.com', '_blank')}>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Enviar Email de Suporte
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-white/[0.08]" />
+                  <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-white/[0.04] cursor-pointer" onClick={() => alert('Guia Rapido:\n\n1. Alunos: Cadastre e gerencie seus alunos\n2. Treinos: Crie treinos personalizados\n3. Financeiro: Controle pagamentos\n4. Check-in: Registre presenca\n\nDuvidas? Entre em contato!')}>
+                    <HelpCircle className="mr-2 h-4 w-4" />
+                    Guia Rapido
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-white/[0.04] cursor-pointer">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Versao 1.0.0
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-9 h-9 text-gray-400 hover:text-white hover:bg-white/[0.04] relative"
-              >
-                <Bell className="w-4 h-4" />
-                {notifications > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
-                )}
-              </Button>
+              {/* Botao Notificacoes */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-9 h-9 text-gray-400 hover:text-white hover:bg-white/[0.04] relative"
+                  >
+                    <Bell className="w-4 h-4" />
+                    {notifications > 0 && (
+                      <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-80 bg-[#141414] border-white/[0.08]">
+                  <DropdownMenuLabel className="text-gray-400 text-xs flex justify-between items-center">
+                    <span>Notificacoes ({notifications})</span>
+                    {notifications > 0 && (
+                      <Button variant="ghost" size="sm" className="h-6 text-xs text-orange-400 hover:text-orange-300" onClick={() => setNotifications(0)}>
+                        Marcar como lidas
+                      </Button>
+                    )}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-white/[0.08]" />
+                  {notifications > 0 ? (
+                    <>
+                      <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-white/[0.04] cursor-pointer flex-col items-start py-3">
+                        <div className="flex items-center gap-2 w-full">
+                          <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                          <span className="font-medium">Novo aluno cadastrado</span>
+                        </div>
+                        <span className="text-xs text-gray-500 ml-4">Ha 5 minutos</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-white/[0.04] cursor-pointer flex-col items-start py-3">
+                        <div className="flex items-center gap-2 w-full">
+                          <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                          <span className="font-medium">Pagamento pendente</span>
+                        </div>
+                        <span className="text-xs text-gray-500 ml-4">Ha 1 hora</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-white/[0.04] cursor-pointer flex-col items-start py-3">
+                        <div className="flex items-center gap-2 w-full">
+                          <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                          <span className="font-medium">3 alunos fizeram check-in</span>
+                        </div>
+                        <span className="text-xs text-gray-500 ml-4">Ha 2 horas</span>
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <div className="py-8 text-center text-gray-500">
+                      <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p>Nenhuma notificacao</p>
+                    </div>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -401,13 +473,6 @@ export function AdminPanel({ adminUsername, onLogout }: { adminUsername: string;
               </div>
             ))}
             <div className="flex-1" />
-            <Button
-              size="sm"
-              className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white border-0 text-xs h-8"
-            >
-              <Sparkles className="w-3 h-3 mr-1.5" />
-              Novo Aluno
-            </Button>
           </div>
         </div>
 

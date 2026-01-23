@@ -3,26 +3,36 @@ import { neon } from "@neondatabase/serverless"
 
 export async function POST(request: Request) {
   try {
-    const { cpf, pin } = await request.json()
-
-    console.log("[v0] Login attempt - CPF recebido:", cpf)
-    console.log("[v0] Login attempt - PIN recebido:", pin)
+    const { cpf, pin, userType } = await request.json()
 
     const sql = neon(process.env.DATABASE_URL!)
 
     const cpfLimpo = cpf.replace(/[.-]/g, "")
 
-    console.log("[v0] CPF limpo:", cpfLimpo)
+    // Definir roles permitidos baseado no tipo de usuario selecionado
+    let allowedRoles: string[] = []
+    
+    switch (userType) {
+      case "gym":
+        allowedRoles = ["gym_admin", "super_admin"]
+        break
+      case "trainer":
+        allowedRoles = ["trainer", "super_admin"]
+        break
+      case "superadmin":
+        allowedRoles = ["super_admin"]
+        break
+      default: // student
+        allowedRoles = ["student", "super_admin"]
+    }
 
     const users = await sql`
       SELECT user_id, name, email, role, gym_id, cpf, pin
       FROM users 
       WHERE REPLACE(REPLACE(cpf, '.', ''), '-', '') = ${cpfLimpo} 
         AND pin = ${pin} 
-        AND role IN ('student', 'super_admin')
+        AND role = ANY(${allowedRoles})
     `
-
-    console.log("[v0] Usuários encontrados:", users.length)
 
     if (users.length === 0) {
       return NextResponse.json({ error: "CPF ou PIN incorretos" }, { status: 401 })
@@ -37,7 +47,7 @@ export async function POST(request: Request) {
         name: user.name,
         email: user.email,
         gymId: user.gym_id,
-        role: user.role, // Incluindo role na resposta
+        role: user.role,
       },
     })
   } catch (error) {

@@ -1,42 +1,45 @@
 "use client"
 
-import { useState } from "react"
-import { AdminLogin } from "@/components/admin-login"
-import { WelcomeDashboard } from "@/components/welcome-dashboard"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { AdminPanel } from "@/components/admin-panel"
 
 export default function AdminPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [showWelcome, setShowWelcome] = useState(false)
-  const [userData, setUserData] = useState<any>(null)
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(true)
+  const [userName, setUserName] = useState<string | null>(null)
+  const [gymId, setGymId] = useState<string | null>(null)
 
-  const handleLogin = (data: any) => {
-    setUserData(data)
-    setShowWelcome(true)
-  }
-
-  const handleContinue = () => {
-    setShowWelcome(false)
-    setIsAuthenticated(true)
-  }
+  useEffect(() => {
+    // Verificar se o usuario esta logado via sessionStorage
+    const userId = sessionStorage.getItem("userId")
+    const storedName = sessionStorage.getItem("userName")
+    const storedGymId = sessionStorage.getItem("gymId")
+    const storedRole = sessionStorage.getItem("userRole")
+    
+    if (!userId || (storedRole !== "gym_admin" && storedRole !== "super_admin")) {
+      // Nao esta logado ou nao tem permissao, redirecionar para login
+      router.push("/login")
+      return
+    }
+    
+    setUserName(storedName || userId)
+    setGymId(storedGymId)
+    setIsLoading(false)
+  }, [router])
 
   const handleLogout = () => {
-    setIsAuthenticated(false)
-    setShowWelcome(false)
-    setUserData(null)
+    sessionStorage.clear()
+    router.push("/login")
   }
 
-  if (!userData) {
-    return <AdminLogin onLogin={handleLogin} />
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500" />
+      </div>
+    )
   }
 
-  if (showWelcome) {
-    return <WelcomeDashboard userData={userData} onContinue={handleContinue} />
-  }
-
-  if (isAuthenticated) {
-    return <AdminPanel adminUsername={userData.user.name} onLogout={handleLogout} />
-  }
-
-  return null
+  return <AdminPanel adminUsername={userName || "Admin"} onLogout={handleLogout} gymId={gymId} />
 }

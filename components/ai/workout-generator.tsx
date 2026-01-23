@@ -72,11 +72,15 @@ export function WorkoutGenerator() {
     restrictions: "",
   })
 
+  const [error, setError] = useState<string | null>(null)
+
   const handleGenerate = async () => {
     setIsGenerating(true)
     setWorkout(null)
+    setError(null)
 
     try {
+      console.log("[v0] Gerando treino com dados:", formData)
       const response = await fetch("/api/ai/generate-workout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -84,9 +88,18 @@ export function WorkoutGenerator() {
       })
 
       const data = await response.json()
-      setWorkout(data.workout)
-    } catch (error) {
-      console.error("Erro ao gerar treino:", error)
+      console.log("[v0] Resposta da API:", data)
+      
+      if (data.error) {
+        setError(data.error)
+      } else if (data.workout) {
+        setWorkout(data.workout)
+      } else {
+        setError("Resposta inesperada do servidor")
+      }
+    } catch (err) {
+      console.error("[v0] Erro ao gerar treino:", err)
+      setError("Erro ao conectar com o servidor. Tente novamente.")
     } finally {
       setIsGenerating(false)
     }
@@ -209,6 +222,13 @@ export function WorkoutGenerator() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Erro */}
+      {error && (
+        <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-center">
+          {error}
+        </div>
+      )}
 
       {/* Resultado */}
       {workout && (

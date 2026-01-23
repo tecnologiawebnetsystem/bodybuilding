@@ -58,10 +58,11 @@ const mealSuggestionSchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const { type, goal, weight, height, age, gender, activityLevel, restrictions, preferences } = await req.json();
+  try {
+    const { type, goal, weight, height, age, gender, activityLevel, restrictions, preferences } = await req.json();
 
-  if (type === 'meal-plan') {
-    const prompt = `Voce e um nutricionista esportivo especializado. Crie um plano alimentar personalizado:
+    if (type === 'meal-plan') {
+      const prompt = `Voce e um nutricionista esportivo brasileiro especializado. Crie um plano alimentar personalizado em portugues:
 
 OBJETIVO: ${goal || 'Manutencao de peso'}
 PESO: ${weight || '70'}kg
@@ -74,22 +75,22 @@ PREFERENCIAS: ${preferences || 'Sem preferencia especifica'}
 
 Calcule as necessidades caloricas e de macronutrientes.
 Crie um cardapio completo com 5-6 refeicoes diarias.
-Inclua opcoes praticas e acessiveis.
+Inclua opcoes praticas e acessiveis no Brasil.
 Adicione dicas de hidratacao e suplementacao se necessario.`;
 
-    const { object } = await generateObject({
-      model: 'openai/gpt-4o',
-      schema: mealPlanSchema,
-      prompt,
-      maxOutputTokens: 4000,
-      temperature: 0.7,
-    });
+      const { object } = await generateObject({
+        model: 'openai/gpt-5-mini',
+        schema: mealPlanSchema,
+        prompt,
+        maxTokens: 4000,
+        temperature: 0.7,
+      });
 
-    return Response.json({ mealPlan: object });
-  }
+      return Response.json({ mealPlan: object });
+    }
 
-  if (type === 'meal-suggestion') {
-    const prompt = `Voce e um nutricionista esportivo. Sugira uma refeicao para:
+    if (type === 'meal-suggestion') {
+      const prompt = `Voce e um nutricionista esportivo brasileiro. Sugira uma refeicao em portugues para:
 
 TIPO DE REFEICAO: ${preferences || 'Almoco'}
 OBJETIVO: ${goal || 'Ganho de massa'}
@@ -97,16 +98,23 @@ RESTRICOES: ${restrictions || 'Nenhuma'}
 
 Crie uma receita completa, saborosa e nutritiva com instrucoes de preparo.`;
 
-    const { object } = await generateObject({
-      model: 'openai/gpt-4o',
-      schema: mealSuggestionSchema,
-      prompt,
-      maxOutputTokens: 2000,
-      temperature: 0.8,
-    });
+      const { object } = await generateObject({
+        model: 'openai/gpt-5-mini',
+        schema: mealSuggestionSchema,
+        prompt,
+        maxTokens: 2000,
+        temperature: 0.8,
+      });
 
-    return Response.json({ suggestion: object.suggestion });
+      return Response.json({ suggestion: object.suggestion });
+    }
+
+    return Response.json({ error: 'Tipo de requisicao invalido' }, { status: 400 });
+  } catch (error) {
+    console.error('[v0] Erro no assistente de nutricao:', error);
+    return Response.json(
+      { error: 'Erro ao processar requisicao. Tente novamente.' },
+      { status: 500 }
+    );
   }
-
-  return Response.json({ error: 'Tipo de requisicao invalido' }, { status: 400 });
 }

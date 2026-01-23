@@ -4,7 +4,6 @@ import React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { useChat } from "@ai-sdk/react"
-import { DefaultChatTransport } from "ai"
 import { Button } from "@/components/ui/button"
 import { MessageCircle, X, Send, Loader2, Bot, User, Minimize2, Maximize2 } from "lucide-react"
 
@@ -16,14 +15,13 @@ interface ChatbotProps {
 export function Chatbot({ context, userName }: ChatbotProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
-  const [input, setInput] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [chatLoading, setChatLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false) // Declare isLoading variable
 
-  const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({ 
-      api: "/api/ai/chat",
-      body: { context },
-    }),
+  const { messages, input, handleInputChange, handleSubmit: handleChatSubmit, status, setInput } = useChat({
+    api: "/api/ai/chat",
+    body: { context },
   })
 
   const scrollToBottom = () => {
@@ -32,16 +30,9 @@ export function Chatbot({ context, userName }: ChatbotProps) {
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages])
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!input.trim() || status !== "ready") return
-    sendMessage({ text: input })
-    setInput("")
-  }
-
-  const isLoading = status === "streaming" || status === "submitted"
+    setChatLoading(status === "streaming" || status === "submitted")
+    setIsLoading(status === "streaming" || status === "submitted") // Update isLoading state
+  }, [messages, status])
 
   return (
     <>
@@ -67,7 +58,7 @@ export function Chatbot({ context, userName }: ChatbotProps) {
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-white/[0.08]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center mx-auto mb-4">
                 <Bot className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -162,28 +153,20 @@ export function Chatbot({ context, userName }: ChatbotProps) {
                           : "bg-white/[0.05] text-gray-200 rounded-tl-sm"
                       }`}
                     >
-                      {message.parts.map((part, index) => {
-                        if (part.type === "text") {
-                          return (
-                            <div 
-                              key={index} 
-                              className="text-sm whitespace-pre-wrap prose prose-invert prose-sm max-w-none"
-                              dangerouslySetInnerHTML={{ 
-                                __html: part.text
-                                  .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                                  .replace(/\n/g, "<br />")
-                              }}
-                            />
-                          )
-                        }
-                        return null
-                      })}
+                      <div 
+                        className="text-sm whitespace-pre-wrap prose prose-invert prose-sm max-w-none"
+                        dangerouslySetInnerHTML={{ 
+                          __html: (message.content || "")
+                            .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                            .replace(/\n/g, "<br />")
+                        }}
+                      />
                     </div>
                   </div>
                 ))}
 
                 {/* Loading indicator */}
-                {isLoading && (
+                {chatLoading && (
                   <div className="flex gap-3">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center">
                       <Bot className="w-4 h-4 text-white" />
@@ -202,22 +185,22 @@ export function Chatbot({ context, userName }: ChatbotProps) {
               </div>
 
               {/* Input */}
-              <form onSubmit={handleSubmit} className="p-4 border-t border-white/[0.08]">
+              <form onSubmit={handleChatSubmit} className="p-4 border-t border-white/[0.08]">
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={handleInputChange}
                     placeholder="Digite sua mensagem..."
                     disabled={isLoading}
                     className="flex-1 h-10 px-4 rounded-full bg-white/[0.05] border border-white/[0.1] text-white placeholder:text-gray-500 focus:border-orange-500 focus:outline-none disabled:opacity-50"
                   />
                   <Button
                     type="submit"
-                    disabled={!input.trim() || isLoading}
+                    disabled={!input.trim() || chatLoading}
                     className="w-10 h-10 rounded-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 p-0"
                   >
-                    {isLoading ? (
+                    {chatLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <Send className="w-4 h-4" />

@@ -3,9 +3,9 @@ import { neon } from "@neondatabase/serverless"
 
 const sql = neon(process.env.DATABASE_URL!)
 
-export async function PUT(request: NextRequest, { params }: { params: { userId: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   try {
-    const { userId } = params
+    const { userId } = await params
     const body = await request.json()
 
     const {
@@ -122,9 +122,9 @@ export async function PUT(request: NextRequest, { params }: { params: { userId: 
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { userId: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   try {
-    const { userId } = params
+    const { userId } = await params
 
     await sql`DELETE FROM users WHERE user_id = ${userId}`
 

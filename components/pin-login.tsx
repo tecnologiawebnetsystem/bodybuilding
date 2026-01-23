@@ -128,7 +128,13 @@ export function PinLogin({ onLogin }: PinLoginProps) {
       const data = await response.json()
 
       if (response.ok) {
+        // Salvar todos os dados do usuario no sessionStorage
         sessionStorage.setItem("userId", data.user.userId)
+        sessionStorage.setItem("userName", data.user.name)
+        sessionStorage.setItem("userRole", data.user.role)
+        if (data.user.gymId) {
+          sessionStorage.setItem("gymId", data.user.gymId.toString())
+        }
 
         if (data.user.role === "super_admin") {
           router.push("/super-admin")
