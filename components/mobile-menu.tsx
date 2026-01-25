@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Menu, X, Dumbbell, BookOpen, Users, Phone, LogIn, Rocket } from "lucide-react"
+import { Menu, X, Dumbbell, BookOpen, Users, Phone, LogIn, Rocket, CreditCard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -17,6 +17,7 @@ export function MobileMenu() {
 
   const menuItems = [
     { href: "/#features", label: "Funcionalidades", icon: Rocket },
+    { href: "/precos", label: "Precos", icon: CreditCard },
     { href: "/blog", label: "Blog", icon: BookOpen },
     { href: "/sobre-nos", label: "Sobre Nos", icon: Users },
     { href: "/contato", label: "Contato", icon: Phone },
@@ -56,7 +57,7 @@ export function MobileMenu() {
           <div className="border-t border-white/10 my-4" />
           
           <Link
-            href="/login"
+            href="/entrar"
             onClick={() => setOpen(false)}
             className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition"
           >
@@ -64,9 +65,9 @@ export function MobileMenu() {
             Entrar
           </Link>
           
-          <Link href="/get-started" onClick={() => setOpen(false)} className="mt-4">
+          <Link href="/precos" onClick={() => setOpen(false)} className="mt-4">
             <Button className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:opacity-90 text-white font-semibold h-12">
-              Comecar Gratis
+              Ver Planos
             </Button>
           </Link>
         </nav>

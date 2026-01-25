@@ -12,10 +12,11 @@ export function SharedHeader() {
 
   const navLinks = [
     { href: "/#funcionalidades", label: "Funcionalidades" },
+    { href: "/precos", label: "Precos" },
     { href: "/blog", label: "Blog" },
-    { href: "/sobre-nos", label: "Sobre Nós" },
+    { href: "/sobre-nos", label: "Sobre Nos" },
     { href: "/contato", label: "Contato" },
-    { href: "/login", label: "Fazer Login" },
+    { href: "/entrar", label: "Fazer Login" },
   ]
 
   const isActive = (href: string) => {
