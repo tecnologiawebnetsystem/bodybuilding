@@ -4,13 +4,16 @@ import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { CheckCircle, ArrowRight, Mail, Phone, Calendar, Sparkles } from "lucide-react"
+import { CheckCircle, ArrowRight, Mail, Calendar, Sparkles, Key, Copy, Check } from "lucide-react"
 import confetti from "canvas-confetti"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 export default function CheckoutSucessoPage() {
   const searchParams = useSearchParams()
   const planId = searchParams.get('plan')
+  const pin = searchParams.get('pin')
+  const [copied, setCopied] = useState(false)
+  const [checkoutData, setCheckoutData] = useState<any>(null)
 
   const planNames: Record<string, string> = {
     gym_pro: "Academia",
@@ -28,6 +31,13 @@ export default function CheckoutSucessoPage() {
   const dashboardLink = planId ? dashboardLinks[planId] || "/student" : "/student"
 
   useEffect(() => {
+    // Recuperar dados do checkout
+    const storedData = localStorage.getItem('checkout_result')
+    if (storedData) {
+      setCheckoutData(JSON.parse(storedData))
+      localStorage.removeItem('checkout_result')
+    }
+
     // Efeito de confete
     const duration = 3 * 1000
     const animationEnd = Date.now() + duration
@@ -63,6 +73,17 @@ export default function CheckoutSucessoPage() {
     return () => clearInterval(interval)
   }, [])
 
+  const copyPin = () => {
+    const pinToCopy = pin || checkoutData?.pin
+    if (pinToCopy) {
+      navigator.clipboard.writeText(pinToCopy)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  const displayPin = pin || checkoutData?.pin
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 flex items-center justify-center p-4">
       <Card className="bg-white/5 border-white/10 max-w-lg w-full">
@@ -80,6 +101,34 @@ export default function CheckoutSucessoPage() {
             Sua assinatura do plano <span className="text-orange-500 font-semibold">{planName}</span> foi confirmada!
           </p>
 
+          {/* PIN de acesso */}
+          {displayPin && (
+            <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-xl p-6 mb-6">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Key className="w-5 h-5 text-orange-400" />
+                <p className="text-white font-medium">Seu PIN de Acesso</p>
+              </div>
+              <div className="flex items-center justify-center gap-3">
+                <p className="text-4xl font-mono font-bold text-white tracking-widest">
+                  {displayPin}
+                </p>
+                <button 
+                  onClick={copyPin}
+                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition"
+                >
+                  {copied ? (
+                    <Check className="w-5 h-5 text-green-400" />
+                  ) : (
+                    <Copy className="w-5 h-5 text-gray-400" />
+                  )}
+                </button>
+              </div>
+              <p className="text-orange-300 text-sm mt-2">
+                Guarde este PIN! Voce usara ele para fazer login.
+              </p>
+            </div>
+          )}
+
           {/* Info box */}
           <div className="bg-white/5 rounded-xl p-6 mb-8 text-left space-y-4">
             <div className="flex items-start gap-4">
@@ -88,7 +137,12 @@ export default function CheckoutSucessoPage() {
               </div>
               <div>
                 <p className="text-white font-medium">Email de confirmacao</p>
-                <p className="text-gray-400 text-sm">Enviamos os detalhes da sua assinatura para seu email.</p>
+                <p className="text-gray-400 text-sm">
+                  {checkoutData?.email 
+                    ? `Enviamos os detalhes para ${checkoutData.email}`
+                    : 'Enviamos os detalhes da sua assinatura para seu email.'
+                  }
+                </p>
               </div>
             </div>
 
@@ -115,9 +169,9 @@ export default function CheckoutSucessoPage() {
 
           {/* Botoes */}
           <div className="space-y-3">
-            <Link href={dashboardLink} className="block">
+            <Link href="/entrar" className="block">
               <Button className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold">
-                Acessar Meu Painel
+                Fazer Login com meu PIN
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>

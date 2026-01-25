@@ -152,11 +152,39 @@ export default function CheckoutPage() {
     e.preventDefault()
     setIsProcessing(true)
 
-    // Simular processamento
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    try {
+      const response = await fetch('/api/checkout/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planId,
+          billing: isYearly ? 'yearly' : 'monthly',
+          paymentMethod,
+          name: formData.name,
+          email: formData.email,
+          cpf: formData.cpf.replace(/\D/g, ''),
+          phone: formData.phone.replace(/\D/g, ''),
+          cardNumber: formData.cardNumber.replace(/\D/g, ''),
+          cardExpiry: formData.cardExpiry,
+          cardCvv: formData.cardCvv,
+          cardName: formData.cardName,
+        })
+      })
 
-    // Redirecionar para sucesso
-    router.push(`/checkout/sucesso?plan=${planId}`)
+      const data = await response.json()
+
+      if (data.success) {
+        // Salvar dados no localStorage para mostrar na pagina de sucesso
+        localStorage.setItem('checkout_result', JSON.stringify(data.data))
+        router.push(`/checkout/sucesso?plan=${planId}&pin=${data.data.pin}`)
+      } else {
+        alert(data.error || 'Erro ao processar pagamento')
+      }
+    } catch (error) {
+      alert('Erro ao processar pagamento. Tente novamente.')
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
   return (
