@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Search, Calendar, User, ArrowRight } from "lucide-react"
+import { Search, Calendar, User, ArrowRight, Clock, Eye } from "lucide-react"
+import Image from "next/image"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -27,6 +28,29 @@ interface Post {
   created_at: string
   category: Category
   views: number
+  image_url?: string
+}
+
+// Imagens por categoria para fallback
+const categoryImages: Record<string, string> = {
+  "musculacao": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
+  "calistenia": "https://images.unsplash.com/photo-1598971639058-a4fac2b09d8c?w=800&q=80",
+  "corrida": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80",
+  "nutricao": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80",
+  "suplementos": "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=800&q=80",
+  "personal-trainer": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80",
+  "academia": "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=800&q=80",
+  "saude": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+  "academia-e-treino": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
+  "alimentacao": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80",
+  "hidratacao": "https://images.unsplash.com/photo-1559839914-17aae19cec71?w=800&q=80",
+  "saude-e-bem-estar": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+}
+
+const getPostImage = (post: Post) => {
+  if (post.image_url) return post.image_url
+  const categorySlug = post.category?.slug || "academia"
+  return categoryImages[categorySlug] || categoryImages["academia"]
 }
 
 export default function BlogPage() {
@@ -82,16 +106,26 @@ export default function BlogPage() {
       <SharedHeader />
 
       {/* Hero */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto text-center">
+      <section className="py-16 px-4 relative overflow-hidden">
+        {/* Background decorativo */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-orange-500/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-red-500/10 rounded-full blur-3xl" />
+        </div>
+        
+        <div className="container mx-auto text-center relative z-10">
+          <Badge className="mb-4 bg-orange-500/20 text-orange-400 border-orange-500/30">
+            +90 artigos exclusivos
+          </Badge>
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
             Blog{" "}
             <span className="bg-gradient-to-r from-red-500 to-orange-500 text-transparent bg-clip-text">
-              FitTransform
+              Fit Transform
             </span>
           </h1>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Conteúdo de qualidade sobre gestão de academias, treinos, alimentação e saúde
+            Tudo sobre musculacao, calistenia, corrida, nutricao e suplementacao. 
+            Transforme seu corpo e mente com conteudo de qualidade!
           </p>
 
           {/* Busca */}
@@ -99,11 +133,27 @@ export default function BlogPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <Input
               type="text"
-              placeholder="Buscar artigos..."
+              placeholder="Buscar artigos sobre treino, dieta, suplementos..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 h-14 bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+              className="pl-12 h-14 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-orange-500 focus:ring-orange-500/20"
             />
+          </div>
+
+          {/* Stats */}
+          <div className="flex flex-wrap justify-center gap-8 mt-10">
+            <div className="text-center">
+              <p className="text-3xl font-bold text-orange-500">90+</p>
+              <p className="text-gray-400 text-sm">Artigos</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-orange-500">6</p>
+              <p className="text-gray-400 text-sm">Categorias</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-orange-500">100%</p>
+              <p className="text-gray-400 text-sm">Gratuito</p>
+            </div>
           </div>
         </div>
       </section>
@@ -162,29 +212,55 @@ export default function BlogPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredPosts.map((post) => (
                   <Link key={post.id} href={`/blog/${post.slug}`}>
-                    <Card className="h-full bg-white/5 border-white/10 hover:bg-white/10 transition cursor-pointer group">
-                      <CardHeader>
-                        <div className="flex items-center gap-2 mb-3">
-                          <Badge className="bg-gradient-to-r from-red-600 to-orange-500 border-0 text-white">
-                            {post.category?.name || "Sem categoria"}
+                    <Card className="h-full bg-white/5 border-white/10 hover:bg-white/10 hover:border-orange-500/30 transition-all duration-300 cursor-pointer group overflow-hidden">
+                      {/* Imagem */}
+                      <div className="relative h-48 overflow-hidden">
+                        <Image
+                          src={getPostImage(post) || "/placeholder.svg"}
+                          alt={post.title}
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                        <Badge className="absolute top-3 left-3 bg-gradient-to-r from-red-600 to-orange-500 border-0 text-white">
+                          {post.category?.name || "Sem categoria"}
+                        </Badge>
+                        {post.views > 100 && (
+                          <Badge className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm border-0 text-white">
+                            Popular
                           </Badge>
-                          <span className="text-xs text-gray-400 flex items-center gap-1">
+                        )}
+                      </div>
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center gap-3 text-xs text-gray-400 mb-2">
+                          <span className="flex items-center gap-1">
                             <Calendar size={12} />
                             {post.created_at ? new Date(post.created_at).toLocaleDateString("pt-BR") : ""}
                           </span>
+                          <span className="flex items-center gap-1">
+                            <Eye size={12} />
+                            {post.views || 0} views
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock size={12} />
+                            5 min
+                          </span>
                         </div>
-                        <CardTitle className="text-white group-hover:text-orange-400 transition">
+                        <CardTitle className="text-white group-hover:text-orange-400 transition line-clamp-2 text-lg">
                           {post.title}
                         </CardTitle>
-                        <CardDescription className="text-gray-400 line-clamp-2">{post.excerpt}</CardDescription>
+                        <CardDescription className="text-gray-400 line-clamp-2 text-sm">{post.excerpt}</CardDescription>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="pt-0">
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-500 flex items-center gap-1">
                             <User size={14} />
                             {post.author}
                           </span>
-                          <ArrowRight className="text-orange-500 group-hover:translate-x-1 transition" size={20} />
+                          <span className="text-orange-500 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                            Ler mais
+                            <ArrowRight size={16} />
+                          </span>
                         </div>
                       </CardContent>
                     </Card>
