@@ -3,7 +3,11 @@ import { neon } from "@neondatabase/serverless"
 
 export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
   try {
-    const sql = neon(process.env.DATABASE_URL!)
+    const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL
+    if (!databaseUrl) {
+      return NextResponse.json({ error: "Database not configured" }, { status: 500 })
+    }
+    const sql = neon(databaseUrl)
     const { slug } = params
 
     const posts = await sql`

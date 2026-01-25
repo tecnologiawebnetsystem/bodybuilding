@@ -16,14 +16,15 @@ export async function POST(request: Request) {
     // Criar usuario
     await sql`
       INSERT INTO users (
-        user_id, name, cpf, email, pin, role, gym_id,
+        user_id, name, cpf, email, phone, pin, role, gym_id,
         age, gender, height, initial_weight, target_weight, current_weight,
-        start_date
+        injuries_limitations, start_date
       ) VALUES (
         ${user_id},
         ${data.name},
         ${data.cpf || '000.000.000-00'},
         ${data.email || null},
+        ${data.phone || null},
         ${pin},
         'student',
         1,
@@ -33,6 +34,7 @@ export async function POST(request: Request) {
         ${data.currentWeight || 70},
         ${data.targetWeight || 70},
         ${data.currentWeight || 70},
+        ${data.injuriesLimitations || null},
         CURRENT_DATE
       )
     `
@@ -46,11 +48,11 @@ export async function POST(request: Request) {
         enable_supplements,
         enable_nutrition,
         enable_home_workouts,
-        gym_frequency,
-        preferred_split,
-        session_duration,
-        primary_goal,
-        training_experience
+        enable_gym_workouts,
+        running_level,
+        home_workout_focus,
+        nutrition_goal,
+        workout_goal
       ) VALUES (
         ${user_id},
         ${data.includeHomeWorkouts || false},
@@ -58,11 +60,11 @@ export async function POST(request: Request) {
         ${data.includeSupplements || false},
         ${data.includeNutrition || false},
         ${data.includeHomeWorkouts || false},
-        ${data.gymFrequency || 4},
-        ${data.preferredSplit || 'abc'},
-        ${data.sessionDuration || 60},
-        ${data.primaryGoal || 'gain_muscle'},
-        ${data.trainingExperience || 'beginner'}
+        true,
+        ${data.runningLevel || 'beginner'},
+        ${data.homeFocus?.join(',') || ''},
+        ${data.dietType || 'balanced'},
+        ${data.primaryGoal || 'gain_muscle'}
       )
       ON CONFLICT (user_id) DO UPDATE SET
         enable_calisthenics = EXCLUDED.enable_calisthenics,
@@ -70,12 +72,85 @@ export async function POST(request: Request) {
         enable_supplements = EXCLUDED.enable_supplements,
         enable_nutrition = EXCLUDED.enable_nutrition,
         enable_home_workouts = EXCLUDED.enable_home_workouts,
-        gym_frequency = EXCLUDED.gym_frequency,
-        preferred_split = EXCLUDED.preferred_split,
-        session_duration = EXCLUDED.session_duration,
-        primary_goal = EXCLUDED.primary_goal,
-        training_experience = EXCLUDED.training_experience
+        enable_gym_workouts = EXCLUDED.enable_gym_workouts,
+        running_level = EXCLUDED.running_level,
+        home_workout_focus = EXCLUDED.home_workout_focus,
+        nutrition_goal = EXCLUDED.nutrition_goal,
+        workout_goal = EXCLUDED.workout_goal
     `
+
+    // Salvar configuracao de treino
+    await sql`
+      INSERT INTO user_training_config (
+        user_id,
+        training_frequency,
+        training_split,
+        workout_duration_min,
+        workout_duration_max,
+        primary_goal,
+        experience_level,
+        intensity_level
+      ) VALUES (
+        ${user_id},
+        ${data.gymFrequency || 4},
+        ${data.preferredSplit || 'abc'},
+        ${data.sessionDuration || 60},
+        ${data.sessionDuration || 60},
+        ${data.primaryGoal || 'gain_muscle'},
+        ${data.trainingExperience || 'beginner'},
+        ${data.goalIntensity || 'moderate'}
+      )
+      ON CONFLICT (user_id) DO UPDATE SET
+        training_frequency = EXCLUDED.training_frequency,
+        training_split = EXCLUDED.training_split,
+        workout_duration_min = EXCLUDED.workout_duration_min,
+        workout_duration_max = EXCLUDED.workout_duration_max,
+        primary_goal = EXCLUDED.primary_goal,
+        experience_level = EXCLUDED.experience_level,
+        intensity_level = EXCLUDED.intensity_level
+    `
+
+    // Salvar configuracao de nutricao se houver
+    if (data.includeNutrition) {
+      await sql`
+        INSERT INTO user_nutrition_config (
+          user_id,
+          diet_type,
+          meals_per_day,
+          avoid_foods
+        ) VALUES (
+          ${user_id},
+          ${data.dietType || 'balanced'},
+          ${data.mealsPerDay || 4},
+          ${data.foodRestrictions?.join(',') || ''}
+        )
+        ON CONFLICT (user_id) DO UPDATE SET
+          diet_type = EXCLUDED.diet_type,
+          meals_per_day = EXCLUDED.meals_per_day,
+          avoid_foods = EXCLUDED.avoid_foods
+      `
+    }
+
+    // Salvar configuracao de cardio/corrida se houver
+    if (data.includeRunning) {
+      await sql`
+        INSERT INTO user_cardio_config (
+          user_id,
+          cardio_frequency,
+          intensity_level,
+          preferred_type
+        ) VALUES (
+          ${user_id},
+          ${data.runningFrequency || 2},
+          ${data.runningLevel || 'beginner'},
+          'running'
+        )
+        ON CONFLICT (user_id) DO UPDATE SET
+          cardio_frequency = EXCLUDED.cardio_frequency,
+          intensity_level = EXCLUDED.intensity_level,
+          preferred_type = EXCLUDED.preferred_type
+      `
+    }
 
     // Salvar suplementos se houver
     if (data.includeSupplements && data.supplements?.length > 0) {

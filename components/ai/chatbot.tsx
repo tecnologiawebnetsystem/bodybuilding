@@ -4,6 +4,7 @@ import React from "react"
 
 import { useState, useRef, useEffect } from "react"
 import { useChat } from "@ai-sdk/react"
+import { DefaultChatTransport } from "ai"
 import { Button } from "@/components/ui/button"
 import { MessageCircle, X, Send, Loader2, Bot, User, Minimize2, Maximize2 } from "lucide-react"
 
@@ -12,17 +13,28 @@ interface ChatbotProps {
   userName?: string
 }
 
+// Helper para extrair texto de uma mensagem
+function getMessageText(message: { parts?: Array<{ type: string; text?: string }> }): string {
+  if (!message.parts || !Array.isArray(message.parts)) return '';
+  return message.parts
+    .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
+    .map((p) => p.text)
+    .join('');
+}
+
 export function Chatbot({ context, userName }: ChatbotProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
+  const [input, setInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const [chatLoading, setChatLoading] = useState(false)
-  const [isLoading, setIsLoading] = useState(false) // Declare isLoading variable
 
-  const { messages, input, handleInputChange, handleSubmit: handleChatSubmit, status, setInput } = useChat({
-    api: "/api/ai/chat",
-    body: { context },
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({ 
+      api: "/api/ai/chat",
+    }),
   })
+
+  const isLoading = status === 'streaming' || status === 'submitted'
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -30,9 +42,18 @@ export function Chatbot({ context, userName }: ChatbotProps) {
 
   useEffect(() => {
     scrollToBottom()
-    setChatLoading(status === "streaming" || status === "submitted")
-    setIsLoading(status === "streaming" || status === "submitted") // Update isLoading state
-  }, [messages, status])
+  }, [messages])
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!input.trim() || isLoading) return
+    sendMessage({ text: input })
+    setInput('')
+  }
+
+  const handleSuggestion = (suggestion: string) => {
+    sendMessage({ text: suggestion })
+  }
 
   return (
     <>
@@ -58,7 +79,7 @@ export function Chatbot({ context, userName }: ChatbotProps) {
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-white/[0.08]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center mx-auto mb-4">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center">
                 <Bot className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -112,9 +133,7 @@ export function Chatbot({ context, userName }: ChatbotProps) {
                         ].map((suggestion, i) => (
                           <button
                             key={i}
-                            onClick={() => {
-                              setInput(suggestion)
-                            }}
+                            onClick={() => handleSuggestion(suggestion)}
                             className="px-3 py-1.5 text-xs bg-white/[0.05] border border-white/[0.1] rounded-full text-gray-400 hover:text-white hover:border-orange-500/50 transition-colors"
                           >
                             {suggestion}
@@ -126,47 +145,51 @@ export function Chatbot({ context, userName }: ChatbotProps) {
                 )}
 
                 {/* Chat messages */}
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex gap-3 ${
-                      message.role === "user" ? "flex-row-reverse" : ""
-                    }`}
-                  >
+                {messages.map((message) => {
+                  const messageText = getMessageText(message);
+                  
+                  return (
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                        message.role === "user"
-                          ? "bg-gradient-to-r from-blue-500 to-purple-600"
-                          : "bg-gradient-to-r from-orange-500 to-red-600"
+                      key={message.id}
+                      className={`flex gap-3 ${
+                        message.role === "user" ? "flex-row-reverse" : ""
                       }`}
                     >
-                      {message.role === "user" ? (
-                        <User className="w-4 h-4 text-white" />
-                      ) : (
-                        <Bot className="w-4 h-4 text-white" />
-                      )}
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                          message.role === "user"
+                            ? "bg-gradient-to-r from-blue-500 to-purple-600"
+                            : "bg-gradient-to-r from-orange-500 to-red-600"
+                        }`}
+                      >
+                        {message.role === "user" ? (
+                          <User className="w-4 h-4 text-white" />
+                        ) : (
+                          <Bot className="w-4 h-4 text-white" />
+                        )}
+                      </div>
+                      <div
+                        className={`max-w-[80%] p-3 rounded-2xl ${
+                          message.role === "user"
+                            ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-tr-sm"
+                            : "bg-white/[0.05] text-gray-200 rounded-tl-sm"
+                        }`}
+                      >
+                        <div 
+                          className="text-sm whitespace-pre-wrap prose prose-invert prose-sm max-w-none"
+                          dangerouslySetInnerHTML={{ 
+                            __html: (messageText || "")
+                              .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                              .replace(/\n/g, "<br />")
+                          }}
+                        />
+                      </div>
                     </div>
-                    <div
-                      className={`max-w-[80%] p-3 rounded-2xl ${
-                        message.role === "user"
-                          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-tr-sm"
-                          : "bg-white/[0.05] text-gray-200 rounded-tl-sm"
-                      }`}
-                    >
-                      <div 
-                        className="text-sm whitespace-pre-wrap prose prose-invert prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ 
-                          __html: (message.content || "")
-                            .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                            .replace(/\n/g, "<br />")
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
 
                 {/* Loading indicator */}
-                {chatLoading && (
+                {isLoading && (
                   <div className="flex gap-3">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center">
                       <Bot className="w-4 h-4 text-white" />
@@ -185,22 +208,22 @@ export function Chatbot({ context, userName }: ChatbotProps) {
               </div>
 
               {/* Input */}
-              <form onSubmit={handleChatSubmit} className="p-4 border-t border-white/[0.08]">
+              <form onSubmit={handleSubmit} className="p-4 border-t border-white/[0.08]">
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={input}
-                    onChange={handleInputChange}
+                    onChange={(e) => setInput(e.target.value)}
                     placeholder="Digite sua mensagem..."
                     disabled={isLoading}
                     className="flex-1 h-10 px-4 rounded-full bg-white/[0.05] border border-white/[0.1] text-white placeholder:text-gray-500 focus:border-orange-500 focus:outline-none disabled:opacity-50"
                   />
                   <Button
                     type="submit"
-                    disabled={!input.trim() || chatLoading}
+                    disabled={!input.trim() || isLoading}
                     className="w-10 h-10 rounded-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 p-0"
                   >
-                    {chatLoading ? (
+                    {isLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <Send className="w-4 h-4" />

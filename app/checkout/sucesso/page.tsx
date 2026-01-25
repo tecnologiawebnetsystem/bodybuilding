@@ -1,0 +1,197 @@
+"use client"
+
+import { useSearchParams } from "next/navigation"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { CheckCircle, ArrowRight, Mail, Calendar, Sparkles, Key, Copy, Check } from "lucide-react"
+import confetti from "canvas-confetti"
+import { useEffect, useState } from "react"
+
+export default function CheckoutSucessoPage() {
+  const searchParams = useSearchParams()
+  const planId = searchParams.get('plan')
+  const pin = searchParams.get('pin')
+  const [copied, setCopied] = useState(false)
+  const [checkoutData, setCheckoutData] = useState<any>(null)
+
+  const planNames: Record<string, string> = {
+    gym_pro: "Academia",
+    trainer_pro: "Personal Trainer",
+    student_premium: "Aluno Premium"
+  }
+
+  const planName = planId ? planNames[planId] || "Premium" : "Premium"
+  // Redirecionar para onboarding em vez do dashboard direto
+  const dashboardLink = "/onboarding"
+
+  useEffect(() => {
+    // Recuperar dados do checkout (NAO remover aqui, vai ser usado no onboarding)
+    const storedData = localStorage.getItem('checkout_result')
+    if (storedData) {
+      setCheckoutData(JSON.parse(storedData))
+      // NAO remover aqui - sera removido no onboarding
+    }
+
+    // Efeito de confete
+    const duration = 3 * 1000
+    const animationEnd = Date.now() + duration
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 }
+
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min
+    }
+
+    const interval: NodeJS.Timeout = setInterval(function() {
+      const timeLeft = animationEnd - Date.now()
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval)
+      }
+
+      const particleCount = 50 * (timeLeft / duration)
+
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+        colors: ['#f97316', '#ef4444', '#22c55e', '#3b82f6']
+      })
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+        colors: ['#f97316', '#ef4444', '#22c55e', '#3b82f6']
+      })
+    }, 250)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  const copyPin = () => {
+    const pinToCopy = pin || checkoutData?.pin
+    if (pinToCopy) {
+      navigator.clipboard.writeText(pinToCopy)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  const displayPin = pin || checkoutData?.pin
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 flex items-center justify-center p-4">
+      <Card className="bg-white/5 border-white/10 max-w-lg w-full">
+        <CardContent className="pt-8 pb-8 text-center">
+          {/* Icone de sucesso */}
+          <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="w-10 h-10 text-green-500" />
+          </div>
+
+          {/* Titulo */}
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Parabens!
+          </h1>
+          <p className="text-xl text-gray-300 mb-6">
+            Sua assinatura do plano <span className="text-orange-500 font-semibold">{planName}</span> foi confirmada!
+          </p>
+
+          {/* PIN de acesso */}
+          {displayPin && (
+            <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-xl p-6 mb-6">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Key className="w-5 h-5 text-orange-400" />
+                <p className="text-white font-medium">Seu PIN de Acesso</p>
+              </div>
+              <div className="flex items-center justify-center gap-3">
+                <p className="text-4xl font-mono font-bold text-white tracking-widest">
+                  {displayPin}
+                </p>
+                <button 
+                  onClick={copyPin}
+                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition"
+                >
+                  {copied ? (
+                    <Check className="w-5 h-5 text-green-400" />
+                  ) : (
+                    <Copy className="w-5 h-5 text-gray-400" />
+                  )}
+                </button>
+              </div>
+              <p className="text-orange-300 text-sm mt-2">
+                Guarde este PIN! Voce usara ele para fazer login.
+              </p>
+            </div>
+          )}
+
+          {/* Info box */}
+          <div className="bg-white/5 rounded-xl p-6 mb-8 text-left space-y-4">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                <Mail className="w-5 h-5 text-orange-400" />
+              </div>
+              <div>
+                <p className="text-white font-medium">Email de confirmacao</p>
+                <p className="text-gray-400 text-sm">
+                  {checkoutData?.email 
+                    ? `Enviamos os detalhes para ${checkoutData.email}`
+                    : 'Enviamos os detalhes da sua assinatura para seu email.'
+                  }
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                <Calendar className="w-5 h-5 text-blue-400" />
+              </div>
+              <div>
+                <p className="text-white font-medium">Periodo de teste</p>
+                <p className="text-gray-400 text-sm">Voce tem 7 dias gratuitos para explorar todas as funcionalidades.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-5 h-5 text-green-400" />
+              </div>
+              <div>
+                <p className="text-white font-medium">Acesso liberado</p>
+                <p className="text-gray-400 text-sm">Voce ja pode comecar a usar a plataforma agora mesmo!</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Botoes */}
+          <div className="space-y-3">
+            <Link href="/entrar" className="block">
+              <Button className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold">
+                Fazer Login com meu PIN
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </Link>
+
+            <Link href="/" className="block">
+              <Button variant="outline" className="w-full h-12 border-white/20 text-gray-300 hover:bg-white/10 bg-transparent">
+                Voltar para o Inicio
+              </Button>
+            </Link>
+          </div>
+
+          {/* Suporte */}
+          <div className="mt-8 pt-6 border-t border-white/10">
+            <p className="text-gray-400 text-sm">
+              Precisa de ajuda? Entre em contato conosco
+            </p>
+            <div className="flex items-center justify-center gap-4 mt-2">
+              <a href="mailto:suporte@fittransform.com.br" className="text-orange-400 hover:text-orange-300 text-sm flex items-center gap-1">
+                <Mail className="w-4 h-4" />
+                suporte@fittransform.com.br
+              </a>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Shield, Trophy, Building2, DumbbellIcon, Sparkles, ArrowRight } from "lucide-react"
+import { Shield, Trophy, Building2, DumbbellIcon, Sparkles, ArrowRight, BookOpen } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import type { UserRole } from "@/lib/user-roles"
@@ -37,6 +37,17 @@ export function MoreTab({ userId, preferences }: MoreTabProps) {
   }, [userId])
 
   const allFeatures = [
+    {
+      id: "blog",
+      title: "Blog Fit Transform",
+      description: "Artigos sobre treino, nutrição, suplementação e muito mais",
+      icon: BookOpen,
+      gradient: "from-orange-500 to-red-600",
+      link: "/blog",
+      badge: "90+ artigos",
+      badgeColor: "bg-orange-100 text-orange-700",
+      roles: ["student", "trainer", "gym_owner", "admin"] as UserRole[],
+    },
     {
       id: "achievements",
       title: "Conquistas e Badges",

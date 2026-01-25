@@ -3,7 +3,14 @@ import { neon } from "@neondatabase/serverless"
 
 export async function GET(request: NextRequest) {
   try {
-    const sql = neon(process.env.DATABASE_URL!)
+    const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL
+    
+    if (!databaseUrl) {
+      console.error("[v0] DATABASE_URL not found")
+      return NextResponse.json({ error: "Database not configured" }, { status: 500 })
+    }
+
+    const sql = neon(databaseUrl)
     const searchParams = request.nextUrl.searchParams
     const category = searchParams.get("category")
 
@@ -31,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(posts)
   } catch (error) {
-    console.error("Erro ao buscar posts:", error)
-    return NextResponse.json({ error: "Erro ao buscar posts" }, { status: 500 })
+    console.error("[v0] Erro ao buscar posts:", error)
+    return NextResponse.json({ error: "Erro ao buscar posts", details: String(error) }, { status: 500 })
   }
 }

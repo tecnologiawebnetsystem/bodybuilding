@@ -1,6 +1,8 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Dumbbell, Users, TrendingUp, Calendar, Smartphone, CheckCircle, ArrowRight, Star, Play, Shield, Zap, Clock, CreditCard, BarChart3, Menu } from "lucide-react"
+import { Dumbbell, Users, TrendingUp, Calendar, Smartphone, CheckCircle, ArrowRight, Star, Play, Shield, Zap, Clock, CreditCard, BarChart3, Menu, BookOpen } from "lucide-react"
+import { MobileMenu } from "@/components/mobile-menu"
+import { Chatbot } from "@/components/chatbot"
 
 export default function HomePage() {
   return (
@@ -26,6 +28,9 @@ export default function HomePage() {
             <Link href="#features" className="text-gray-400 hover:text-white transition text-sm font-medium">
               Funcionalidades
             </Link>
+            <Link href="/precos" className="text-gray-400 hover:text-white transition text-sm font-medium">
+              Precos
+            </Link>
             <Link href="#testimonials" className="text-gray-400 hover:text-white transition text-sm font-medium">
               Depoimentos
             </Link>
@@ -35,17 +40,15 @@ export default function HomePage() {
             <Link href="/sobre-nos" className="text-gray-400 hover:text-white transition text-sm font-medium">
               Sobre Nos
             </Link>
-            <Link href="/contato" className="text-gray-400 hover:text-white transition text-sm font-medium">
-              Contato
-            </Link>
           </nav>
           <div className="flex items-center gap-4">
-            <Link href="/login" className="hidden md:block text-gray-300 hover:text-white transition text-sm font-medium">
+            <Link href="/entrar" className="hidden md:block text-gray-300 hover:text-white transition text-sm font-medium">
               Entrar
             </Link>
-            <Button className="bg-white text-black hover:bg-gray-100 font-semibold shadow-lg">
-              <Link href="/get-started">Comecar Gratis</Link>
+            <Button className="hidden sm:flex bg-white text-black hover:bg-gray-100 font-semibold shadow-lg">
+              <Link href="/precos">Ver Planos</Link>
             </Button>
+            <MobileMenu />
           </div>
         </div>
       </header>
@@ -346,6 +349,9 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* Chatbot */}
+      <Chatbot />
     </div>
   )
 }
