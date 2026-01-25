@@ -4,6 +4,7 @@ import { MobileMenu } from "./mobile-menu"
 
 const navigation = [
   { name: "Início", href: "/" },
+  { name: "Blog", href: "/blog" },
   { name: "Sobre", href: "/about" },
   { name: "Contato", href: "/contact" },
 ]

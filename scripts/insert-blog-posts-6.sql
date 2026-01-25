@@ -1,260 +1,449 @@
--- ARTIGOS SOBRE PERSONAL TRAINER (categoria_id = 6)
-INSERT INTO blog_posts (title, slug, excerpt, content, category_id, author, tags, meta_title, meta_description, keywords, reading_time, featured, published) VALUES
+-- Artigos sobre SAUDE E BEM-ESTAR (10 artigos)
 
-('Por Que Contratar um Personal Trainer', 'por-que-contratar-personal-trainer',
-'Descubra as vantagens de ter um personal trainer e como ele pode acelerar seus resultados.',
-'<h2>Vantagens de Ter um Personal</h2>
+INSERT INTO blog_posts (slug, title, excerpt, content, image_url, category_id, author, published, created_at) VALUES
 
-<h3>1. Treino Personalizado</h3>
-<p>Cada pessoa e unica. Um personal cria treinos especificos para seus objetivos, limitacoes e preferencias.</p>
+('importancia-sono-ganho-muscular',
+'A Importância do Sono para Ganho Muscular: Descanse para Crescer',
+'Entenda por que o sono é tão importante quanto o treino para seus resultados e como a Fit Transform monitora sua recuperação.',
+'<h2>Músculos Crescem Enquanto Você Dorme</h2>
+<p>O sono é quando a mágica acontece. Durante o sono profundo, seu corpo libera hormônios essenciais para o crescimento muscular. Na <strong>Fit Transform</strong>, enfatizamos a recuperação como pilar fundamental.</p>
 
-<h3>2. Tecnica Correta</h3>
-<p>Aprenda a executar os exercicios corretamente, prevenindo lesoes e maximizando resultados.</p>
-
-<h3>3. Motivacao</h3>
-<p>Ter alguem te acompanhando aumenta o comprometimento e a consistencia.</p>
-
-<h3>4. Resultados Mais Rapidos</h3>
-<p>Com orientacao adequada, voce alcanca seus objetivos em menos tempo.</p>
-
-<h3>5. Seguranca</h3>
-<p>Especialmente importante para iniciantes ou pessoas com condicoes especiais.</p>
-
-<h2>Quando Contratar?</h2>
+<h3>O que Acontece Durante o Sono</h3>
 <ul>
-<li>Voce e iniciante</li>
-<li>Estagnou nos resultados</li>
-<li>Tem lesoes ou limitacoes</li>
-<li>Quer resultados mais rapidos</li>
-<li>Precisa de motivacao</li>
+<li><strong>GH (Hormônio do Crescimento):</strong> Pico de liberação durante o sono profundo</li>
+<li><strong>Testosterona:</strong> Níveis restaurados durante a noite</li>
+<li><strong>Síntese Proteica:</strong> Acelerada durante o repouso</li>
+<li><strong>Recuperação Neural:</strong> Sistema nervoso se recupera</li>
 </ul>
 
-<h2>Fit Transform para Personais</h2>
-<p>A Fit Transform e a melhor plataforma para personal trainers gerenciarem seus alunos, treinos e financeiro.</p>',
-6, 'Equipe Fit Transform', ARRAY['personal trainer', 'treino personalizado', 'academia'],
-'Por Que Contratar Personal Trainer | Fit Transform',
-'Vantagens de ter um personal trainer para seus treinos.',
-ARRAY['contratar personal trainer', 'vantagens personal', 'personal trainer vale pena'], 6, true, true),
-
-('Como Escolher o Personal Trainer Ideal', 'como-escolher-personal-trainer-ideal',
-'Dicas para encontrar o personal trainer perfeito para seus objetivos.',
-'<h2>O que Avaliar</h2>
-
-<h3>1. Formacao</h3>
-<p>Verifique se tem CREF ativo e formacao em Educacao Fisica.</p>
-
-<h3>2. Especializacao</h3>
-<p>Alguns sao especialistas em hipertrofia, outros em emagrecimento, reabilitacao, etc.</p>
-
-<h3>3. Experiencia</h3>
-<p>Pergunte sobre experiencia com alunos similares a voce.</p>
-
-<h3>4. Metodologia</h3>
-<p>Entenda como ele trabalha e se faz sentido para voce.</p>
-
-<h3>5. Comunicacao</h3>
-<p>E importante que voces se comuniquem bem.</p>
-
-<h2>Perguntas para Fazer</h2>
+<h3>Quanto Dormir?</h3>
+<p>Para otimizar resultados:</p>
 <ul>
-<li>Qual sua formacao e especializacao?</li>
-<li>Como voce monta os treinos?</li>
-<li>Como acompanha o progresso dos alunos?</li>
-<li>Oferece suporte fora dos treinos?</li>
-<li>Quais resultados posso esperar?</li>
+<li><strong>Mínimo:</strong> 7 horas</li>
+<li><strong>Ideal:</strong> 8-9 horas</li>
+<li><strong>Atletas:</strong> 9-10 horas</li>
 </ul>
 
-<h2>Red Flags</h2>
+<h3>Qualidade vs Quantidade</h3>
+<p>Não basta dormir muito, precisa dormir bem:</p>
 <ul>
-<li>Promessas irrealistas</li>
-<li>Nao tem CREF</li>
-<li>Nao faz avaliacao inicial</li>
-<li>Treino igual para todos</li>
-</ul>',
-6, 'Equipe Fit Transform', ARRAY['personal trainer', 'escolher personal', 'academia'],
-'Como Escolher Personal Trainer | Fit Transform',
-'Dicas para escolher o melhor personal trainer.',
-ARRAY['como escolher personal', 'melhor personal trainer', 'encontrar personal'], 5, false, true),
-
-('Quanto Custa um Personal Trainer?', 'quanto-custa-personal-trainer',
-'Guia de precos e o que considerar ao investir em um personal trainer.',
-'<h2>Faixa de Precos</h2>
-<p>Os precos variam muito dependendo da regiao, experiencia e formato:</p>
-
-<h3>Aula Avulsa</h3>
-<p>R$ 80 a R$ 250 por sessao</p>
-
-<h3>Pacote Mensal (2x/semana)</h3>
-<p>R$ 500 a R$ 1.500 por mes</p>
-
-<h3>Pacote Mensal (3x/semana)</h3>
-<p>R$ 800 a R$ 2.000 por mes</p>
-
-<h3>Online</h3>
-<p>R$ 200 a R$ 800 por mes</p>
-
-<h2>O que Influencia o Preco</h2>
-<ul>
-<li>Experiencia do profissional</li>
-<li>Localizacao</li>
-<li>Local do treino (academia, domicilio, online)</li>
-<li>Servicos inclusos (nutricao, acompanhamento)</li>
+<li>Quarto escuro e fresco</li>
+<li>Evitar telas 1h antes</li>
+<li>Horário consistente</li>
+<li>Evitar cafeína após 14h</li>
 </ul>
 
-<h2>Vale o Investimento?</h2>
-<p>Considere o custo de:</p>
+<h3>Impacto da Privação de Sono</h3>
 <ul>
-<li>Meses de treino sem resultados</li>
-<li>Lesoes por ma execucao</li>
-<li>Tempo perdido</li>
+<li>Redução de 60% na síntese proteica</li>
+<li>Aumento do cortisol</li>
+<li>Menor recuperação</li>
+<li>Mais fome e compulsão</li>
 </ul>
 
-<h2>Fit Transform</h2>
-<p>Personais que usam a Fit Transform conseguem oferecer mais valor aos alunos com acompanhamento completo.</p>',
-6, 'Equipe Fit Transform', ARRAY['personal trainer', 'preco personal', 'investimento'],
-'Quanto Custa Personal Trainer | Fit Transform',
-'Guia de precos de personal trainer no Brasil.',
-ARRAY['preco personal trainer', 'quanto custa personal', 'valor personal trainer'], 5, false, true),
+<p><em>O sistema Fit Transform inclui monitoramento de sono para otimizar sua recuperação.</em></p>',
+'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=800', 5, 'Equipe Fit Transform', true, NOW() - INTERVAL '3 days'),
 
-('Personal Trainer Online: Como Funciona', 'personal-trainer-online-como-funciona',
-'Entenda como funciona o personal trainer online e se e para voce.',
-'<h2>O que e Personal Online?</h2>
-<p>Acompanhamento a distancia, com treinos personalizados enviados por app ou plataforma.</p>
+('como-evitar-lesoes-academia',
+'Como Evitar Lesões na Academia: Guia Completo de Prevenção',
+'Aprenda a treinar de forma segura e prevenir lesões com as dicas dos profissionais Fit Transform.',
+'<h2>Prevenção é Melhor que Remédio</h2>
+<p>Lesões podem atrasar seus resultados em meses ou anos. Na <strong>Fit Transform</strong>, priorizamos a segurança em cada treino.</p>
 
-<h2>Como Funciona</h2>
-<ol>
-<li>Avaliacao inicial por video chamada</li>
-<li>Elaboracao do treino personalizado</li>
-<li>Envio do treino pela plataforma</li>
-<li>Aluno executa sozinho</li>
-<li>Acompanhamento por mensagens e videos</li>
-<li>Ajustes periodicos</li>
-</ol>
-
-<h2>Vantagens</h2>
+<h3>Principais Causas de Lesões</h3>
 <ul>
-<li>Mais barato que presencial</li>
-<li>Flexibilidade de horario</li>
-<li>Treina onde quiser</li>
-<li>Acesso a profissionais de outras cidades</li>
+<li>Técnica incorreta</li>
+<li>Carga excessiva</li>
+<li>Aquecimento inadequado</li>
+<li>Overtraining</li>
+<li>Desequilíbrios musculares</li>
 </ul>
 
-<h2>Desvantagens</h2>
+<h3>Estratégias de Prevenção</h3>
+
+<h4>1. Aquecimento Adequado</h4>
+<p>5-10 minutos de cardio leve + mobilidade articular + séries de aquecimento.</p>
+
+<h4>2. Técnica Perfeita</h4>
+<p>Aprenda a executar corretamente antes de aumentar carga.</p>
+
+<h4>3. Progressão Gradual</h4>
+<p>Aumente cargas em no máximo 5-10% por semana.</p>
+
+<h4>4. Descanso Adequado</h4>
+<p>48-72h entre treinos do mesmo grupo muscular.</p>
+
+<h4>5. Mobilidade</h4>
+<p>Trabalhe flexibilidade e mobilidade regularmente.</p>
+
+<h3>Sinais de Alerta</h3>
 <ul>
-<li>Sem correcao em tempo real</li>
-<li>Exige mais disciplina</li>
-<li>Nao ideal para iniciantes totais</li>
+<li>Dor aguda durante exercício</li>
+<li>Dor que não melhora em 48h</li>
+<li>Inchaço ou vermelhidão</li>
+<li>Perda de força ou amplitude</li>
 </ul>
 
-<h2>Para Quem e Indicado?</h2>
+<p><em>Personal trainers Fit Transform são treinados em prevenção de lesões.</em></p>',
+'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800', 5, 'Equipe Fit Transform', true, NOW() - INTERVAL '5 days'),
+
+('beneficios-exercicio-saude-mental',
+'Exercício Físico e Saúde Mental: Como o Treino Melhora seu Humor',
+'Descubra os benefícios do exercício para ansiedade, depressão e bem-estar geral com Fit Transform.',
+'<h2>Treino é Remédio Natural</h2>
+<p>O exercício físico é uma das intervenções mais eficazes para saúde mental. Na <strong>Fit Transform</strong>, entendemos que resultados vão além da estética.</p>
+
+<h3>Benefícios Comprovados</h3>
+
+<h4>Redução da Ansiedade</h4>
+<p>Exercício reduz sintomas de ansiedade em até 40% em algumas pessoas.</p>
+
+<h4>Combate à Depressão</h4>
+<p>Tão eficaz quanto medicamentos em casos leves a moderados.</p>
+
+<h4>Melhora do Sono</h4>
+<p>Exercício regular melhora qualidade e duração do sono.</p>
+
+<h4>Aumento da Autoestima</h4>
+<p>Conquistas físicas refletem em confiança geral.</p>
+
+<h3>Como Funciona</h3>
 <ul>
-<li>Intermediarios e avancados</li>
-<li>Quem ja tem boa tecnica</li>
-<li>Pessoas com horarios flexiveis</li>
-<li>Quem busca custo menor</li>
+<li><strong>Endorfinas:</strong> Hormônios do bem-estar liberados durante exercício</li>
+<li><strong>Serotonina:</strong> Neurotransmissor do humor aumenta</li>
+<li><strong>BDNF:</strong> Fator de crescimento cerebral estimulado</li>
+<li><strong>Cortisol:</strong> Níveis de estresse reduzidos</li>
 </ul>
 
-<h2>Fit Transform para Personal Online</h2>
-<p>A Fit Transform e perfeita para personal trainers que atendem online, com todas as ferramentas necessarias.</p>',
-6, 'Equipe Fit Transform', ARRAY['personal online', 'treino online', 'personal distancia'],
-'Personal Trainer Online | Fit Transform',
-'Como funciona o personal trainer online.',
-ARRAY['personal online', 'personal trainer a distancia', 'treino online personal'], 5, false, true),
-
-('Como se Tornar Personal Trainer de Sucesso', 'como-tornar-personal-trainer-sucesso',
-'Guia para profissionais que querem crescer na carreira de personal trainer.',
-'<h2>Fundamentos</h2>
-
-<h3>1. Formacao Solida</h3>
-<p>Graduacao em Educacao Fisica e especializacoes na area.</p>
-
-<h3>2. CREF Ativo</h3>
-<p>Obrigatorio para exercer a profissao legalmente.</p>
-
-<h3>3. Conhecimento Continuo</h3>
-<p>A area evolui constantemente. Mantenha-se atualizado.</p>
-
-<h2>Construindo Carreira</h2>
-
-<h3>Diferenciais</h3>
+<h3>Dose Ideal</h3>
+<p>Para benefícios mentais:</p>
 <ul>
-<li>Especialize-se em um nicho</li>
-<li>Construa presenca online</li>
-<li>Colete depoimentos de alunos</li>
-<li>Offereca experiencia completa</li>
+<li>Mínimo 150 minutos/semana de atividade moderada</li>
+<li>Ou 75 minutos/semana de atividade intensa</li>
 </ul>
 
-<h3>Marketing</h3>
+<h3>Fit Transform e Bem-Estar</h3>
+<p>Nosso sistema acompanha não só métricas físicas, mas também seu bem-estar geral.</p>
+
+<p><em>Cuide da mente enquanto cuida do corpo com Fit Transform.</em></p>',
+'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800', 5, 'Equipe Fit Transform', true, NOW() - INTERVAL '7 days'),
+
+('overtraining-sinais-como-evitar',
+'Overtraining: Sinais de que Você Está Treinando Demais',
+'Aprenda a identificar e evitar o overtraining para manter seus resultados com Fit Transform.',
+'<h2>Quando Menos é Mais</h2>
+<p>Treinar mais nem sempre significa melhores resultados. O overtraining pode destruir seus ganhos. A <strong>Fit Transform</strong> monitora sinais de excesso.</p>
+
+<h3>O que é Overtraining</h3>
+<p>Estado de fadiga crônica causado por excesso de treino e/ou recuperação insuficiente.</p>
+
+<h3>Sinais de Alerta</h3>
+
+<h4>Físicos</h4>
 <ul>
-<li>Instagram profissional</li>
-<li>Conteudo educativo</li>
-<li>Antes e depois de alunos</li>
-<li>Parcerias com academias</li>
+<li>Queda de performance</li>
+<li>Lesões frequentes</li>
+<li>Fadiga constante</li>
+<li>Imunidade baixa (doenças frequentes)</li>
+<li>Dores musculares persistentes</li>
 </ul>
 
-<h2>Ferramentas Essenciais</h2>
-<p>Um personal de sucesso precisa de:</p>
+<h4>Mentais</h4>
 <ul>
-<li>Sistema de gestao de alunos</li>
-<li>Controle financeiro</li>
-<li>Plataforma para treinos</li>
-<li>Comunicacao eficiente</li>
+<li>Falta de motivação</li>
+<li>Irritabilidade</li>
+<li>Dificuldade de concentração</li>
+<li>Insônia</li>
+<li>Humor deprimido</li>
 </ul>
 
-<h2>Fit Transform para Personais</h2>
-<p>A Fit Transform oferece todas essas ferramentas em uma unica plataforma, ajudando personais a crescerem seus negocios.</p>',
-6, 'Equipe Fit Transform', ARRAY['personal trainer', 'carreira', 'sucesso'],
-'Como Ser Personal de Sucesso | Fit Transform',
-'Guia para personal trainers que querem crescer na carreira.',
-ARRAY['como ser personal trainer', 'carreira personal', 'personal de sucesso'], 6, false, true),
-
-('Gestao de Alunos para Personal Trainers', 'gestao-alunos-personal-trainers',
-'Como organizar e gerenciar seus alunos de forma profissional.',
-'<h2>Desafios do Personal</h2>
+<h3>Como Evitar</h3>
 <ul>
-<li>Gerenciar multiplos alunos</li>
-<li>Acompanhar evolucao de cada um</li>
-<li>Controlar pagamentos</li>
-<li>Manter comunicacao eficiente</li>
+<li>Periodização adequada</li>
+<li>Semanas de deload</li>
+<li>Sono suficiente</li>
+<li>Nutrição adequada</li>
+<li>Escutar o corpo</li>
 </ul>
 
-<h2>O que Voce Precisa Controlar</h2>
+<h3>Recuperação do Overtraining</h3>
+<p>Pode levar semanas ou meses. Prevenção é fundamental.</p>
 
-<h3>Dados do Aluno</h3>
+<h3>Monitoramento Fit Transform</h3>
+<p>Nosso sistema identifica padrões que indicam overtraining antes que seja tarde.</p>
+
+<p><em>Treine de forma inteligente com monitoramento Fit Transform.</em></p>',
+'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800', 5, 'Equipe Fit Transform', true, NOW() - INTERVAL '9 days'),
+
+('exercicio-terceira-idade',
+'Exercício na Terceira Idade: Nunca é Tarde para Começar',
+'Como a atividade física beneficia idosos e como academias Fit Transform atendem esse público.',
+'<h2>Qualidade de Vida em Qualquer Idade</h2>
+<p>O exercício físico é ainda mais importante na terceira idade. A <strong>Fit Transform</strong> tem programas específicos para idosos.</p>
+
+<h3>Benefícios para Idosos</h3>
 <ul>
-<li>Informacoes pessoais</li>
-<li>Objetivos</li>
-<li>Restricoes e lesoes</li>
-<li>Historico de treinos</li>
+<li>Prevenção de quedas</li>
+<li>Manutenção da massa muscular (sarcopenia)</li>
+<li>Saúde óssea (osteoporose)</li>
+<li>Função cognitiva</li>
+<li>Independência funcional</li>
+<li>Socialização</li>
 </ul>
 
-<h3>Treinos</h3>
+<h3>Exercícios Recomendados</h3>
+
+<h4>Musculação</h4>
+<p>Essencial para manter força e massa muscular. Com cargas adequadas e supervisão.</p>
+
+<h4>Exercícios de Equilíbrio</h4>
+<p>Fundamentais para prevenir quedas.</p>
+
+<h4>Caminhada</h4>
+<p>Acessível e com inúmeros benefícios cardiovasculares.</p>
+
+<h4>Alongamento</h4>
+<p>Manter flexibilidade e mobilidade.</p>
+
+<h3>Cuidados Especiais</h3>
 <ul>
-<li>Periodizacao</li>
-<li>Exercicios e cargas</li>
-<li>Progressao</li>
+<li>Avaliação médica prévia</li>
+<li>Progressão muito gradual</li>
+<li>Atenção a limitações</li>
+<li>Hidratação constante</li>
 </ul>
 
-<h3>Financeiro</h3>
+<h3>Fit Transform para Idosos</h3>
+<p>Nosso sistema permite criar treinos específicos para terceira idade com todos os cuidados necessários.</p>
+
+<p><em>Academias parceiras Fit Transform oferecem programas especializados para idosos.</em></p>',
+'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800', 5, 'Equipe Fit Transform', true, NOW() - INTERVAL '11 days'),
+
+('importancia-mobilidade-flexibilidade',
+'Mobilidade e Flexibilidade: Por que Você Não Deve Ignorar',
+'Entenda a diferença entre mobilidade e flexibilidade e por que ambas são essenciais no treino Fit Transform.',
+'<h2>Além da Força</h2>
+<p>Mobilidade e flexibilidade são frequentemente ignoradas, mas são essenciais para treinar bem e evitar lesões. Na <strong>Fit Transform</strong>, incluímos trabalho de mobilidade em todos os programas.</p>
+
+<h3>Diferença Entre Mobilidade e Flexibilidade</h3>
 <ul>
-<li>Mensalidades</li>
-<li>Vencimentos</li>
-<li>Inadimplencia</li>
+<li><strong>Flexibilidade:</strong> Capacidade passiva de alongar um músculo</li>
+<li><strong>Mobilidade:</strong> Capacidade ativa de mover uma articulação em toda amplitude</li>
 </ul>
 
-<h2>Solucao: Fit Transform</h2>
-<p>A Fit Transform foi criada especialmente para resolver esses problemas:</p>
+<h3>Benefícios</h3>
 <ul>
-<li>Cadastro completo de alunos</li>
-<li>Criacao de treinos personalizados</li>
-<li>Acompanhamento de evolucao</li>
-<li>Controle financeiro integrado</li>
-<li>Comunicacao com alunos</li>
-<li>Relatorios e metricas</li>
+<li>Melhor técnica nos exercícios</li>
+<li>Maior amplitude de movimento</li>
+<li>Prevenção de lesões</li>
+<li>Melhor postura</li>
+<li>Redução de dores</li>
 </ul>
 
-<p>Comece a usar a Fit Transform e profissionalize sua gestao!</p>',
-6, 'Equipe Fit Transform', ARRAY['gestao alunos', 'personal trainer', 'crm personal'],
-'Gestao de Alunos para Personal | Fit Transform',
-'Como gerenciar alunos de forma profissional.',
-ARRAY['gestao alunos personal', 'crm personal trainer', 'software personal'], 5, false, true);
+<h3>Exercícios de Mobilidade</h3>
+
+<h4>Quadril</h4>
+<p>90/90, pigeon pose, hip circles</p>
+
+<h4>Tornozelo</h4>
+<p>Mobilização com peso, agachamento no calcanhar</p>
+
+<h4>Torácica</h4>
+<p>Rotações, extensões com foam roller</p>
+
+<h4>Ombro</h4>
+<p>Wall slides, rotações com bastão</p>
+
+<h3>Quando Fazer</h3>
+<ul>
+<li>Aquecimento: mobilidade dinâmica</li>
+<li>Pós-treino: alongamento estático</li>
+<li>Dias de descanso: sessão completa</li>
+</ul>
+
+<p><em>Treinos Fit Transform incluem protocolos de mobilidade personalizados.</em></p>',
+'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800', 5, 'Equipe Fit Transform', true, NOW() - INTERVAL '13 days'),
+
+('gerenciamento-estresse-exercicio',
+'Gerenciamento de Estresse Através do Exercício: Seu Aliado Contra a Ansiedade',
+'Descubra como o exercício pode ser sua ferramenta mais poderosa contra o estresse com Fit Transform.',
+'<h2>Estresse: O Inimigo Silencioso</h2>
+<p>O estresse crônico sabota seus resultados e sua saúde. O exercício é uma das melhores formas de combatê-lo. Na <strong>Fit Transform</strong>, entendemos essa conexão.</p>
+
+<h3>Como o Estresse Afeta o Corpo</h3>
+<ul>
+<li>Aumento do cortisol</li>
+<li>Acúmulo de gordura abdominal</li>
+<li>Perda de massa muscular</li>
+<li>Imunidade comprometida</li>
+<li>Sono prejudicado</li>
+</ul>
+
+<h3>Como o Exercício Combate o Estresse</h3>
+
+<h4>Liberação de Endorfinas</h4>
+<p>Hormônios do bem-estar liberados durante e após o treino.</p>
+
+<h4>Redução do Cortisol</h4>
+<p>Exercício regular normaliza níveis de cortisol.</p>
+
+<h4>Melhora do Sono</h4>
+<p>Sono melhor = menos estresse.</p>
+
+<h4>Válvula de Escape</h4>
+<p>Canalize frustrações de forma saudável.</p>
+
+<h3>Melhores Exercícios para Estresse</h3>
+<ul>
+<li>Musculação (foco e concentração)</li>
+<li>Yoga (respiração e relaxamento)</li>
+<li>Cardio moderado (endorfinas)</li>
+<li>Artes marciais (descarga emocional)</li>
+</ul>
+
+<h3>Fit Transform e Bem-Estar</h3>
+<p>Nosso sistema considera seu nível de estresse ao programar treinos.</p>
+
+<p><em>Transforme estresse em força com Fit Transform.</em></p>',
+'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800', 5, 'Equipe Fit Transform', true, NOW() - INTERVAL '15 days'),
+
+('postura-correta-treino-dia-dia',
+'Postura Correta: No Treino e no Dia a Dia',
+'Como melhorar sua postura através do treino e hábitos diários com orientação Fit Transform.',
+'<h2>Postura é Saúde</h2>
+<p>A má postura causa dores, lesões e limita sua performance. Na <strong>Fit Transform</strong>, avaliamos e corrigimos desvios posturais.</p>
+
+<h3>Problemas Posturais Comuns</h3>
+<ul>
+<li>Cifose (corcunda)</li>
+<li>Lordose acentuada</li>
+<li>Escoliose</li>
+<li>Ombros protraídos</li>
+<li>Cabeça anteriorizada</li>
+</ul>
+
+<h3>Causas da Má Postura</h3>
+<ul>
+<li>Sentar muito tempo</li>
+<li>Uso excessivo de celular</li>
+<li>Desequilíbrios musculares</li>
+<li>Fraqueza do core</li>
+<li>Falta de consciência corporal</li>
+</ul>
+
+<h3>Exercícios para Postura</h3>
+
+<h4>Fortalecimento</h4>
+<ul>
+<li>Remada (dorsais)</li>
+<li>Face pull (rotadores externos)</li>
+<li>Prancha (core)</li>
+<li>Glúteos</li>
+</ul>
+
+<h4>Alongamento</h4>
+<ul>
+<li>Peitoral</li>
+<li>Flexores do quadril</li>
+<li>Pescoço</li>
+</ul>
+
+<h3>Hábitos Diários</h3>
+<ul>
+<li>Pausas a cada 30-60 min sentado</li>
+<li>Ergonomia no trabalho</li>
+<li>Celular na altura dos olhos</li>
+</ul>
+
+<p><em>Avaliação postural inclusa no programa Fit Transform.</em></p>',
+'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800', 5, 'Equipe Fit Transform', true, NOW() - INTERVAL '17 days'),
+
+('recuperacao-muscular-tecnicas',
+'Técnicas de Recuperação Muscular: Acelere seus Resultados',
+'Conheça as melhores técnicas de recuperação utilizadas pelos profissionais Fit Transform.',
+'<h2>Recuperação é Ganho</h2>
+<p>Você não cresce no treino, cresce na recuperação. Na <strong>Fit Transform</strong>, a recuperação é parte integral do programa.</p>
+
+<h3>Técnicas de Recuperação</h3>
+
+<h4>1. Sono de Qualidade</h4>
+<p>A técnica mais importante e gratuita. 7-9 horas por noite.</p>
+
+<h4>2. Nutrição Adequada</h4>
+<p>Proteína, carboidratos e micronutrientes para reparação.</p>
+
+<h4>3. Hidratação</h4>
+<p>Água é essencial para todos os processos de recuperação.</p>
+
+<h4>4. Alongamento e Mobilidade</h4>
+<p>Mantém amplitude de movimento e reduz tensão.</p>
+
+<h4>5. Foam Rolling</h4>
+<p>Auto massagem que alivia tensão miofascial.</p>
+
+<h4>6. Banho de Contraste</h4>
+<p>Alternância entre água quente e fria estimula circulação.</p>
+
+<h4>7. Descanso Ativo</h4>
+<p>Atividades leves em dias de descanso (caminhada, yoga).</p>
+
+<h3>Quanto Tempo de Recuperação?</h3>
+<ul>
+<li><strong>Grupos pequenos:</strong> 48 horas</li>
+<li><strong>Grupos grandes:</strong> 72 horas</li>
+<li><strong>Treino muito intenso:</strong> 96+ horas</li>
+</ul>
+
+<h3>Sistema Fit Transform</h3>
+<p>Nosso CRM programa automaticamente tempo de recuperação entre treinos.</p>
+
+<p><em>Recupere melhor, cresça mais com Fit Transform.</em></p>',
+'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800', 5, 'Equipe Fit Transform', true, NOW() - INTERVAL '19 days'),
+
+('exercicio-durante-gravidez',
+'Exercício Durante a Gravidez: Guia Seguro para Gestantes',
+'Como se exercitar de forma segura durante a gravidez com acompanhamento Fit Transform.',
+'<h2>Movimento Seguro na Gestação</h2>
+<p>Exercício durante a gravidez traz inúmeros benefícios quando feito corretamente. A <strong>Fit Transform</strong> tem protocolos específicos para gestantes.</p>
+
+<h3>Benefícios do Exercício na Gravidez</h3>
+<ul>
+<li>Controle de peso</li>
+<li>Redução de dores lombares</li>
+<li>Melhora do humor</li>
+<li>Preparação para o parto</li>
+<li>Recuperação pós-parto mais rápida</li>
+<li>Menos risco de diabetes gestacional</li>
+</ul>
+
+<h3>Exercícios Recomendados</h3>
+<ul>
+<li>Caminhada</li>
+<li>Natação e hidroginástica</li>
+<li>Yoga pré-natal</li>
+<li>Musculação leve com orientação</li>
+<li>Pilates adaptado</li>
+</ul>
+
+<h3>Exercícios a Evitar</h3>
+<ul>
+<li>Esportes de contato</li>
+<li>Exercícios deitada de barriga para cima (após 1º trimestre)</li>
+<li>Exercícios com risco de queda</li>
+<li>Atividades em altitude ou calor extremo</li>
+</ul>
+
+<h3>Sinais para Parar</h3>
+<ul>
+<li>Sangramento</li>
+<li>Tontura</li>
+<li>Dor no peito</li>
+<li>Contrações</li>
+<li>Falta de ar</li>
+</ul>
+
+<h3>Fit Transform para Gestantes</h3>
+<p>Nosso sistema permite criar treinos adaptados para cada fase da gestação.</p>
+
+<p><em>Treine com segurança durante a gravidez com Fit Transform.</em></p>',
+'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800', 5, 'Equipe Fit Transform', true, NOW() - INTERVAL '21 days');
