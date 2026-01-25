@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Dumbbell, Users, TrendingUp, Calendar, Smartphone, CheckCircle, ArrowRight, Star, Play, Shield, Zap, Clock, CreditCard, BarChart3, Menu, BookOpen } from "lucide-react"
 import { MobileMenu } from "@/components/mobile-menu"
+import { Chatbot } from "@/components/chatbot"
 
 export default function HomePage() {
   return (
@@ -348,6 +349,9 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* Chatbot */}
+      <Chatbot />
     </div>
   )
 }

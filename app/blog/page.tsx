@@ -117,13 +117,13 @@ export default function BlogPage() {
           <Badge className="mb-4 bg-orange-500/20 text-orange-400 border-orange-500/30">
             +90 artigos exclusivos
           </Badge>
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
             Blog{" "}
             <span className="bg-gradient-to-r from-red-500 to-orange-500 text-transparent bg-clip-text">
               Fit Transform
             </span>
           </h1>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
             Tudo sobre musculacao, calistenia, corrida, nutricao e suplementacao. 
             Transforme seu corpo e mente com conteudo de qualidade!
           </p>
@@ -159,9 +159,9 @@ export default function BlogPage() {
       </section>
 
       {/* Categorias */}
-      <section className="py-8 px-4">
+      <section className="py-6 sm:py-8 px-4">
         <div className="container mx-auto">
-          <div className="flex flex-wrap gap-3 justify-center">
+          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
             <button
               onClick={() => setSelectedCategory(null)}
               className={`px-4 py-2 rounded-full font-medium transition ${
@@ -209,7 +209,7 @@ export default function BlogPage() {
               <p className="text-gray-400 text-center mb-8">
                 {filteredPosts.length} {filteredPosts.length === 1 ? "artigo encontrado" : "artigos encontrados"}
               </p>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {filteredPosts.map((post) => (
                   <Link key={post.id} href={`/blog/${post.slug}`}>
                     <Card className="h-full bg-white/5 border-white/10 hover:bg-white/10 hover:border-orange-500/30 transition-all duration-300 cursor-pointer group overflow-hidden">
