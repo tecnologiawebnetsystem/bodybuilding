@@ -21,21 +21,16 @@ export default function CheckoutSucessoPage() {
     student_premium: "Aluno Premium"
   }
 
-  const dashboardLinks: Record<string, string> = {
-    gym_pro: "/gym-admin",
-    trainer_pro: "/trainer",
-    student_premium: "/student"
-  }
-
   const planName = planId ? planNames[planId] || "Premium" : "Premium"
-  const dashboardLink = planId ? dashboardLinks[planId] || "/student" : "/student"
+  // Redirecionar para onboarding em vez do dashboard direto
+  const dashboardLink = "/onboarding"
 
   useEffect(() => {
-    // Recuperar dados do checkout
+    // Recuperar dados do checkout (NAO remover aqui, vai ser usado no onboarding)
     const storedData = localStorage.getItem('checkout_result')
     if (storedData) {
       setCheckoutData(JSON.parse(storedData))
-      localStorage.removeItem('checkout_result')
+      // NAO remover aqui - sera removido no onboarding
     }
 
     // Efeito de confete
