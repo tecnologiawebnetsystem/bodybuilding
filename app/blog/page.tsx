@@ -38,13 +38,17 @@ const categoryImages: Record<string, string> = {
   "corrida": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80",
   "nutricao": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80",
   "suplementos": "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=800&q=80",
+  "suplementacao": "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=800&q=80",
   "personal-trainer": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80",
   "academia": "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=800&q=80",
-  "saude": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+  "academia-treino": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
   "academia-e-treino": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
+  "saude": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+  "saude-bem-estar": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+  "saude-e-bem-estar": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
   "alimentacao": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80",
   "hidratacao": "https://images.unsplash.com/photo-1559839914-17aae19cec71?w=800&q=80",
-  "saude-e-bem-estar": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+  "fit-transform": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
 }
 
 const getPostImage = (post: Post) => {
@@ -77,6 +81,9 @@ export default function BlogPage() {
       const categoriesData = await categoriesRes.json()
       const postsData = await postsRes.json()
 
+      console.log("[v0] Blog API response - categories:", categoriesData)
+      console.log("[v0] Blog API response - posts:", postsData)
+
       if (Array.isArray(categoriesData)) {
         setCategories(categoriesData)
       }
@@ -84,6 +91,7 @@ export default function BlogPage() {
       if (Array.isArray(postsData)) {
         setPosts(postsData)
       } else {
+        console.log("[v0] Posts data is not an array:", typeof postsData, postsData)
         setError(postsData.error || "Erro ao carregar posts")
         setPosts([])
       }
