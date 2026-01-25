@@ -81,9 +81,6 @@ export default function BlogPage() {
       const categoriesData = await categoriesRes.json()
       const postsData = await postsRes.json()
 
-      console.log("[v0] Blog API response - categories:", categoriesData)
-      console.log("[v0] Blog API response - posts:", postsData)
-
       if (Array.isArray(categoriesData)) {
         setCategories(categoriesData)
       }
@@ -91,7 +88,6 @@ export default function BlogPage() {
       if (Array.isArray(postsData)) {
         setPosts(postsData)
       } else {
-        console.log("[v0] Posts data is not an array:", typeof postsData, postsData)
         setError(postsData.error || "Erro ao carregar posts")
         setPosts([])
       }

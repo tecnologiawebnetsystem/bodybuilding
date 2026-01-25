@@ -3,7 +3,14 @@ import { neon } from "@neondatabase/serverless"
 
 export async function GET(request: NextRequest) {
   try {
-    const sql = neon(process.env.DATABASE_URL!)
+    const databaseUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL
+    
+    if (!databaseUrl) {
+      console.error("[v0] DATABASE_URL not found")
+      return NextResponse.json({ error: "Database not configured" }, { status: 500 })
+    }
+
+    const sql = neon(databaseUrl)
 
     const categories = await sql`
       SELECT c.*, COUNT(p.id)::int as posts_count
