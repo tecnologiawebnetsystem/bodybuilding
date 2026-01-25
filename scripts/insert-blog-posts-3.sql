@@ -1,208 +1,241 @@
 -- ARTIGOS SOBRE CORRIDA (categoria_id = 3)
-INSERT INTO blog_posts (title, slug, excerpt, content, category_id, author, tags, meta_title, meta_description, keywords, reading_time, featured, published) VALUES
+INSERT INTO blog_posts (title, slug, excerpt, content, category_id, author, image_url, published, views) VALUES
 
 ('Guia Completo de Corrida para Iniciantes', 'guia-corrida-iniciantes',
-'Tudo que voce precisa saber para comecar a correr. Dicas, plano de treino e como evitar lesoes.',
-'<h2>Por Que Correr?</h2>
-<p>A corrida e uma das atividades fisicas mais acessiveis e completas. Melhora o condicionamento cardiovascular, queima calorias e libera endorfinas.</p>
+'Tudo que voce precisa saber para comecar a correr de forma segura e eficiente.',
+'<h2>Por que Correr?</h2>
+<p>A corrida e um dos exercicios mais acessiveis e eficientes para melhorar a saude cardiovascular, queimar gordura e aumentar a disposicao.</p>
 
-<h2>Equipamento Basico</h2>
+<h2>Beneficios da Corrida</h2>
 <ul>
-<li>Tenis adequado para corrida</li>
-<li>Roupas confortaveis</li>
-<li>Relogio ou app de corrida</li>
+<li>Melhora a saude do coracao</li>
+<li>Queima calorias eficientemente</li>
+<li>Reduz estresse e ansiedade</li>
+<li>Aumenta a energia</li>
+<li>Melhora o sono</li>
 </ul>
 
-<h2>Plano para Iniciantes</h2>
-<h3>Semanas 1-2</h3>
-<p>Alterne 1 min correndo e 2 min caminhando por 20 minutos.</p>
+<h2>Como Comecar</h2>
+<p><strong>Semana 1-2:</strong> Caminhe 30 minutos, 3x por semana.</p>
+<p><strong>Semana 3-4:</strong> Alterne 1 min correndo, 2 min caminhando por 30 min.</p>
+<p><strong>Semana 5-6:</strong> Alterne 2 min correndo, 1 min caminhando.</p>
+<p><strong>Semana 7-8:</strong> Corra 20-30 minutos continuos.</p>
 
-<h3>Semanas 3-4</h3>
-<p>Alterne 2 min correndo e 1 min caminhando por 25 minutos.</p>
+<h2>Fit Transform e Corrida</h2>
+<p>A Fit Transform permite registrar suas corridas, acompanhar distancia, tempo e evolucao. Personal trainers podem criar planilhas de corrida personalizadas.</p>',
+3, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=800', true, 2567),
 
-<h3>Semanas 5-6</h3>
-<p>Corra 3 min, caminhe 1 min por 30 minutos.</p>
-
-<h3>Semanas 7-8</h3>
-<p>Tente correr 20-30 minutos continuos.</p>
-
-<h2>Dicas Importantes</h2>
-<ul>
-<li>Comece devagar</li>
-<li>Respeite o descanso</li>
-<li>Hidrate-se bem</li>
-<li>Alongue apos correr</li>
-</ul>
-
-<h2>Acompanhamento com Fit Transform</h2>
-<p>Personal trainers podem usar a Fit Transform para criar planos de corrida personalizados e acompanhar a evolucao de seus alunos.</p>',
-3, 'Equipe Fit Transform', ARRAY['corrida', 'iniciantes', 'cardio', 'running'],
-'Guia de Corrida para Iniciantes | Fit Transform',
-'Aprenda a correr do zero com este guia completo para iniciantes.',
-ARRAY['como comecar a correr', 'corrida iniciantes', 'plano de corrida', 'treino corrida'], 7, true, true),
-
-('Como Melhorar seu Pace na Corrida', 'como-melhorar-pace-corrida',
-'Estrategias para correr mais rapido e melhorar seu tempo por quilometro.',
+('Como Melhorar seu Pace na Corrida', 'melhorar-pace-corrida',
+'Estrategias para correr mais rapido e melhorar seu ritmo de corrida.',
 '<h2>O que e Pace?</h2>
-<p>Pace e o tempo que voce leva para correr um quilometro. Quanto menor o pace, mais rapido voce esta correndo.</p>
+<p>Pace e o tempo que voce leva para correr 1 km. Um pace de 6:00 significa 6 minutos por quilometro.</p>
 
-<h2>Estrategias para Melhorar</h2>
-<h3>1. Treino Intervalado</h3>
-<p>Alterne periodos de alta intensidade com recuperacao.</p>
+<h2>Como Melhorar o Pace</h2>
+<p><strong>1. Treino de Intervalos:</strong> Corra rapido por 400m, descanse 1 min, repita 6-8x.</p>
+<p><strong>2. Treino de Tempo:</strong> Corra em ritmo desconfortavel por 20-40 minutos.</p>
+<p><strong>3. Long Run:</strong> Corra devagar por distancias maiores (10-20km).</p>
+<p><strong>4. Fartlek:</strong> Varie a velocidade durante a corrida de forma aleatoria.</p>
 
-<h3>2. Fartlek</h3>
-<p>Variacao de ritmo durante a corrida de forma nao estruturada.</p>
+<h2>Progressao Segura</h2>
+<p>Aumente no maximo 10% do volume semanal para evitar lesoes.</p>
 
-<h3>3. Tempo Run</h3>
-<p>Corra em ritmo desconfortavel mas sustentavel por 20-40 minutos.</p>
-
-<h3>4. Long Run</h3>
-<p>Corridas longas em ritmo leve para construir base aerobica.</p>
-
-<h2>Exemplo de Treino Intervalado</h2>
-<p>Aquecimento 10 min<br>
-8x (400m rapido + 200m leve)<br>
-Desaquecimento 10 min</p>
-
-<h2>Paciencia e Consistencia</h2>
-<p>Melhorar o pace leva tempo. Seja consistente e os resultados virao.</p>',
-3, 'Equipe Fit Transform', ARRAY['pace', 'corrida', 'velocidade', 'intervalado'],
-'Como Melhorar o Pace | Fit Transform',
-'Dicas e treinos para melhorar seu pace e correr mais rapido.',
-ARRAY['melhorar pace', 'correr mais rapido', 'treino intervalado', 'fartlek'], 6, false, true),
+<h2>Fit Transform para Corredores</h2>
+<p>Registre todos os seus treinos, veja graficos de evolucao do pace e receba treinos personalizados do seu personal.</p>',
+3, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=800', true, 1876),
 
 ('Preparacao para sua Primeira Corrida de 5km', 'preparacao-primeira-corrida-5km',
-'Plano completo de 8 semanas para sua primeira prova de 5 quilometros.',
-'<h2>Seu Primeiro 5K</h2>
-<p>Completar uma prova de 5km e um objetivo alcancavel para qualquer pessoa disposta a treinar.</p>
+'Plano de treino de 8 semanas para completar seus primeiros 5km.',
+'<h2>Sua Primeira Prova</h2>
+<p>Correr 5km e um marco importante. Com o treino certo, qualquer pessoa pode conseguir.</p>
 
 <h2>Plano de 8 Semanas</h2>
-<h3>Semanas 1-2</h3>
-<p>3 treinos/semana: 20-25 min alternando corrida e caminhada.</p>
-
-<h3>Semanas 3-4</h3>
-<p>3 treinos/semana: 25-30 min com mais tempo correndo.</p>
-
-<h3>Semanas 5-6</h3>
-<p>4 treinos/semana: Corridas de 30-35 min.</p>
-
-<h3>Semanas 7-8</h3>
-<p>3-4 treinos/semana: Inclua um long run de 5km.</p>
+<p><strong>Semana 1-2:</strong> 3x por semana, 20 min alternando corrida e caminhada.</p>
+<p><strong>Semana 3-4:</strong> 3x por semana, 25 min com mais corrida que caminhada.</p>
+<p><strong>Semana 5-6:</strong> 4x por semana, 30 min correndo continuo.</p>
+<p><strong>Semana 7:</strong> Teste de 5km em ritmo tranquilo.</p>
+<p><strong>Semana 8:</strong> Reducao de volume + dia da prova!</p>
 
 <h2>Dicas para o Dia da Prova</h2>
 <ul>
 <li>Nao experimente nada novo</li>
-<li>Chegue cedo</li>
+<li>Chegue com antecedencia</li>
 <li>Comece devagar</li>
-<li>Hidrate-se nos pontos de agua</li>
-<li>Curta a experiencia!</li>
+<li>Divirta-se!</li>
 </ul>
 
-<h2>Pos-Prova</h2>
-<p>Descanse, comemore e ja comece a pensar nos proximos 10km!</p>',
-3, 'Equipe Fit Transform', ARRAY['5km', 'corrida', 'prova', 'iniciante'],
-'Preparacao para 5km | Fit Transform',
-'Plano de treino de 8 semanas para sua primeira corrida de 5km.',
-ARRAY['treino 5km', 'primeira corrida', 'prova 5 km', 'como correr 5km'], 6, false, true),
+<h2>Fit Transform</h2>
+<p>Use a Fit Transform para seguir seu plano de treino e chegar preparado para sua primeira 5km.</p>',
+3, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1596727362302-b8d891c42ab8?w=800', true, 1543),
 
-('Corrida e Musculacao: Como Conciliar os Dois', 'corrida-musculacao-conciliar',
-'Estrategias para treinar corrida e musculacao sem prejudicar seus ganhos.',
-'<h2>O Dilema do Treino Concorrente</h2>
-<p>Muitos acreditam que corrida atrapalha a hipertrofia. A verdade e mais complexa.</p>
+('Treino de Corrida para Emagrecer', 'treino-corrida-emagrecer',
+'Como usar a corrida de forma eficiente para perder peso e queimar gordura.',
+'<h2>Corrida e Emagrecimento</h2>
+<p>A corrida e uma das atividades que mais queima calorias. Uma hora pode queimar 500-800 calorias.</p>
 
-<h2>Como Conciliar</h2>
-<h3>Organize seus Treinos</h3>
-<p>Separe corrida e musculacao por pelo menos 6 horas, ou faca em dias diferentes.</p>
+<h2>Estrategias para Emagrecer Correndo</h2>
+<p><strong>1. HIIT na Corrida:</strong> Alterne sprints de 30 seg com descanso de 1 min.</p>
+<p><strong>2. Corrida em Jejum:</strong> Corra pela manha antes do cafe.</p>
+<p><strong>3. Long Run Leve:</strong> Corra em ritmo leve por 45-60 minutos.</p>
 
-<h3>Priorize seu Objetivo</h3>
-<p>Se o foco e hipertrofia, limite a corrida a 2-3x por semana.</p>
-
-<h3>Nutricao Adequada</h3>
-<p>Aumente o consumo calorico para compensar o gasto da corrida.</p>
-
-<h2>Ordem dos Treinos</h2>
+<h2>Frequencia Ideal</h2>
 <ul>
-<li>Se no mesmo dia: Musculacao primeiro</li>
-<li>Melhor: Musculacao de manha, corrida a noite</li>
-<li>Ideal: Dias alternados</li>
+<li>3-4 corridas por semana</li>
+<li>Alterne intensidades</li>
+<li>Inclua dias de descanso</li>
 </ul>
 
-<h2>Fit Transform Treinos Hibridos</h2>
-<p>A Fit Transform permite criar treinos que combinam musculacao e corrida de forma inteligente.</p>',
-3, 'Equipe Fit Transform', ARRAY['corrida', 'musculacao', 'treino hibrido'],
-'Corrida e Musculacao | Fit Transform',
-'Como treinar corrida e musculacao sem perder ganhos musculares.',
-ARRAY['corrida e musculacao', 'treino concorrente', 'cardio e hipertrofia'], 5, false, true),
+<h2>Fit Transform para Emagrecimento</h2>
+<p>Combine o modulo de corrida com o controle nutricional da Fit Transform para resultados maximos.</p>',
+3, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800', true, 3210),
 
 ('Prevencao de Lesoes na Corrida', 'prevencao-lesoes-corrida',
-'Aprenda a evitar as lesoes mais comuns entre corredores.',
-'<h2>Lesoes Comuns na Corrida</h2>
+'Como evitar as lesoes mais comuns entre corredores.',
+'<h2>Lesoes Mais Comuns</h2>
 <ul>
 <li>Canelite</li>
-<li>Fascite plantar</li>
-<li>Joelho de corredor</li>
+<li>Fasciite plantar</li>
+<li>Sindrome da banda iliotibial</li>
 <li>Tendinite de Aquiles</li>
 </ul>
 
 <h2>Como Prevenir</h2>
-<h3>1. Progressao Gradual</h3>
-<p>Nao aumente mais que 10% do volume por semana.</p>
+<p><strong>1. Aquecimento:</strong> Sempre aqueca 5-10 min antes de correr.</p>
+<p><strong>2. Progressao Gradual:</strong> Aumente no maximo 10% do volume por semana.</p>
+<p><strong>3. Fortalecimento:</strong> Faca musculacao para fortalecer pernas e core.</p>
+<p><strong>4. Alongamento:</strong> Alongue apos as corridas.</p>
+<p><strong>5. Descanso:</strong> Inclua dias de descanso na sua rotina.</p>
 
-<h3>2. Fortalecimento</h3>
-<p>Fortaleca pernas, gluteos e core.</p>
+<h2>Fit Transform e Prevencao</h2>
+<p>A plataforma ajuda a monitorar volume de treino e prevenir overtraining.</p>',
+3, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1571731956672-f2b94d7dd0cb?w=800', true, 1234),
 
-<h3>3. Alongamento</h3>
-<p>Alongue apos cada treino.</p>
+('Como Treinar para uma Meia Maratona', 'treinar-meia-maratona',
+'Plano e dicas para se preparar para correr 21km.',
+'<h2>Preparacao para 21km</h2>
+<p>A meia maratona e um desafio serio que requer planejamento de 12-16 semanas.</p>
 
-<h3>4. Descanso</h3>
-<p>Respeite os dias de descanso.</p>
-
-<h3>5. Tenis Adequado</h3>
-<p>Use calcados apropriados para seu tipo de pisada.</p>
-
-<h2>Sinais de Alerta</h2>
+<h2>Pre-requisitos</h2>
 <ul>
-<li>Dor que piora durante a corrida</li>
-<li>Dor que persiste apos o treino</li>
-<li>Inchaço</li>
-<li>Limitacao de movimento</li>
+<li>Conseguir correr 10km confortavelmente</li>
+<li>Correr ha pelo menos 6 meses</li>
+<li>Sem lesoes</li>
 </ul>
 
-<p>Se sentir esses sintomas, pare e procure um profissional.</p>',
-3, 'Equipe Fit Transform', ARRAY['lesoes', 'corrida', 'prevencao', 'saude'],
-'Prevencao de Lesoes na Corrida | Fit Transform',
-'Como evitar lesoes comuns na corrida e treinar com seguranca.',
-ARRAY['lesoes corrida', 'prevencao lesoes', 'canelite', 'joelho corredor'], 5, false, true),
-
-('Treino de Corrida para Emagrecer', 'treino-corrida-emagrecer',
-'Como usar a corrida de forma eficiente para perder peso.',
-'<h2>Corrida e Emagrecimento</h2>
-<p>A corrida e excelente para queimar calorias, mas precisa ser bem estruturada.</p>
-
-<h2>Estrategias Eficientes</h2>
-<h3>HIIT Running</h3>
-<p>Intervalos de alta intensidade queimam mais calorias em menos tempo.</p>
-
-<h3>Long Slow Distance</h3>
-<p>Corridas longas e leves usam mais gordura como combustivel.</p>
-
-<h3>Combinacao</h3>
-<p>O ideal e combinar os dois tipos de treino na semana.</p>
-
-<h2>Exemplo de Semana</h2>
+<h2>Estrutura do Treino Semanal</h2>
 <ul>
-<li>Segunda: HIIT 20 min</li>
-<li>Quarta: Corrida moderada 40 min</li>
-<li>Sexta: HIIT 25 min</li>
-<li>Domingo: Long run 50-60 min leve</li>
+<li><strong>Segunda:</strong> Descanso</li>
+<li><strong>Terca:</strong> Treino de velocidade</li>
+<li><strong>Quarta:</strong> Corrida leve 6-8km</li>
+<li><strong>Quinta:</strong> Treino de forca</li>
+<li><strong>Sexta:</strong> Descanso</li>
+<li><strong>Sabado:</strong> Corrida moderada 8-10km</li>
+<li><strong>Domingo:</strong> Longao</li>
 </ul>
 
-<h2>Importancia da Dieta</h2>
-<p>Lembre-se: voce nao consegue correr mais rapido que uma dieta ruim. A nutricao e fundamental.</p>
+<h2>Fit Transform para Maratonistas</h2>
+<p>Acompanhe seu plano de treino completo na plataforma Fit Transform.</p>',
+3, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1513593771513-7b58b6c4af38?w=800', true, 1654),
 
-<h2>Fit Transform e Objetivos</h2>
-<p>Personal trainers podem usar a Fit Transform para criar programas de emagrecimento que combinam corrida e dieta.</p>',
-3, 'Equipe Fit Transform', ARRAY['corrida', 'emagrecer', 'perder peso', 'cardio'],
-'Corrida para Emagrecer | Fit Transform',
-'Como usar a corrida para perder peso de forma eficiente.',
-ARRAY['corrida para emagrecer', 'perder peso correndo', 'cardio emagrecimento'], 5, false, true);
+('Nutricao para Corredores', 'nutricao-corredores',
+'Guia de alimentacao para otimizar seu desempenho na corrida.',
+'<h2>Antes da Corrida</h2>
+<p><strong>2-3 horas antes:</strong> Carboidratos complexos (arroz, batata doce).</p>
+<p><strong>30-60 min antes:</strong> Lanche leve (banana, torrada com mel).</p>
+
+<h2>Durante a Corrida</h2>
+<p>Para corridas acima de 1 hora:</p>
+<ul>
+<li>Agua a cada 15-20 minutos</li>
+<li>Gel ou repositor a cada 45 minutos</li>
+</ul>
+
+<h2>Depois da Corrida</h2>
+<p><strong>Ate 30 minutos:</strong> Proteina + carboidrato (whey com banana).</p>
+<p><strong>1-2 horas depois:</strong> Refeicao completa.</p>
+
+<h2>Fit Transform</h2>
+<p>Use o modulo de nutricao da Fit Transform para planejar sua alimentacao de corredor.</p>',
+3, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800', true, 2103),
+
+('Treino de Forca para Corredores', 'treino-forca-corredores',
+'Por que corredores devem fazer musculacao e quais exercicios priorizar.',
+'<h2>Por que Forca para Corredores?</h2>
+<ul>
+<li>Previne lesoes</li>
+<li>Melhora a economia de corrida</li>
+<li>Aumenta a potencia</li>
+<li>Fortalece articulacoes</li>
+</ul>
+
+<h2>Exercicios Essenciais - Pernas</h2>
+<ul>
+<li>Agachamento - 3x10</li>
+<li>Afundo - 3x10 cada perna</li>
+<li>Stiff - 3x10</li>
+<li>Panturrilha - 3x15</li>
+</ul>
+
+<h2>Exercicios Essenciais - Core</h2>
+<ul>
+<li>Prancha - 3x45 seg</li>
+<li>Russian twist - 3x20</li>
+<li>Dead bug - 3x10 cada lado</li>
+</ul>
+
+<h2>Frequencia</h2>
+<p>2x por semana, em dias sem corrida intensa.</p>
+
+<h2>Fit Transform</h2>
+<p>Crie treinos de forca complementares para sua corrida na plataforma.</p>',
+3, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1434608519344-49d77a699e1d?w=800', true, 1432),
+
+('Corrida de Rua vs Esteira', 'corrida-rua-vs-esteira',
+'Compare corrida ao ar livre com treino na esteira.',
+'<h2>Corrida de Rua - Vantagens</h2>
+<ul>
+<li>Mais desafiadora</li>
+<li>Queima mais calorias</li>
+<li>Contato com a natureza</li>
+<li>Variacao de percurso</li>
+</ul>
+
+<h2>Esteira - Vantagens</h2>
+<ul>
+<li>Clima controlado</li>
+<li>Piso regular</li>
+<li>Controle de velocidade</li>
+<li>Seguranca</li>
+</ul>
+
+<h2>Qual Escolher?</h2>
+<p>O ideal e combinar ambos! Use a esteira em dias chuvosos e a rua quando o tempo permitir.</p>
+
+<h2>Fit Transform</h2>
+<p>Registre seus treinos de corrida, seja na rua ou esteira, e acompanhe sua evolucao.</p>',
+3, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=800', true, 987),
+
+('Como Escolher o Tenis de Corrida Ideal', 'escolher-tenis-corrida',
+'Guia para encontrar o tenis perfeito para seu tipo de pisada.',
+'<h2>Tipos de Pisada</h2>
+<p><strong>Neutra:</strong> O pe aterrissa no centro. Precisa de tenis neutro.</p>
+<p><strong>Pronada:</strong> O pe rola para dentro. Precisa de controle de movimento.</p>
+<p><strong>Supinada:</strong> O pe rola para fora. Precisa de muito amortecimento.</p>
+
+<h2>Como Descobrir sua Pisada</h2>
+<ul>
+<li>Teste em loja especializada</li>
+<li>Analise do desgaste do tenis antigo</li>
+<li>Teste do pe molhado</li>
+</ul>
+
+<h2>Dicas de Compra</h2>
+<ul>
+<li>Experimente no final do dia</li>
+<li>Use a meia que vai correr</li>
+<li>Caminhe e corra na loja</li>
+<li>Troque a cada 500-800km</li>
+</ul>
+
+<h2>Fit Transform</h2>
+<p>Registre a quilometragem do seu tenis na plataforma para saber quando trocar.</p>',
+3, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800', true, 1876);

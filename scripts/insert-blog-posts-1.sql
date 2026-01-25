@@ -1,5 +1,5 @@
 -- ARTIGOS SOBRE MUSCULACAO (categoria_id = 1)
-INSERT INTO blog_posts (title, slug, excerpt, content, category_id, author, tags, meta_title, meta_description, keywords, reading_time, featured, published) VALUES
+INSERT INTO blog_posts (title, slug, excerpt, content, category_id, author, image_url, published, views) VALUES
 
 ('Guia Completo de Musculacao para Iniciantes', 'guia-completo-musculacao-iniciantes', 
 'Tudo que voce precisa saber para comecar a treinar musculacao do zero. Dicas, exercicios e como a Fit Transform pode ajudar.',
@@ -35,10 +35,7 @@ INSERT INTO blog_posts (title, slug, excerpt, content, category_id, author, tags
 
 <h2>Conclusao</h2>
 <p>Comecar na musculacao pode parecer intimidador, mas com orientacao adequada e as ferramentas certas, voce pode alcancar seus objetivos. A Fit Transform esta aqui para ajudar academias e profissionais a oferecerem o melhor servico aos seus alunos.</p>',
-1, 'Equipe Fit Transform', ARRAY['musculacao', 'iniciantes', 'treino', 'academia'],
-'Guia de Musculacao para Iniciantes | Fit Transform', 
-'Aprenda tudo sobre musculacao para iniciantes. Exercicios, dicas e como a Fit Transform ajuda academias e personal trainers.',
-ARRAY['musculacao iniciantes', 'como comecar musculacao', 'treino para iniciantes', 'academia para iniciantes'], 8, true, true),
+1, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800', true, 1250),
 
 ('Os 10 Melhores Exercicios para Ganhar Massa Muscular', 'melhores-exercicios-ganhar-massa-muscular',
 'Descubra os exercicios mais eficientes para hipertrofia e como estruturar seu treino para maximo ganho muscular.',
@@ -77,10 +74,7 @@ ARRAY['musculacao iniciantes', 'como comecar musculacao', 'treino para iniciante
 
 <h2>Acompanhamento com Fit Transform</h2>
 <p>Use a plataforma Fit Transform para registrar seus treinos, acompanhar cargas e ver sua evolucao. Personal trainers podem montar treinos otimizados para cada aluno.</p>',
-1, 'Equipe Fit Transform', ARRAY['hipertrofia', 'massa muscular', 'exercicios', 'treino'],
-'10 Melhores Exercicios para Massa Muscular | Fit Transform',
-'Conheca os 10 exercicios mais eficientes para ganhar massa muscular e como otimizar seus treinos.',
-ARRAY['exercicios para massa muscular', 'hipertrofia', 'ganhar musculo', 'melhores exercicios academia'], 7, true, true),
+1, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1581009146145-b5ef050c149a?w=800', true, 980),
 
 ('Treino ABC: O Guia Definitivo para Divisao de Treino', 'treino-abc-guia-definitivo',
 'Entenda como funciona a divisao ABC de treino, para quem e indicada e como montar seu treino ideal.',
@@ -120,10 +114,7 @@ ARRAY['exercicios para massa muscular', 'hipertrofia', 'ganhar musculo', 'melhor
 
 <h2>Fit Transform e Treinos Personalizados</h2>
 <p>Com a Fit Transform, personal trainers podem criar divisoes personalizadas para cada aluno, considerando objetivos, disponibilidade e nivel de experiencia.</p>',
-1, 'Equipe Fit Transform', ARRAY['treino abc', 'divisao de treino', 'musculacao'],
-'Treino ABC Completo | Guia Fit Transform',
-'Guia completo sobre treino ABC. Aprenda a dividir seus treinos para melhores resultados.',
-ARRAY['treino abc', 'divisao de treino', 'treino de musculacao', 'como dividir treino'], 6, false, true),
+1, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800', true, 856),
 
 ('Como Aumentar a Forca nos Principais Levantamentos', 'aumentar-forca-levantamentos',
 'Estrategias comprovadas para aumentar sua forca no supino, agachamento e levantamento terra.',
@@ -148,10 +139,7 @@ ARRAY['treino abc', 'divisao de treino', 'treino de musculacao', 'como dividir t
 
 <h2>Registro de Treinos</h2>
 <p>Use o app Fit Transform para registrar suas cargas e acompanhar sua evolucao de forca ao longo do tempo.</p>',
-1, 'Equipe Fit Transform', ARRAY['forca', 'powerlifting', 'supino', 'agachamento'],
-'Como Aumentar Forca | Fit Transform',
-'Aprenda estrategias para aumentar sua forca nos principais levantamentos.',
-ARRAY['aumentar forca', 'treino de forca', 'powerlifting', 'supino pesado'], 5, false, true),
+1, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=800', true, 723),
 
 ('Periodizacao de Treino: Maximize seus Resultados', 'periodizacao-treino-resultados',
 'Aprenda a periodizar seu treino para evitar plateaus e continuar evoluindo constantemente.',
@@ -175,10 +163,7 @@ Semanas 9-12: Alta intensidade (5x5)</p>
 
 <h2>Fit Transform para Personal Trainers</h2>
 <p>Com a Fit Transform, personal trainers podem planejar periodizacoes completas, ajustar treinos conforme a evolucao do aluno e garantir progressao continua.</p>',
-1, 'Equipe Fit Transform', ARRAY['periodizacao', 'planejamento', 'treino avancado'],
-'Periodizacao de Treino | Fit Transform',
-'Guia completo sobre periodizacao de treino para maximizar seus resultados.',
-ARRAY['periodizacao de treino', 'planejamento de treino', 'treino avancado', 'evitar plateu'], 6, false, true),
+1, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=800', true, 654),
 
 ('Descanso e Recuperacao: A Chave para o Crescimento Muscular', 'descanso-recuperacao-crescimento-muscular',
 'Entenda por que o descanso e tao importante quanto o treino para ganhar massa muscular.',
@@ -212,7 +197,143 @@ ARRAY['periodizacao de treino', 'planejamento de treino', 'treino avancado', 'ev
 
 <h2>Monitoramento com Fit Transform</h2>
 <p>A plataforma Fit Transform permite que personal trainers monitorem a fadiga dos alunos e ajustem os treinos conforme necessario.</p>',
-1, 'Equipe Fit Transform', ARRAY['descanso', 'recuperacao', 'sono', 'overtraining'],
-'Descanso e Recuperacao Muscular | Fit Transform',
-'Saiba como o descanso e fundamental para o crescimento muscular.',
-ARRAY['recuperacao muscular', 'descanso treino', 'overtraining', 'crescimento muscular'], 5, false, true);
+1, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800', true, 589),
+
+('Treino de Peito Completo: Do Iniciante ao Avancado', 'treino-peito-completo',
+'Monte um treino de peito eficiente com exercicios para todas as porcoes do peitoral.',
+'<h2>Anatomia do Peitoral</h2>
+<p>O peitoral maior e dividido em tres porcoes: clavicular (superior), esternal (medio) e costal (inferior). Um treino completo deve trabalhar todas.</p>
+
+<h2>Treino para Iniciantes</h2>
+<ul>
+<li>Supino reto - 3x12</li>
+<li>Supino inclinado maquina - 3x12</li>
+<li>Peck deck - 3x15</li>
+</ul>
+
+<h2>Treino Intermediario</h2>
+<ul>
+<li>Supino reto com barra - 4x8-10</li>
+<li>Supino inclinado halteres - 4x10</li>
+<li>Crucifixo - 3x12</li>
+<li>Crossover - 3x15</li>
+</ul>
+
+<h2>Treino Avancado</h2>
+<ul>
+<li>Supino reto - 5x5 (forca)</li>
+<li>Supino inclinado - 4x8</li>
+<li>Supino declinado - 3x10</li>
+<li>Crucifixo inclinado - 3x12</li>
+<li>Crossover baixo - 3x15</li>
+</ul>
+
+<h2>Dicas Fit Transform</h2>
+<p>Use nossa plataforma para registrar cargas, acompanhar volume semanal e garantir progressao no treino de peito.</p>',
+1, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800', true, 1102),
+
+('Treino de Costas: Construa um Dorsal em V', 'treino-costas-dorsal-v',
+'Exercicios e tecnicas para desenvolver costas largas e definidas.',
+'<h2>Por que Treinar Costas?</h2>
+<p>Costas fortes melhoram a postura, previnem lesoes e criam o formato em V tao desejado.</p>
+
+<h2>Principais Musculos</h2>
+<ul>
+<li>Latissimo do dorso (lats)</li>
+<li>Trapezio</li>
+<li>Romboides</li>
+<li>Eretores da espinha</li>
+</ul>
+
+<h2>Exercicios Essenciais</h2>
+<h3>Para Largura</h3>
+<ul>
+<li>Barra fixa - 4x max</li>
+<li>Puxada frontal - 4x10-12</li>
+<li>Puxada triangulo - 3x12</li>
+</ul>
+
+<h3>Para Espessura</h3>
+<ul>
+<li>Remada curvada - 4x8-10</li>
+<li>Remada cavalinho - 4x10</li>
+<li>Remada unilateral - 3x12</li>
+</ul>
+
+<h2>Conexao Mente-Musculo</h2>
+<p>Foque em puxar com os cotovelos, nao com as maos. Isso aumenta a ativacao dos dorsais.</p>
+
+<h2>Fit Transform</h2>
+<p>Personal trainers podem usar a Fit Transform para criar progressoes de barra fixa e acompanhar o desenvolvimento das costas dos alunos.</p>',
+1, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1603287681836-b174ce5074c2?w=800', true, 934),
+
+('Treino de Pernas: Nao Pule o Leg Day', 'treino-pernas-leg-day',
+'Guia completo para desenvolver pernas fortes e proporcionais.',
+'<h2>A Importancia do Treino de Pernas</h2>
+<p>Pernas sao o maior grupo muscular do corpo. Treina-las aumenta a producao de hormonios anabolicos e melhora o metabolismo.</p>
+
+<h2>Musculos Principais</h2>
+<ul>
+<li>Quadriceps</li>
+<li>Isquiotibiais</li>
+<li>Gluteos</li>
+<li>Panturrilhas</li>
+</ul>
+
+<h2>Treino Completo de Pernas</h2>
+<ul>
+<li>Agachamento livre - 4x6-8</li>
+<li>Leg press 45 - 4x10-12</li>
+<li>Cadeira extensora - 3x12-15</li>
+<li>Mesa flexora - 3x10-12</li>
+<li>Stiff - 3x10</li>
+<li>Panturrilha em pe - 4x15-20</li>
+</ul>
+
+<h2>Dicas de Execucao</h2>
+<ul>
+<li>Agache ate pelo menos 90 graus</li>
+<li>Mantenha os joelhos alinhados com os pes</li>
+<li>Contraia os gluteos no topo do movimento</li>
+</ul>
+
+<h2>Acompanhamento Fit Transform</h2>
+<p>Registre seus PRs de agachamento e acompanhe sua evolucao com graficos detalhados na plataforma.</p>',
+1, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=800', true, 1456),
+
+('Treino de Ombros: Deltoides 3D', 'treino-ombros-deltoides',
+'Desenvolva ombros redondos e definidos com este guia completo.',
+'<h2>Anatomia dos Deltoides</h2>
+<p>Os deltoides tem tres cabecas: anterior (frontal), lateral (medio) e posterior. Cada uma requer exercicios especificos.</p>
+
+<h2>Exercicios por Cabeca</h2>
+<h3>Deltoide Anterior</h3>
+<ul>
+<li>Desenvolvimento militar</li>
+<li>Elevacao frontal</li>
+</ul>
+
+<h3>Deltoide Lateral</h3>
+<ul>
+<li>Elevacao lateral</li>
+<li>Elevacao lateral no cabo</li>
+</ul>
+
+<h3>Deltoide Posterior</h3>
+<ul>
+<li>Crucifixo inverso</li>
+<li>Face pull</li>
+</ul>
+
+<h2>Treino Completo</h2>
+<ul>
+<li>Desenvolvimento com halteres - 4x8-10</li>
+<li>Elevacao lateral - 4x12-15</li>
+<li>Elevacao frontal - 3x12</li>
+<li>Crucifixo inverso - 4x12-15</li>
+<li>Face pull - 3x15</li>
+</ul>
+
+<h2>Fit Transform para Ombros</h2>
+<p>Crie treinos balanceados que trabalham todas as cabecas do deltoide usando a plataforma Fit Transform.</p>',
+1, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1532029837206-abbe2b7620e3?w=800', true, 823);

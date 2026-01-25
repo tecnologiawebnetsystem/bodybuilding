@@ -1,240 +1,229 @@
--- ARTIGOS SOBRE NUTRICAO (categoria_id = 4)
-INSERT INTO blog_posts (title, slug, excerpt, content, category_id, author, tags, meta_title, meta_description, keywords, reading_time, featured, published) VALUES
+-- ARTIGOS SOBRE PERSONAL TRAINER (categoria_id = 4)
+INSERT INTO blog_posts (title, slug, excerpt, content, category_id, author, image_url, published, views) VALUES
 
-('Nutricao para Ganho de Massa Muscular', 'nutricao-ganho-massa-muscular',
-'Guia completo de alimentacao para quem quer ganhar massa muscular de forma saudavel.',
-'<h2>Base da Nutricao para Hipertrofia</h2>
-<p>Para ganhar massa muscular, voce precisa estar em superavit calorico e consumir proteina suficiente.</p>
+('Por que Contratar um Personal Trainer', 'por-que-contratar-personal-trainer',
+'Descubra os beneficios de ter um personal trainer e como isso acelera seus resultados.',
+'<h2>O Papel do Personal Trainer</h2>
+<p>Um personal trainer e um profissional que cria treinos personalizados, corrige sua execucao e te motiva a alcancar seus objetivos.</p>
 
-<h2>Macronutrientes</h2>
-<h3>Proteinas</h3>
-<p>Consuma 1.6 a 2.2g por kg de peso corporal. Fontes: frango, carne, ovos, peixe, whey.</p>
-
-<h3>Carboidratos</h3>
-<p>Combustivel para os treinos. Arroz, batata, aveia, frutas.</p>
-
-<h3>Gorduras</h3>
-<p>Essenciais para hormonios. Azeite, abacate, castanhas.</p>
-
-<h2>Timing Nutricional</h2>
+<h2>Beneficios de ter um Personal</h2>
 <ul>
-<li>Pre-treino: Carbs + proteina 1-2h antes</li>
-<li>Pos-treino: Proteina + carbs ate 2h apos</li>
-<li>Antes de dormir: Proteina de digestao lenta</li>
+<li>Treinos 100% personalizados</li>
+<li>Correcao de postura e execucao</li>
+<li>Motivacao constante</li>
+<li>Resultados mais rapidos</li>
+<li>Menor risco de lesoes</li>
+<li>Accountability (compromisso)</li>
 </ul>
 
-<h2>Exemplo de Dieta</h2>
-<p><strong>Cafe:</strong> Ovos + pao integral + fruta<br>
-<strong>Lanche:</strong> Iogurte + granola<br>
-<strong>Almoco:</strong> Arroz + feijao + frango + salada<br>
-<strong>Pre-treino:</strong> Batata doce + frango<br>
-<strong>Pos-treino:</strong> Whey + banana<br>
-<strong>Jantar:</strong> Carne + legumes</p>
-
-<h2>Fit Transform e Nutricao</h2>
-<p>A plataforma Fit Transform permite que personal trainers acompanhem a nutricao de seus alunos e ajustem conforme os resultados.</p>',
-4, 'Equipe Fit Transform', ARRAY['nutricao', 'hipertrofia', 'dieta', 'proteina'],
-'Nutricao para Massa Muscular | Fit Transform',
-'Guia de alimentacao para ganhar massa muscular. Macros, timing e exemplo de dieta.',
-ARRAY['dieta para ganhar massa', 'nutricao hipertrofia', 'alimentacao musculacao', 'proteina'], 7, true, true),
-
-('Dieta para Emagrecer: Guia Pratico', 'dieta-para-emagrecer-guia-pratico',
-'Como montar uma dieta para perder peso de forma saudavel e sustentavel.',
-'<h2>Principios do Emagrecimento</h2>
-<p>Para emagrecer, voce precisa gastar mais calorias do que consome. Simples assim.</p>
-
-<h2>Calculando seu Deficit</h2>
-<p>Um deficit de 300-500 calorias por dia resulta em perda de 0.5-1kg por semana.</p>
-
-<h2>Estrategias Praticas</h2>
+<h2>Para Quem e Indicado?</h2>
 <ul>
-<li>Priorize proteinas - saciam mais</li>
-<li>Coma mais vegetais - baixa caloria, alto volume</li>
-<li>Reduza ultraprocessados</li>
-<li>Beba mais agua</li>
-<li>Evite calorias liquidas</li>
+<li>Iniciantes que nao sabem por onde comecar</li>
+<li>Pessoas com objetivos especificos</li>
+<li>Quem tem lesoes ou restricoes</li>
+<li>Atletas que querem melhorar performance</li>
 </ul>
 
-<h2>Alimentos para Incluir</h2>
+<h2>Fit Transform para Personal Trainers</h2>
+<p>A Fit Transform e a plataforma ideal para personal trainers gerenciarem seus alunos, criarem treinos personalizados e acompanharem a evolucao de cada cliente.</p>',
+4, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800', true, 2341),
+
+('Como Escolher o Personal Trainer Ideal', 'como-escolher-personal-trainer',
+'Dicas para encontrar o profissional certo para seus objetivos.',
+'<h2>O que Avaliar</h2>
+<p><strong>1. Formacao:</strong> Verifique se tem CREF (registro no Conselho de Educacao Fisica).</p>
+<p><strong>2. Especializacao:</strong> Busque alguem especializado no seu objetivo.</p>
+<p><strong>3. Experiencia:</strong> Veja ha quanto tempo atua e peca referencias.</p>
+<p><strong>4. Metodologia:</strong> Entenda como ele trabalha.</p>
+<p><strong>5. Empatia:</strong> Voce precisa se sentir confortavel com o profissional.</p>
+
+<h2>Perguntas para Fazer</h2>
 <ul>
-<li>Proteinas magras: frango, peixe, ovos</li>
-<li>Vegetais verdes</li>
-<li>Frutas com moderacao</li>
-<li>Graos integrais</li>
+<li>Qual sua formacao?</li>
+<li>Ha quanto tempo atua?</li>
+<li>Qual sua especialidade?</li>
+<li>Como funciona o acompanhamento?</li>
 </ul>
 
-<h2>Alimentos para Evitar</h2>
+<h2>Fit Transform</h2>
+<p>Personal trainers que usam a Fit Transform oferecem acompanhamento digital completo aos seus alunos.</p>',
+4, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800', true, 1654),
+
+('Personal Trainer: Como Fidelizar seus Alunos', 'personal-trainer-fidelizar-alunos',
+'Estrategias para manter seus alunos engajados e evitar cancelamentos.',
+'<h2>O Desafio da Fidelizacao</h2>
+<p>Manter alunos e tao importante quanto conquistar novos. Um aluno fidelizado gera receita recorrente e indicacoes.</p>
+
+<h2>Estrategias de Fidelizacao</h2>
+<p><strong>1. Resultados Visiveis:</strong> Registre fotos, medidas e evolucao.</p>
+<p><strong>2. Comunicacao Constante:</strong> Mantenha contato mesmo fora dos treinos.</p>
+<p><strong>3. Treinos Variados:</strong> Evite monotonia. Surpreenda com novidades.</p>
+<p><strong>4. Flexibilidade:</strong> Adapte horarios quando possivel.</p>
+<p><strong>5. Tecnologia:</strong> Use apps e plataformas para acompanhamento.</p>
+
+<h2>Fit Transform para Fidelizacao</h2>
+<p>A Fit Transform permite que personal trainers oferecam acompanhamento completo, com treinos digitais, registro de evolucao e comunicacao integrada.</p>',
+4, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1576678927484-cc907957088c?w=800', true, 1234),
+
+('Treino Online vs Presencial: Qual Oferecer?', 'treino-online-vs-presencial',
+'Comparativo entre as duas modalidades e como oferecer ambas.',
+'<h2>Treino Presencial - Vantagens</h2>
 <ul>
-<li>Refrigerantes</li>
-<li>Doces</li>
-<li>Fast food</li>
-<li>Salgadinhos</li>
+<li>Correcao em tempo real</li>
+<li>Maior conexao com o aluno</li>
+<li>Motivacao direta</li>
 </ul>
 
-<h2>Sustentabilidade</h2>
-<p>A melhor dieta e aquela que voce consegue manter. Seja flexivel!</p>',
-4, 'Equipe Fit Transform', ARRAY['dieta', 'emagrecer', 'perder peso', 'deficit'],
-'Dieta para Emagrecer | Fit Transform',
-'Guia pratico para montar uma dieta de emagrecimento saudavel.',
-ARRAY['dieta para emagrecer', 'como perder peso', 'deficit calorico', 'alimentacao saudavel'], 6, false, true),
-
-('Cafe da Manha para Atletas: O que Comer', 'cafe-da-manha-atletas',
-'Opcoes de cafe da manha para quem treina e quer otimizar os resultados.',
-'<h2>Importancia do Cafe da Manha</h2>
-<p>O cafe da manha quebra o jejum noturno e fornece energia para o dia.</p>
-
-<h2>Opcoes de Cafe da Manha</h2>
-<h3>Para Ganho de Massa</h3>
+<h2>Treino Online - Vantagens</h2>
 <ul>
-<li>4 ovos mexidos + 2 fatias pao integral + 1 banana</li>
-<li>Mingau de aveia com whey + frutas + pasta de amendoim</li>
-<li>Panquecas de banana com ovos + mel</li>
+<li>Alcance ilimitado</li>
+<li>Flexibilidade de horario</li>
+<li>Escalabilidade</li>
 </ul>
 
-<h3>Para Emagrecimento</h3>
+<h2>O Ideal: Modelo Hibrido</h2>
+<p>Oferecer ambas as modalidades amplia seu mercado e atende diferentes perfis de alunos.</p>
+
+<h2>Fit Transform</h2>
+<p>A plataforma Fit Transform permite gerenciar alunos presenciais e online em um so lugar.</p>',
+4, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800', true, 987),
+
+('Marketing Digital para Personal Trainers', 'marketing-digital-personal-trainers',
+'Como atrair mais alunos usando redes sociais e internet.',
+'<h2>Por que Marketing Digital?</h2>
+<p>Seus potenciais alunos estao nas redes sociais. Voce precisa estar la tambem.</p>
+
+<h2>Estrategias Essenciais</h2>
+<p><strong>1. Instagram:</strong> Poste conteudo educativo e transformacoes de alunos.</p>
+<p><strong>2. YouTube:</strong> Videos de treino posicionam voce como autoridade.</p>
+<p><strong>3. WhatsApp Business:</strong> Atendimento profissional.</p>
+<p><strong>4. Google Meu Negocio:</strong> Apareca nas buscas locais.</p>
+
+<h2>Conteudo que Funciona</h2>
 <ul>
-<li>2 ovos + 1 fatia pao integral + abacate</li>
-<li>Iogurte grego + frutas vermelhas + chia</li>
-<li>Omelete de claras com vegetais</li>
+<li>Antes e depois de alunos</li>
+<li>Dicas rapidas de treino</li>
+<li>Correcao de exercicios</li>
+<li>Mitos e verdades</li>
 </ul>
 
-<h3>Pre-Treino (manha)</h3>
+<h2>Fit Transform</h2>
+<p>Profissionalize seu servico com a Fit Transform e tenha mais credibilidade para atrair alunos.</p>',
+4, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1432888622747-4eb9a8f2c2b2?w=800', true, 2103),
+
+('CRM para Personal Trainers: O que e e Por que Usar', 'crm-personal-trainers',
+'Entenda como um sistema de gestao pode transformar seu negocio.',
+'<h2>O que e CRM?</h2>
+<p>CRM (Customer Relationship Management) e um sistema para gerenciar o relacionamento com seus clientes/alunos.</p>
+
+<h2>Beneficios para Personal Trainers</h2>
 <ul>
-<li>Banana + pasta de amendoim</li>
-<li>Tapioca com frango desfiado</li>
-<li>Vitamina de frutas com aveia</li>
+<li>Organizacao de alunos e dados</li>
+<li>Controle financeiro</li>
+<li>Agendamento de aulas</li>
+<li>Comunicacao centralizada</li>
+<li>Acompanhamento de evolucao</li>
 </ul>
 
-<h2>Dicas</h2>
+<h2>O que a Fit Transform Oferece</h2>
 <ul>
-<li>Inclua sempre proteina</li>
-<li>Adicione fibras para saciedade</li>
-<li>Evite acucar em excesso</li>
-</ul>',
-4, 'Equipe Fit Transform', ARRAY['cafe da manha', 'nutricao', 'atletas'],
-'Cafe da Manha para Atletas | Fit Transform',
-'Opcoes de cafe da manha nutritivo para quem treina.',
-ARRAY['cafe da manha saudavel', 'cafe da manha atleta', 'o que comer antes treino'], 5, false, true),
-
-('Alimentacao Pre e Pos Treino', 'alimentacao-pre-pos-treino',
-'O que comer antes e depois do treino para maximizar seus resultados.',
-'<h2>Pre-Treino</h2>
-<h3>Objetivo</h3>
-<p>Fornecer energia para o treino sem causar desconforto.</p>
-
-<h3>Timing</h3>
-<p>Coma 1-2 horas antes do treino.</p>
-
-<h3>O que Comer</h3>
-<ul>
-<li>Carboidratos de facil digestao</li>
-<li>Proteina moderada</li>
-<li>Pouca gordura</li>
+<li>Cadastro completo de alunos</li>
+<li>Criacao de treinos personalizados</li>
+<li>Controle de pagamentos</li>
+<li>Modulos de corrida, calistenia e musculacao</li>
+<li>Acompanhamento nutricional</li>
+<li>Graficos de evolucao</li>
 </ul>
 
-<h3>Exemplos</h3>
+<h2>Profissionalize seu Negocio</h2>
+<p>A Fit Transform e o CRM completo para personal trainers que querem crescer de forma organizada e profissional.</p>',
+4, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800', true, 2876),
+
+('Como Criar Treinos Personalizados Eficientes', 'criar-treinos-personalizados',
+'Metodologia para montar treinos que realmente funcionam para cada aluno.',
+'<h2>Avaliacao Inicial</h2>
 <ul>
-<li>Batata doce + frango</li>
-<li>Arroz + carne</li>
-<li>Banana + whey</li>
+<li>Anamnese completa</li>
+<li>Avaliacao fisica</li>
+<li>Historico de treino</li>
+<li>Objetivos</li>
+<li>Restricoes</li>
 </ul>
 
-<h2>Pos-Treino</h2>
-<h3>Objetivo</h3>
-<p>Repor glicogenio e fornecer aminoacidos para recuperacao.</p>
+<h2>Principios da Periodizacao</h2>
+<p><strong>Especificidade:</strong> Treino focado no objetivo.</p>
+<p><strong>Progressao:</strong> Aumento gradual de carga.</p>
+<p><strong>Variacao:</strong> Mudancas para evitar estagnacao.</p>
+<p><strong>Individualizacao:</strong> Adaptado ao aluno.</p>
 
-<h3>Timing</h3>
-<p>Ate 2 horas apos o treino (a janela anabolica nao e tao curta quanto se pensava).</p>
+<h2>Fit Transform para Treinos</h2>
+<p>A Fit Transform permite criar treinos personalizados com biblioteca de exercicios, videos e acompanhamento de carga.</p>',
+4, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1581009146145-b5ef050c149a?w=800', true, 1765),
 
-<h3>O que Comer</h3>
+('Avaliacao Fisica: Como Fazer Corretamente', 'avaliacao-fisica-como-fazer',
+'Guia completo para realizar avaliacoes fisicas em seus alunos.',
+'<h2>Importancia da Avaliacao</h2>
+<p>A avaliacao e o ponto de partida para qualquer programa de treino.</p>
+
+<h2>O que Avaliar - Composicao Corporal</h2>
 <ul>
-<li>Proteina de rapida absorcao</li>
-<li>Carboidratos para repor energia</li>
+<li>Peso</li>
+<li>Percentual de gordura</li>
+<li>Medidas (perimetria)</li>
 </ul>
 
-<h3>Exemplos</h3>
+<h2>O que Avaliar - Capacidades Fisicas</h2>
 <ul>
-<li>Whey + banana + aveia</li>
-<li>Frango + arroz branco</li>
-<li>Ovos + pao</li>
-</ul>',
-4, 'Equipe Fit Transform', ARRAY['pre treino', 'pos treino', 'nutricao'],
-'Alimentacao Pre e Pos Treino | Fit Transform',
-'Guia de o que comer antes e depois do treino.',
-ARRAY['o que comer pre treino', 'alimentacao pos treino', 'nutricao treino'], 6, false, true),
-
-('Dieta Low Carb: Funciona para Quem Treina?', 'dieta-low-carb-funciona-treina',
-'Analise da dieta low carb para praticantes de musculacao e exercicios.',
-'<h2>O que e Low Carb?</h2>
-<p>Dieta que restringe carboidratos, geralmente abaixo de 100-150g por dia.</p>
-
-<h2>Beneficios</h2>
-<ul>
-<li>Controle de apetite</li>
-<li>Reducao de inchaço</li>
-<li>Pode ajudar no emagrecimento</li>
+<li>Forca</li>
+<li>Resistencia</li>
+<li>Flexibilidade</li>
 </ul>
 
-<h2>Desvantagens para Atletas</h2>
+<h2>Frequencia</h2>
+<p>Reavalie a cada 4-8 semanas para ajustar o treino.</p>
+
+<h2>Fit Transform</h2>
+<p>Registre todas as avaliacoes na Fit Transform e acompanhe a evolucao dos seus alunos com graficos detalhados.</p>',
+4, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1571019613576-2b22c76fd955?w=800', true, 1432),
+
+('Gestao Financeira para Personal Trainers', 'gestao-financeira-personal-trainers',
+'Como organizar as financas do seu negocio de personal trainer.',
+'<h2>Controle de Receitas</h2>
 <ul>
-<li>Menor energia para treinos intensos</li>
-<li>Pode prejudicar hipertrofia</li>
-<li>Dificil de manter a longo prazo</li>
+<li>Registre todos os pagamentos</li>
+<li>Defina precos por modalidade</li>
+<li>Crie pacotes e mensalidades</li>
 </ul>
 
-<h2>Quando Usar</h2>
-<p>Low carb pode funcionar para:</p>
+<h2>Controle de Despesas</h2>
 <ul>
-<li>Fases de cutting</li>
-<li>Dias de descanso</li>
-<li>Pessoas sedentarias</li>
+<li>Aluguel de espaco</li>
+<li>Equipamentos</li>
+<li>Marketing</li>
+<li>Cursos e atualizacoes</li>
 </ul>
 
-<h2>Quando Evitar</h2>
-<ul>
-<li>Treinos de alta intensidade</li>
-<li>Fases de ganho de massa</li>
-<li>Atletas de resistencia</li>
-</ul>
+<h2>Precificacao</h2>
+<p>Considere seus custos, experiencia, mercado local e o valor que voce entrega.</p>
 
-<h2>Conclusao</h2>
-<p>Para a maioria dos praticantes de musculacao, uma dieta moderada em carboidratos e mais adequada.</p>',
-4, 'Equipe Fit Transform', ARRAY['low carb', 'dieta', 'carboidratos'],
-'Dieta Low Carb para Atletas | Fit Transform',
-'Analise da dieta low carb para quem pratica musculacao.',
-ARRAY['low carb musculacao', 'dieta sem carboidrato', 'low carb funciona'], 5, false, true),
+<h2>Fit Transform</h2>
+<p>A Fit Transform oferece modulo financeiro completo para personal trainers controlarem pagamentos, inadimplencia e fluxo de caixa.</p>',
+4, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1554244933-d876deb6b2ff?w=800', true, 1543),
 
-('Hidratacao: Quanto de Agua Voce Deve Beber', 'hidratacao-quanta-agua-beber',
-'Guia completo sobre hidratacao para atletas e praticantes de exercicios.',
-'<h2>Importancia da Hidratacao</h2>
-<p>A agua e essencial para todas as funcoes do corpo, especialmente durante o exercicio.</p>
+('Como Escalar seu Negocio de Personal Trainer', 'escalar-negocio-personal-trainer',
+'Estrategias para crescer alem das aulas presenciais individuais.',
+'<h2>Limitacoes do Modelo Tradicional</h2>
+<p>Aulas individuais presenciais tem teto de faturamento: seu tempo e limitado.</p>
 
-<h2>Quanto Beber?</h2>
-<p>Recomendacao geral: 35-40ml por kg de peso corporal.</p>
-<p>Exemplo: Pessoa de 70kg = 2.5 a 2.8 litros por dia.</p>
+<h2>Formas de Escalar</h2>
+<p><strong>1. Grupos Pequenos:</strong> Atenda 2-4 alunos simultaneamente.</p>
+<p><strong>2. Treino Online:</strong> Alcance alunos de qualquer lugar.</p>
+<p><strong>3. Programas Digitais:</strong> Venda treinos prontos.</p>
+<p><strong>4. Consultoria:</strong> Atenda outros personal trainers.</p>
 
-<h2>Durante o Treino</h2>
-<ul>
-<li>Beba 200-300ml a cada 15-20 minutos</li>
-<li>Para treinos acima de 1 hora, considere bebidas com eletrolitos</li>
-</ul>
+<h2>Tecnologia como Aliada</h2>
+<p>Use plataformas para automatizar tarefas e atender mais alunos sem perder qualidade.</p>
 
-<h2>Sinais de Desidratacao</h2>
-<ul>
-<li>Urina escura</li>
-<li>Sede intensa</li>
-<li>Fadiga</li>
-<li>Tontura</li>
-<li>Dor de cabeca</li>
-</ul>
-
-<h2>Dicas</h2>
-<ul>
-<li>Carregue uma garrafa sempre</li>
-<li>Beba antes de sentir sede</li>
-<li>Aumente no calor e em treinos intensos</li>
-</ul>',
-4, 'Equipe Fit Transform', ARRAY['hidratacao', 'agua', 'saude'],
-'Hidratacao para Atletas | Fit Transform',
-'Quanto de agua beber por dia e durante os treinos.',
-ARRAY['quanta agua beber', 'hidratacao treino', 'importancia da agua'], 4, false, true);
+<h2>Fit Transform</h2>
+<p>A Fit Transform permite escalar seu negocio mantendo a personalizacao e qualidade no atendimento.</p>',
+4, 'Equipe Fit Transform', 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800', true, 876);
