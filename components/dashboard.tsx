@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Home,
@@ -133,6 +133,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
 }
 
 export function Dashboard({ userId, onLogout }: DashboardProps) {
+  console.log("[v0] Dashboard rendering with userId:", userId)
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== "undefined") {
       const savedTab = sessionStorage.getItem("activeTab")
@@ -144,6 +145,17 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
     return "home"
   })
   const preferences = getUserPreferences(userId)
+
+  // Listener para mudar de tab via evento customizado (usado pelos widgets da home)
+  useEffect(() => {
+    const handleChangeTab = (event: CustomEvent) => {
+      setActiveTab(event.detail)
+    }
+    window.addEventListener('changeTab', handleChangeTab as EventListener)
+    return () => {
+      window.removeEventListener('changeTab', handleChangeTab as EventListener)
+    }
+  }, [])
 
   const tabs = [
     { id: "home", label: "Início", icon: Home, color: preferences.theme_primary, enabled: true },
@@ -201,21 +213,21 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
       label: "Calistenia",
       icon: Zap,
       color: preferences.theme_primary,
-      enabled: preferences.enable_home_workouts,
+      enabled: preferences.enable_home_workouts && !["kleber", "pamela"].includes(userId?.toLowerCase() || ""), // Kleber e Pamela acessam via widget
     },
     {
       id: "spinning",
       label: "Spinning",
       icon: Bike,
       color: "#7c3aed",
-      enabled: preferences.enable_spinning,
+      enabled: preferences.enable_spinning && !["kleber", "pamela"].includes(userId?.toLowerCase() || ""), // Kleber e Pamela acessam via widget
     },
     {
       id: "ginastica",
       label: "Ginastica",
       icon: Dumbbell,
       color: "#7c3aed",
-      enabled: preferences.enable_ginastica,
+      enabled: preferences.enable_ginastica && !["kleber", "pamela"].includes(userId?.toLowerCase() || ""), // Kleber e Pamela acessam via widget
     },
     { id: "ai", label: "IA", icon: Sparkles, color: "#a855f7", enabled: true },
     { id: "loyalty", label: "Pontos", icon: Coins, color: "#f59e0b", enabled: true },
