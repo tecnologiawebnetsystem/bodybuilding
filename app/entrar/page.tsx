@@ -1,92 +1,72 @@
 "use client"
 
 import React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Dumbbell, Mail, Lock, Eye, EyeOff, ArrowRight, Loader2, KeyRound, Smartphone } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Dumbbell, ArrowRight, Loader2, Delete, Shield, ChevronLeft } from "lucide-react"
 
 export default function EntrarPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  
-  // Login por email/senha
-  const [identifier, setIdentifier] = useState("") // email ou cpf
-  const [password, setPassword] = useState("")
-  
-  // Login por PIN
+  const [step, setStep] = useState<"cpf" | "pin">("cpf")
+  const [cpf, setCpf] = useState("")
   const [pin, setPin] = useState("")
+  const [userName, setUserName] = useState("")
+  const [currentTime, setCurrentTime] = useState(new Date())
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
 
-    try {
-      const res = await fetch("/api/auth/unified-login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, password })
-      })
+  const greeting = currentTime.getHours() < 12 ? "Bom dia" : currentTime.getHours() < 18 ? "Boa tarde" : "Boa noite"
 
-      const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.error || "Erro ao fazer login")
-        return
-      }
-
-      // Salvar dados no localStorage
-      localStorage.setItem("authUser", JSON.stringify(data.user))
-      localStorage.setItem("authConnections", JSON.stringify(data.connections))
-
-      // Redirecionar baseado no tipo
-      router.push(data.redirectTo)
-    } catch (err) {
-      setError("Erro de conexao. Tente novamente.")
-    } finally {
-      setLoading(false)
+  const formatCPF = (value: string) => {
+    const numbers = value.replace(/\D/g, "")
+    if (numbers.length <= 11) {
+      return numbers
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
     }
+    return value
   }
 
-  const handlePinLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCPF(e.target.value)
+    setCpf(formatted)
     setError("")
-    
-    if (pin.length !== 6) {
-      setError("PIN deve ter 6 digitos")
+  }
+
+  const handleContinue = async () => {
+    const cleanCPF = cpf.replace(/\D/g, "")
+    if (cleanCPF.length !== 11) {
+      setError("CPF invalido. Digite os 11 digitos.")
       return
     }
 
     setLoading(true)
+    setError("")
 
     try {
-      const res = await fetch("/api/auth/unified-login", {
+      // Verificar se o CPF existe
+      const res = await fetch("/api/auth/check-cpf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pin })
+        body: JSON.stringify({ cpf: cleanCPF })
       })
 
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || "PIN invalido")
+        setError(data.error || "CPF nao encontrado")
         return
       }
 
-      // Salvar dados no localStorage
-      localStorage.setItem("authUser", JSON.stringify(data.user))
-      localStorage.setItem("authConnections", JSON.stringify(data.connections))
-
-      // Redirecionar
-      router.push(data.redirectTo)
+      setUserName(data.name || "")
+      setStep("pin")
     } catch (err) {
       setError("Erro de conexao. Tente novamente.")
     } finally {
@@ -94,190 +74,266 @@ export default function EntrarPage() {
     }
   }
 
+  const handlePinInput = (digit: string) => {
+    if (pin.length < 6) {
+      const newPin = pin + digit
+      setPin(newPin)
+      setError("")
+      
+      // Auto submit when PIN is complete
+      if (newPin.length === 6) {
+        handleLogin(newPin)
+      }
+    }
+  }
+
+  const handlePinDelete = () => {
+    if (pin.length > 0) {
+      setPin(pin.slice(0, -1))
+      setError("")
+    }
+  }
+
+  const handleLogin = async (finalPin: string) => {
+    const cleanCPF = cpf.replace(/\D/g, "")
+    setLoading(true)
+    setError("")
+
+    try {
+      const res = await fetch("/api/auth/unified-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          identifier: cleanCPF,
+          pin: finalPin 
+        })
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "PIN incorreto")
+        setPin("")
+        return
+      }
+
+      // Salvar dados no sessionStorage
+      sessionStorage.setItem("userId", data.user.userId || data.user.id)
+      sessionStorage.setItem("userName", data.user.name)
+      sessionStorage.setItem("userRole", data.user.role)
+      if (data.user.gymId) {
+        sessionStorage.setItem("gymId", data.user.gymId.toString())
+      }
+
+      // Redirecionar baseado no tipo
+      if (data.user.role === "super_admin") {
+        router.push("/super-admin")
+      } else if (data.user.role === "gym_admin") {
+        router.push("/admin")
+      } else if (data.user.role === "trainer") {
+        router.push("/trainer")
+      } else {
+        router.push("/app-mobile")
+      }
+    } catch (err) {
+      setError("Erro de conexao. Tente novamente.")
+      setPin("")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleBack = () => {
+    setStep("cpf")
+    setPin("")
+    setError("")
+  }
+
+  const numpadButtons = [
+    "1", "2", "3",
+    "4", "5", "6",
+    "7", "8", "9",
+    "", "0", "del"
+  ]
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 flex flex-col">
-      {/* Header */}
-      <header className="p-6">
-        <Link href="/" className="flex items-center gap-3 w-fit">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-orange-500 flex items-center justify-center">
-            <Dumbbell className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-2xl font-bold text-white">
-            Fit<span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Transform</span>
-          </span>
-        </Link>
-      </header>
+    <div className="min-h-screen min-h-[100dvh] bg-[#0a0a0a] text-white flex flex-col overflow-hidden">
+      {/* Background */}
+      <div className="fixed inset-0 bg-gradient-to-b from-orange-500/5 via-transparent to-red-500/5 pointer-events-none" />
+      <div className="fixed top-0 right-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="fixed bottom-0 left-0 w-96 h-96 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Main */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8">
-        <Card className="w-full max-w-md p-8 bg-white/5 border-white/10">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">Bem-vindo de volta</h1>
-            <p className="text-gray-400">Entre na sua conta para continuar</p>
-          </div>
+      <div className="relative z-10 flex-1 flex flex-col w-full max-w-md mx-auto px-6">
+        {/* Header */}
+        <header className="flex items-center justify-between py-6">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+              <Dumbbell className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-lg font-semibold tracking-tight">FitTransform</span>
+          </Link>
+        </header>
 
-          <Tabs defaultValue="email" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-white/5 border-white/10 mb-6">
-              <TabsTrigger value="email" className="flex items-center gap-2 data-[state=active]:bg-orange-500/20 data-[state=active]:text-orange-400">
-                <Mail className="w-4 h-4" /> Email/CPF
-              </TabsTrigger>
-              <TabsTrigger value="pin" className="flex items-center gap-2 data-[state=active]:bg-orange-500/20 data-[state=active]:text-orange-400">
-                <KeyRound className="w-4 h-4" /> PIN
-              </TabsTrigger>
-            </TabsList>
+        {/* Main Content */}
+        <main className="flex-1 flex flex-col justify-center py-4">
+          {step === "cpf" ? (
+            /* CPF Step */
+            <div className="space-y-8">
+              <div className="text-center">
+                <p className="text-gray-500 text-sm mb-1">{greeting}</p>
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+                  Bem-vindo de{" "}
+                  <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">volta</span>
+                </h1>
+                <p className="text-gray-400 mt-2">Digite seu CPF para continuar</p>
+              </div>
 
-            <TabsContent value="email">
-              <form onSubmit={handleEmailLogin} className="space-y-4">
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">Email ou CPF</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                    <Input
-                      type="text"
-                      value={identifier}
-                      onChange={(e) => setIdentifier(e.target.value)}
-                      placeholder="seu@email.com ou 000.000.000-00"
-                      className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-orange-500"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block">Senha</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Sua senha"
-                      className="pl-10 pr-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-orange-500"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white"
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                  </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm text-gray-400 font-medium">CPF</label>
+                  <input
+                    type="text"
+                    value={cpf}
+                    onChange={handleCPFChange}
+                    placeholder="000.000.000-00"
+                    maxLength={14}
+                    className="w-full h-16 px-6 bg-white/5 border border-white/10 rounded-2xl text-xl font-medium text-white placeholder:text-gray-600 focus:outline-none focus:border-orange-500/50 focus:bg-white/10 transition-all text-center tracking-wider"
+                    autoFocus
+                    inputMode="numeric"
+                  />
                 </div>
 
                 {error && (
-                  <p className="text-red-400 text-sm text-center bg-red-500/10 p-3 rounded-lg">{error}</p>
-                )}
-
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600"
-                >
-                  {loading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>
-                      Entrar <ArrowRight className="w-5 h-5 ml-2" />
-                    </>
-                  )}
-                </Button>
-
-                <div className="text-center">
-                  <Link href="/recuperar-senha" className="text-sm text-orange-400 hover:text-orange-300">
-                    Esqueceu sua senha?
-                  </Link>
-                </div>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="pin">
-              <form onSubmit={handlePinLogin} className="space-y-4">
-                <div>
-                  <label className="text-sm text-gray-400 mb-2 block text-center">
-                    Digite seu PIN de 6 digitos
-                  </label>
-                  <p className="text-xs text-gray-500 mb-4 text-center">
-                    O PIN e usado para acesso rapido de alunos em academias
-                  </p>
-                  <div className="flex justify-center gap-2">
-                    {[0, 1, 2, 3, 4, 5].map((index) => (
-                      <input
-                        key={index}
-                        type="text"
-                        inputMode="numeric"
-                        maxLength={1}
-                        value={pin[index] || ""}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, "")
-                          if (value) {
-                            const newPin = pin.split("")
-                            newPin[index] = value
-                            setPin(newPin.join(""))
-                            // Auto-focus next input
-                            const nextInput = e.target.nextElementSibling as HTMLInputElement
-                            if (nextInput && value) nextInput.focus()
-                          }
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Backspace" && !pin[index]) {
-                            const prevInput = (e.target as HTMLElement).previousElementSibling as HTMLInputElement
-                            if (prevInput) {
-                              prevInput.focus()
-                              const newPin = pin.split("")
-                              newPin[index - 1] = ""
-                              setPin(newPin.join(""))
-                            }
-                          }
-                        }}
-                        className="w-12 h-14 text-center text-2xl font-bold bg-white/5 border border-white/10 rounded-xl text-white focus:border-orange-500 focus:outline-none"
-                      />
-                    ))}
+                  <div className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                    <div className="w-2 h-2 rounded-full bg-red-500" />
+                    <p className="text-sm text-red-400">{error}</p>
                   </div>
-                </div>
-
-                {error && (
-                  <p className="text-red-400 text-sm text-center bg-red-500/10 p-3 rounded-lg">{error}</p>
                 )}
 
-                <Button
-                  type="submit"
-                  disabled={loading || pin.length !== 6}
-                  className="w-full bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600"
+                <button
+                  onClick={handleContinue}
+                  disabled={loading || cpf.replace(/\D/g, "").length !== 11}
+                  className="w-full h-14 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 rounded-2xl text-lg font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-500/20"
                 >
                   {loading ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="w-6 h-6 animate-spin" />
                   ) : (
                     <>
-                      Acessar com PIN <ArrowRight className="w-5 h-5 ml-2" />
+                      Continuar
+                      <ArrowRight className="w-5 h-5" />
                     </>
                   )}
-                </Button>
+                </button>
+              </div>
 
-                <p className="text-xs text-gray-500 text-center">
-                  Nao tem PIN? Use email/senha ou solicite ao seu personal/academia
+              <div className="text-center">
+                <p className="text-gray-500 text-sm mb-3">Primeira vez aqui?</p>
+                <Link
+                  href="/cadastro"
+                  className="text-orange-400 hover:text-orange-300 font-medium text-sm"
+                >
+                  Criar minha conta gratis
+                </Link>
+              </div>
+            </div>
+          ) : (
+            /* PIN Step */
+            <div className="space-y-6">
+              <button
+                onClick={handleBack}
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5" />
+                Voltar
+              </button>
+
+              <div className="text-center">
+                {userName && (
+                  <p className="text-orange-400 text-sm mb-1">Ola, {userName.split(" ")[0]}!</p>
+                )}
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+                  Digite seu{" "}
+                  <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">PIN</span>
+                </h1>
+                <p className="text-gray-400 text-sm mt-1">CPF: {cpf}</p>
+              </div>
+
+              {/* PIN Display */}
+              <div className="flex justify-center gap-3">
+                {[0, 1, 2, 3, 4, 5].map((index) => (
+                  <div
+                    key={index}
+                    className={`w-12 h-14 rounded-xl border-2 flex items-center justify-center transition-all ${
+                      pin.length > index
+                        ? "bg-gradient-to-br from-orange-500/20 to-red-500/20 border-orange-500/50"
+                        : "bg-white/5 border-white/10"
+                    }`}
+                  >
+                    {pin.length > index && (
+                      <div className="w-3 h-3 rounded-full bg-gradient-to-br from-orange-500 to-red-500" />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {error && (
+                <div className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                  <div className="w-2 h-2 rounded-full bg-red-500" />
+                  <p className="text-sm text-red-400">{error}</p>
+                </div>
+              )}
+
+              {loading && (
+                <div className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin text-orange-500" />
+                  <span className="text-gray-400 text-sm">Verificando...</span>
+                </div>
+              )}
+
+              {/* Numeric Keypad */}
+              <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto">
+                {numpadButtons.map((btn, index) => (
+                  <div key={index}>
+                    {btn === "" ? (
+                      <div className="w-20 h-16" />
+                    ) : btn === "del" ? (
+                      <button
+                        onClick={handlePinDelete}
+                        disabled={loading}
+                        className="w-20 h-16 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 flex items-center justify-center transition-all active:scale-95 disabled:opacity-50"
+                      >
+                        <Delete className="w-6 h-6 text-gray-400" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handlePinInput(btn)}
+                        disabled={loading || pin.length >= 6}
+                        className="w-20 h-16 rounded-2xl bg-white/5 border border-white/10 hover:bg-orange-500/20 hover:border-orange-500/30 text-2xl font-semibold transition-all active:scale-95 disabled:opacity-50"
+                      >
+                        {btn}
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-center pt-4">
+                <p className="text-gray-500 text-xs">
+                  Esqueceu o PIN? Fale com sua academia ou personal
                 </p>
-              </form>
-            </TabsContent>
-          </Tabs>
+              </div>
+            </div>
+          )}
+        </main>
 
-          <div className="mt-8 pt-6 border-t border-white/10">
-            <p className="text-center text-gray-400 text-sm">
-              Nao tem conta?{" "}
-              <Link href="/cadastro" className="text-orange-400 hover:text-orange-300 font-medium">
-                Criar conta gratis
-              </Link>
-            </p>
+        {/* Footer */}
+        <footer className="py-6 text-center">
+          <div className="flex items-center justify-center gap-2 text-gray-600 text-xs">
+            <Shield className="w-4 h-4" />
+            <span>Seus dados estao protegidos</span>
           </div>
-        </Card>
-      </main>
-
-      {/* Footer */}
-      <footer className="p-6 text-center">
-        <p className="text-gray-500 text-sm">
-          © 2025 FitTransform. Todos os direitos reservados.
-        </p>
-      </footer>
+        </footer>
+      </div>
     </div>
   )
 }
