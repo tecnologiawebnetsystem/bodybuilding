@@ -20,8 +20,25 @@ export async function POST(request: NextRequest) {
     let user = null
     let authMethod = ""
 
-    if (pin) {
-      // Login por PIN (alunos de academia/personal)
+    if (identifier && pin) {
+      // Login por CPF + PIN (fluxo unificado)
+      authMethod = "cpf_pin"
+      const cleanCPF = identifier.replace(/\D/g, "")
+      
+      const users = await sql`
+        SELECT 
+          user_id, name, email, cpf, pin, role, account_type, is_independent,
+          gym_id, personal_trainer_id, profile_photo_url
+        FROM users 
+        WHERE REPLACE(REPLACE(cpf, '.', ''), '-', '') = ${cleanCPF} AND pin = ${pin}
+      `
+      user = users[0]
+
+      if (!user) {
+        return NextResponse.json({ error: "CPF ou PIN incorretos" }, { status: 401 })
+      }
+    } else if (pin && !identifier) {
+      // Login apenas por PIN (backward compatibility)
       authMethod = "pin"
       const users = await sql`
         SELECT 

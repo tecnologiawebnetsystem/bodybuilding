@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { Eye, EyeOff, Dumbbell, ChevronRight, Shield, Fingerprint, Monitor } from "lucide-react"
+import { Dumbbell, ChevronLeft, Shield, Fingerprint, Monitor, Delete, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
@@ -16,17 +16,17 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function PinLogin({ onLogin }: PinLoginProps) {
+  const [step, setStep] = useState<"cpf" | "pin">("cpf")
   const [userType, setUserType] = useState<string>("student")
   const [cpf, setCpf] = useState<string>("")
   const [pin, setPin] = useState<string>("")
-  const [showPin, setShowPin] = useState(false)
+  const [userName, setUserName] = useState("")
   const [error, setError] = useState<string>("")
   const [loading, setLoading] = useState(false)
   const [showSuperAdmin, setShowSuperAdmin] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isInstallable, setIsInstallable] = useState(false)
-  const [isIOS, setIsIOS] = useState(false)
   const [showIOSInstructions, setShowIOSInstructions] = useState(false)
   const router = useRouter()
 
@@ -36,11 +36,6 @@ export function PinLogin({ onLogin }: PinLoginProps) {
   }, [])
 
   useEffect(() => {
-    // Detectar iOS
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
-    setIsIOS(isIOSDevice)
-
-    // Capturar evento de instalação (Android/Desktop)
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
@@ -49,7 +44,6 @@ export function PinLogin({ onLogin }: PinLoginProps) {
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
 
-    // Verificar se já está instalado
     if (window.matchMedia("(display-mode: standalone)").matches) {
       setIsInstallable(false)
     }
@@ -73,7 +67,6 @@ export function PinLogin({ onLogin }: PinLoginProps) {
         setIsInstallable(false)
       }
     } else {
-      // Fallback: abrir em nova aba para adicionar à tela inicial manualmente
       alert(
         "Para instalar:\n\n1. Clique nos 3 pontos do navegador\n2. Selecione 'Instalar app' ou 'Adicionar à tela inicial'",
       )
@@ -97,20 +90,60 @@ export function PinLogin({ onLogin }: PinLoginProps) {
     setError("")
   }
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleContinue = async () => {
     const cleanCPF = cpf.replace(/\D/g, "")
-
     if (cleanCPF.length !== 11) {
-      setError("CPF inválido. Digite os 11 dígitos.")
+      setError("CPF invalido. Digite os 11 digitos.")
       return
     }
 
-    if (!pin || pin.length !== 6) {
-      setError("PIN inválido. Digite 6 dígitos.")
-      return
-    }
+    setLoading(true)
+    setError("")
 
+    try {
+      const res = await fetch("/api/auth/check-cpf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cpf: cleanCPF })
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "CPF nao encontrado")
+        return
+      }
+
+      setUserName(data.name || "")
+      setStep("pin")
+    } catch (err) {
+      setError("Erro de conexao. Tente novamente.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handlePinInput = (digit: string) => {
+    if (pin.length < 6) {
+      const newPin = pin + digit
+      setPin(newPin)
+      setError("")
+      
+      if (newPin.length === 6) {
+        handleLogin(newPin)
+      }
+    }
+  }
+
+  const handlePinDelete = () => {
+    if (pin.length > 0) {
+      setPin(pin.slice(0, -1))
+      setError("")
+    }
+  }
+
+  const handleLogin = async (finalPin: string) => {
+    const cleanCPF = cpf.replace(/\D/g, "")
     setLoading(true)
     setError("")
 
@@ -120,7 +153,7 @@ export function PinLogin({ onLogin }: PinLoginProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           cpf: cleanCPF,
-          pin: pin,
+          pin: finalPin,
           userType: userType,
         }),
       })
@@ -128,7 +161,6 @@ export function PinLogin({ onLogin }: PinLoginProps) {
       const data = await response.json()
 
       if (response.ok) {
-        // Salvar todos os dados do usuario no sessionStorage
         sessionStorage.setItem("userId", data.user.userId)
         sessionStorage.setItem("userName", data.user.name)
         sessionStorage.setItem("userRole", data.user.role)
@@ -147,25 +179,40 @@ export function PinLogin({ onLogin }: PinLoginProps) {
         }
       } else {
         setError(data.error || "CPF ou PIN incorretos")
+        setPin("")
       }
     } catch (error) {
-      setError("Erro de conexão. Tente novamente.")
+      setError("Erro de conexao. Tente novamente.")
+      setPin("")
     } finally {
       setLoading(false)
     }
   }
 
+  const handleBack = () => {
+    setStep("cpf")
+    setPin("")
+    setError("")
+  }
+
   const userTypes = [
     { value: "student", label: "Aluno", icon: Dumbbell, desc: "Treinos" },
-    { value: "gym", label: "Academia", icon: Shield, desc: "Gestão" },
+    { value: "gym", label: "Academia", icon: Shield, desc: "Gestao" },
     { value: "trainer", label: "Personal", icon: Fingerprint, desc: "Clientes" },
+  ]
+
+  const numpadButtons = [
+    "1", "2", "3",
+    "4", "5", "6",
+    "7", "8", "9",
+    "", "0", "del"
   ]
 
   const greeting = currentTime.getHours() < 12 ? "Bom dia" : currentTime.getHours() < 18 ? "Boa tarde" : "Boa noite"
 
   return (
     <div className="min-h-screen min-h-[100dvh] flex flex-col bg-[#0a0a0a] text-white overflow-x-hidden">
-      {/* Background com gradiente sutil */}
+      {/* Background */}
       <div className="fixed inset-0 bg-gradient-to-b from-orange-500/5 via-transparent to-red-500/5 pointer-events-none" />
       <div className="fixed top-0 right-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="fixed bottom-0 left-0 w-96 h-96 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -180,14 +227,14 @@ export function PinLogin({ onLogin }: PinLoginProps) {
             <span className="text-lg font-semibold tracking-tight">FitTransform</span>
           </div>
 
-          {/* Botão Super Admin discreto */}
+          {/* Botao Super Admin discreto */}
           <button
             onClick={() => {
               setShowSuperAdmin(!showSuperAdmin)
               if (!showSuperAdmin) {
                 setUserType("superadmin")
                 setCpf("000.000.000-00")
-                setPin("999999")
+                setStep("pin")
               }
             }}
             className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all"
@@ -196,192 +243,235 @@ export function PinLogin({ onLogin }: PinLoginProps) {
           </button>
         </header>
 
-        {/* Conteúdo principal - centralizado */}
-        <main className="flex-1 flex flex-col justify-center py-8">
-          {/* Saudação - centralizada */}
-          <div className="text-center mb-8">
-            <p className="text-gray-500 text-sm mb-1">{greeting}</p>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-              Acesse sua{" "}
-              <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">conta</span>
-            </h1>
-          </div>
+        {/* Main Content */}
+        <main className="flex-1 flex flex-col justify-center py-4">
+          {step === "cpf" ? (
+            /* CPF Step */
+            <div className="space-y-6">
+              <div className="text-center">
+                <p className="text-gray-500 text-sm mb-1">{greeting}</p>
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+                  Acesse sua{" "}
+                  <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">conta</span>
+                </h1>
+              </div>
 
-          <div className="grid grid-cols-3 gap-2 mb-8">
-            {userTypes.map((type) => (
-              <button
-                key={type.value}
-                onClick={() => {
-                  setUserType(type.value)
-                  setError("")
-                }}
-                className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all ${
-                  userType === type.value
-                    ? "bg-gradient-to-b from-orange-500/20 to-red-500/20 border-orange-500/50"
-                    : "bg-white/5 border-white/10 hover:bg-white/10"
-                }`}
-              >
-                <div
-                  className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                    userType === type.value ? "bg-gradient-to-br from-orange-500 to-red-600" : "bg-white/10"
-                  }`}
-                >
-                  <type.icon className="w-6 h-6" />
-                </div>
-                <div className="text-center">
-                  <p className="font-semibold text-sm">{type.label}</p>
-                  <p className="text-[10px] text-gray-500">{type.desc}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {/* Formulário de login - centralizado */}
-          <form onSubmit={handleLogin} className="space-y-4 w-full">
-            {/* Campo CPF */}
-            <div className="space-y-2">
-              <label className="text-sm text-gray-400 font-medium">CPF</label>
-              <input
-                type="text"
-                value={cpf}
-                onChange={handleCPFChange}
-                placeholder="000.000.000-00"
-                maxLength={14}
-                className="w-full h-14 px-4 bg-white/5 border border-white/10 rounded-2xl text-lg font-medium text-white placeholder:text-gray-600 focus:outline-none focus:border-orange-500/50 focus:bg-white/10 transition-all text-center"
-                autoFocus
-                inputMode="numeric"
-              />
-            </div>
-
-            {/* Campo PIN */}
-            <div className="space-y-2">
-              <label className="text-sm text-gray-400 font-medium">PIN de acesso</label>
-              <div className="relative">
-                <input
-                  type={showPin ? "text" : "password"}
-                  value={pin}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "")
-                    if (value.length <= 6) {
-                      setPin(value)
+              {/* Tipo de usuario */}
+              <div className="grid grid-cols-3 gap-2">
+                {userTypes.map((type) => (
+                  <button
+                    key={type.value}
+                    onClick={() => {
+                      setUserType(type.value)
                       setError("")
-                    }
-                  }}
-                  placeholder="••••••"
-                  maxLength={6}
-                  className="w-full h-14 px-4 pr-14 bg-white/5 border border-white/10 rounded-2xl text-lg font-medium text-white tracking-[0.5em] text-center placeholder:text-gray-600 placeholder:tracking-[0.3em] focus:outline-none focus:border-orange-500/50 focus:bg-white/10 transition-all"
+                    }}
+                    className={`flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all ${
+                      userType === type.value
+                        ? "bg-gradient-to-b from-orange-500/20 to-red-500/20 border-orange-500/50"
+                        : "bg-white/5 border-white/10 hover:bg-white/10"
+                    }`}
+                  >
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        userType === type.value ? "bg-gradient-to-br from-orange-500 to-red-600" : "bg-white/10"
+                      }`}
+                    >
+                      <type.icon className="w-5 h-5" />
+                    </div>
+                    <div className="text-center">
+                      <p className="font-semibold text-xs">{type.label}</p>
+                      <p className="text-[10px] text-gray-500">{type.desc}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Campo CPF */}
+              <div className="space-y-2">
+                <label className="text-sm text-gray-400 font-medium">CPF</label>
+                <input
+                  type="text"
+                  value={cpf}
+                  onChange={handleCPFChange}
+                  placeholder="000.000.000-00"
+                  maxLength={14}
+                  className="w-full h-16 px-6 bg-white/5 border border-white/10 rounded-2xl text-xl font-medium text-white placeholder:text-gray-600 focus:outline-none focus:border-orange-500/50 focus:bg-white/10 transition-all text-center tracking-wider"
+                  autoFocus
                   inputMode="numeric"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPin(!showPin)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all"
-                >
-                  {showPin ? <EyeOff className="w-5 h-5 text-gray-400" /> : <Eye className="w-5 h-5 text-gray-400" />}
-                </button>
+              </div>
+
+              {error && (
+                <div className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                  <div className="w-2 h-2 rounded-full bg-red-500" />
+                  <p className="text-sm text-red-400">{error}</p>
+                </div>
+              )}
+
+              <button
+                onClick={handleContinue}
+                disabled={loading || cpf.replace(/\D/g, "").length !== 11}
+                className="w-full h-14 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 rounded-2xl text-lg font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-500/20"
+              >
+                {loading ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : (
+                  "Continuar"
+                )}
+              </button>
+
+              {userType === "student" && (
+                <div className="text-center">
+                  <p className="text-gray-500 text-sm mb-2">Primeira vez aqui?</p>
+                  <Link
+                    href="/app-mobile/register"
+                    className="text-orange-400 hover:text-orange-300 font-medium text-sm"
+                  >
+                    Criar minha conta gratis
+                  </Link>
+                </div>
+              )}
+
+              {/* Install PWA */}
+              <div className="pt-6 border-t border-white/10">
+                <p className="text-center text-gray-500 text-xs mb-3">Instale o app</p>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => handleInstallPWA("android")}
+                    className="flex flex-col items-center gap-2 p-3 bg-white/5 hover:bg-green-500/10 border border-white/10 hover:border-green-500/30 rounded-xl transition-all"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-green-500" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.523 15.341a.5.5 0 0 0 .477-.646l-1.08-3.287a.5.5 0 0 0-.477-.354H7.558a.5.5 0 0 0-.477.354l-1.08 3.287a.5.5 0 0 0 .477.646h11.046zM6.5 6.5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v4H6.5v-4z" />
+                      </svg>
+                    </div>
+                    <p className="text-[10px] text-white">Android</p>
+                  </button>
+
+                  <button
+                    onClick={() => handleInstallPWA("ios")}
+                    className="flex flex-col items-center gap-2 p-3 bg-white/5 hover:bg-gray-400/10 border border-white/10 hover:border-gray-400/30 rounded-xl transition-all"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-gray-500/20 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-gray-300" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                      </svg>
+                    </div>
+                    <p className="text-[10px] text-white">iOS</p>
+                  </button>
+
+                  <button
+                    onClick={() => handleInstallPWA("desktop")}
+                    className="flex flex-col items-center gap-2 p-3 bg-white/5 hover:bg-blue-500/10 border border-white/10 hover:border-blue-500/30 rounded-xl transition-all"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                      <Monitor className="w-4 h-4 text-blue-400" />
+                    </div>
+                    <p className="text-[10px] text-white">Desktop</p>
+                  </button>
+                </div>
               </div>
             </div>
-
-            {/* Mensagem de erro */}
-            {error && (
-              <div className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-                <div className="w-2 h-2 rounded-full bg-red-500" />
-                <p className="text-sm text-red-400">{error}</p>
-              </div>
-            )}
-
-            {/* Botão de login */}
-            <button
-              type="submit"
-              disabled={loading || cpf.replace(/\D/g, "").length !== 11 || pin.length !== 6}
-              className="w-full h-14 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 rounded-2xl text-lg font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-500/20"
-            >
-              {loading ? (
-                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  Entrar
-                  <ChevronRight className="w-5 h-5" />
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Link de cadastro - apenas para alunos */}
-          {userType === "student" && (
-            <div className="mt-6 text-center">
-              <p className="text-gray-500 text-sm mb-3">Primeira vez aqui?</p>
-              <Link
-                href="/app-mobile/register"
-                className="flex items-center justify-center gap-2 w-full h-12 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-sm font-medium transition-all"
+          ) : (
+            /* PIN Step - Teclado Numerico */
+            <div className="space-y-6">
+              <button
+                onClick={handleBack}
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
               >
-                Criar minha conta
-                <ChevronRight className="w-4 h-4" />
-              </Link>
+                <ChevronLeft className="w-5 h-5" />
+                Voltar
+              </button>
+
+              <div className="text-center">
+                {userName && (
+                  <p className="text-orange-400 text-sm mb-1">Ola, {userName.split(" ")[0]}!</p>
+                )}
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+                  Digite seu{" "}
+                  <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">PIN</span>
+                </h1>
+                <p className="text-gray-400 text-sm mt-1">CPF: {cpf}</p>
+              </div>
+
+              {/* PIN Display */}
+              <div className="flex justify-center gap-3">
+                {[0, 1, 2, 3, 4, 5].map((index) => (
+                  <div
+                    key={index}
+                    className={`w-12 h-14 rounded-xl border-2 flex items-center justify-center transition-all ${
+                      pin.length > index
+                        ? "bg-gradient-to-br from-orange-500/20 to-red-500/20 border-orange-500/50"
+                        : "bg-white/5 border-white/10"
+                    }`}
+                  >
+                    {pin.length > index && (
+                      <div className="w-3 h-3 rounded-full bg-gradient-to-br from-orange-500 to-red-500" />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {error && (
+                <div className="flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                  <div className="w-2 h-2 rounded-full bg-red-500" />
+                  <p className="text-sm text-red-400">{error}</p>
+                </div>
+              )}
+
+              {loading && (
+                <div className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin text-orange-500" />
+                  <span className="text-gray-400 text-sm">Verificando...</span>
+                </div>
+              )}
+
+              {/* Numeric Keypad */}
+              <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto">
+                {numpadButtons.map((btn, index) => (
+                  <div key={index}>
+                    {btn === "" ? (
+                      <div className="w-20 h-16" />
+                    ) : btn === "del" ? (
+                      <button
+                        onClick={handlePinDelete}
+                        disabled={loading}
+                        className="w-20 h-16 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 flex items-center justify-center transition-all active:scale-95 disabled:opacity-50"
+                      >
+                        <Delete className="w-6 h-6 text-gray-400" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handlePinInput(btn)}
+                        disabled={loading || pin.length >= 6}
+                        className="w-20 h-16 rounded-2xl bg-white/5 border border-white/10 hover:bg-orange-500/20 hover:border-orange-500/30 text-2xl font-semibold transition-all active:scale-95 disabled:opacity-50"
+                      >
+                        {btn}
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-center pt-4">
+                <p className="text-gray-500 text-xs">
+                  Esqueceu o PIN? Fale com sua academia ou personal
+                </p>
+              </div>
             </div>
           )}
-
-          <div className="mt-10 pt-8 border-t border-white/10">
-            <p className="text-center text-gray-500 text-sm mb-4">Instale o app no seu dispositivo</p>
-            <div className="grid grid-cols-3 gap-3">
-              {/* Android */}
-              <button
-                onClick={() => handleInstallPWA("android")}
-                className="flex flex-col items-center gap-3 p-4 bg-white/5 hover:bg-green-500/10 border border-white/10 hover:border-green-500/30 rounded-2xl transition-all group"
-              >
-                <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center group-hover:bg-green-500/30 transition-all">
-                  <svg className="w-6 h-6 text-green-500" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.523 15.341a.5.5 0 0 0 .477-.646l-1.08-3.287a.5.5 0 0 0-.477-.354H7.558a.5.5 0 0 0-.477.354l-1.08 3.287a.5.5 0 0 0 .477.646h11.046zM6.5 6.5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v4H6.5v-4zm3.879-4.414a.5.5 0 0 1 .707 0l.914.914.914-.914a.5.5 0 0 1 .707.707l-.914.914.914.914a.5.5 0 0 1-.707.707l-.914-.914-.914.914a.5.5 0 0 1-.707-.707l.914-.914-.914-.914a.5.5 0 0 1 0-.707zM6.5 16.5v2a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2h-11z" />
-                  </svg>
-                </div>
-                <div className="text-center">
-                  <p className="font-semibold text-sm text-white">Android</p>
-                  <p className="text-[10px] text-gray-500">Google Play</p>
-                </div>
-              </button>
-
-              {/* iOS */}
-              <button
-                onClick={() => handleInstallPWA("ios")}
-                className="flex flex-col items-center gap-3 p-4 bg-white/5 hover:bg-gray-400/10 border border-white/10 hover:border-gray-400/30 rounded-2xl transition-all group"
-              >
-                <div className="w-12 h-12 rounded-xl bg-gray-500/20 flex items-center justify-center group-hover:bg-gray-400/30 transition-all">
-                  <svg className="w-6 h-6 text-gray-300" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
-                  </svg>
-                </div>
-                <div className="text-center">
-                  <p className="font-semibold text-sm text-white">iOS</p>
-                  <p className="text-[10px] text-gray-500">App Store</p>
-                </div>
-              </button>
-
-              {/* Desktop */}
-              <button
-                onClick={() => handleInstallPWA("desktop")}
-                className="flex flex-col items-center gap-3 p-4 bg-white/5 hover:bg-blue-500/10 border border-white/10 hover:border-blue-500/30 rounded-2xl transition-all group"
-              >
-                <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30 transition-all">
-                  <Monitor className="w-6 h-6 text-blue-400" />
-                </div>
-                <div className="text-center">
-                  <p className="font-semibold text-sm text-white">Desktop</p>
-                  <p className="text-[10px] text-gray-500">Windows/Mac</p>
-                </div>
-              </button>
-            </div>
-          </div>
         </main>
 
-        {/* Footer com segurança */}
+        {/* Footer */}
         <footer className="py-6 text-center safe-area-bottom">
           <div className="flex items-center justify-center gap-2 text-gray-600 text-xs">
             <Shield className="w-4 h-4" />
-            <span>Seus dados estão protegidos</span>
+            <span>Seus dados estao protegidos</span>
           </div>
         </footer>
       </div>
 
+      {/* iOS Instructions Modal */}
       {showIOSInstructions && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
           <div className="w-full max-w-sm bg-[#111] border border-white/10 rounded-3xl p-6 space-y-4">
@@ -391,7 +481,7 @@ export function PinLogin({ onLogin }: PinLoginProps) {
                 onClick={() => setShowIOSInstructions(false)}
                 className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-xl"
               >
-                ×
+                x
               </button>
             </div>
 
@@ -401,7 +491,7 @@ export function PinLogin({ onLogin }: PinLoginProps) {
                   <span className="text-blue-400 font-bold">1</span>
                 </div>
                 <div>
-                  <p className="text-sm text-white font-medium">Toque no ícone de compartilhar</p>
+                  <p className="text-sm text-white font-medium">Toque no icone de compartilhar</p>
                   <p className="text-xs text-gray-500 mt-1">Na barra inferior do Safari</p>
                 </div>
               </div>
@@ -411,8 +501,8 @@ export function PinLogin({ onLogin }: PinLoginProps) {
                   <span className="text-blue-400 font-bold">2</span>
                 </div>
                 <div>
-                  <p className="text-sm text-white font-medium">Role e toque em "Adicionar à Tela de Início"</p>
-                  <p className="text-xs text-gray-500 mt-1">Ícone com + ao lado</p>
+                  <p className="text-sm text-white font-medium">Role e toque em "Adicionar a Tela de Inicio"</p>
+                  <p className="text-xs text-gray-500 mt-1">Icone com + ao lado</p>
                 </div>
               </div>
 
@@ -422,7 +512,7 @@ export function PinLogin({ onLogin }: PinLoginProps) {
                 </div>
                 <div>
                   <p className="text-sm text-white font-medium">Toque em "Adicionar"</p>
-                  <p className="text-xs text-gray-500 mt-1">O app será instalado na sua tela inicial</p>
+                  <p className="text-xs text-gray-500 mt-1">O app sera instalado na sua tela inicial</p>
                 </div>
               </div>
             </div>
@@ -437,47 +527,41 @@ export function PinLogin({ onLogin }: PinLoginProps) {
         </div>
       )}
 
-      {/* Modal Super Admin */}
+      {/* Super Admin Modal */}
       {showSuperAdmin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
           <div className="w-full max-w-sm bg-[#111] border border-white/10 rounded-3xl p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Acesso Super Admin</h3>
               <button
-                onClick={() => setShowSuperAdmin(false)}
+                onClick={() => {
+                  setShowSuperAdmin(false)
+                  setStep("cpf")
+                  setCpf("")
+                  setPin("")
+                  setUserType("student")
+                }}
                 className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center"
               >
-                ×
+                x
               </button>
             </div>
-            <p className="text-sm text-gray-400">Credenciais preenchidas automaticamente. Clique em Entrar.</p>
-            <div className="space-y-2 p-4 bg-white/5 rounded-xl">
-              <p className="text-sm font-mono">
-                <span className="text-gray-500">CPF:</span> 000.000.000-00
-              </p>
-              <p className="text-sm font-mono">
-                <span className="text-gray-500">PIN:</span> 999999
-              </p>
-            </div>
+
+            <p className="text-gray-400 text-sm">
+              Modo super admin ativado. Use o PIN 999999 para entrar.
+            </p>
+
             <button
-              onClick={() => setShowSuperAdmin(false)}
+              onClick={() => {
+                setShowSuperAdmin(false)
+              }}
               className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl font-medium"
             >
-              Entendi
+              Continuar
             </button>
           </div>
         </div>
       )}
-
-      {/* Safe area styles para iOS */}
-      <style jsx global>{`
-        .safe-area-top {
-          padding-top: max(1rem, env(safe-area-inset-top));
-        }
-        .safe-area-bottom {
-          padding-bottom: max(1rem, env(safe-area-inset-bottom));
-        }
-      `}</style>
     </div>
   )
 }
