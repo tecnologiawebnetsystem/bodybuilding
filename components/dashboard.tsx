@@ -16,6 +16,7 @@ import {
   MoreHorizontal,
   Sparkles,
   Bike,
+  Coins,
 } from "lucide-react"
 import { HomeTab } from "@/components/tabs/home-tab"
 import { WorkoutsTab } from "@/components/tabs/workouts-tab"
@@ -31,6 +32,7 @@ import { MoreTab } from "@/components/tabs/more-tab"
 import { AiTab } from "@/components/tabs/ai-tab"
 import { SpinningTab } from "@/components/tabs/spinning-tab"
 import { GinasticaTab } from "@/components/tabs/ginastica-tab"
+import { LoyaltyTab } from "@/components/tabs/loyalty-tab"
 import { Chatbot } from "@/components/ai/chatbot"
 
 interface DashboardProps {
@@ -216,6 +218,7 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
       enabled: preferences.enable_ginastica,
     },
     { id: "ai", label: "IA", icon: Sparkles, color: "#a855f7", enabled: true },
+    { id: "loyalty", label: "Pontos", icon: Coins, color: "#f59e0b", enabled: true },
     { id: "more", label: "Mais", icon: MoreHorizontal, color: preferences.theme_accent, enabled: true },
     { id: "profile", label: "Perfil", icon: User, color: preferences.theme_primary, enabled: true },
   ].filter((tab) => tab.enabled)
@@ -305,6 +308,9 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
           )}
           <TabsContent value="ai" className="mt-0">
             <AiTab userId={userId} preferences={preferences} />
+          </TabsContent>
+          <TabsContent value="loyalty" className="mt-0">
+            <LoyaltyTab userId={userId} preferences={preferences} />
           </TabsContent>
           <TabsContent value="more" className="mt-0">
             <MoreTab userId={userId} preferences={preferences} />

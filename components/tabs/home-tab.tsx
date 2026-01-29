@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Trophy, Target, Flame, TrendingDown, Calendar, CheckCircle2, Activity, LogOut, Wine, X, Copy, Check, QrCode } from "lucide-react"
+import { Trophy, Target, Flame, TrendingDown, Calendar, CheckCircle2, Activity, LogOut, Wine, X, Copy, Check, QrCode, Coins, Star } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ProgressionAlert } from "@/components/progression-alert"
 import { QRAccessCard } from "@/components/qr-access-card"
@@ -25,6 +25,12 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
   const [showDrinkModal, setShowDrinkModal] = useState(false)
   const [showQRModal, setShowQRModal] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
+  const [loyaltyData, setLoyaltyData] = useState<{
+    total_points: number
+    current_level: string
+    cashback_balance: number
+    current_streak: number
+  } | null>(null)
 
   // Dados do Drink exclusivo para Kleber e Pamela
   const drinkData: Record<string, { mat: string; senha: string }> = {
@@ -97,6 +103,13 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
       } else {
         setTodayWorkout("Não definido")
         setTodayWorkoutDescription("Configure seu cronograma semanal")
+      }
+
+      // Carregar dados de fidelidade
+      const loyaltyResponse = await fetch(`/api/loyalty?userId=${userId}`)
+      const loyaltyJson = await loyaltyResponse.json()
+      if (loyaltyJson.success) {
+        setLoyaltyData(loyaltyJson.data.points)
       }
     } catch (error) {
       console.error("[v0] Error loading home data:", error)
@@ -289,6 +302,39 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
           </div>
         </div>
       </Card>
+
+      {/* Widget Pontos de Fidelidade */}
+      {loyaltyData && (
+        <Card
+          className="p-6 cursor-pointer hover:scale-[1.02] transition-transform border-2"
+          style={{
+            borderColor: "#f59e0b",
+            background: "linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%)",
+          }}
+        >
+          <div className="flex items-center justify-between text-white">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
+                <Coins className="w-8 h-8" />
+              </div>
+              <div>
+                <p className="text-white/70 text-sm">Seus Pontos</p>
+                <h3 className="text-3xl font-bold">{loyaltyData.total_points.toLocaleString()}</h3>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center gap-1 justify-end mb-1">
+                <Star className="w-4 h-4" />
+                <span className="font-semibold">{loyaltyData.current_level}</span>
+              </div>
+              <p className="text-white/70 text-sm">R${Number(loyaltyData.cashback_balance).toFixed(2)} cashback</p>
+              {loyaltyData.current_streak > 0 && (
+                <p className="text-white/70 text-xs mt-1">{loyaltyData.current_streak} dias seguidos</p>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Widget QR Code Catraca */}
       <Card
