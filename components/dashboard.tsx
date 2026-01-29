@@ -15,6 +15,7 @@ import {
   Zap,
   MoreHorizontal,
   Sparkles,
+  Bike,
 } from "lucide-react"
 import { HomeTab } from "@/components/tabs/home-tab"
 import { WorkoutsTab } from "@/components/tabs/workouts-tab"
@@ -28,6 +29,7 @@ import { StatsTab } from "@/components/tabs/stats-tab"
 import { CalisthenicsTab } from "@/components/tabs/calisthenics-tab"
 import { MoreTab } from "@/components/tabs/more-tab"
 import { AiTab } from "@/components/tabs/ai-tab"
+import { SpinningTab } from "@/components/tabs/spinning-tab"
 import { Chatbot } from "@/components/ai/chatbot"
 
 interface DashboardProps {
@@ -48,6 +50,7 @@ interface UserPreferences {
   enable_measurements: boolean
   enable_hydration: boolean
   enable_stats: boolean
+  enable_spinning: boolean
 }
 
 const getUserPreferences = (userId: string): UserPreferences => {
@@ -68,6 +71,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_measurements: true,
       enable_hydration: true,
       enable_stats: true,
+      enable_spinning: true, // Spinning - APENAS Kleber e Pamela
     },
     pamela: {
       theme_primary: "#ef4444",
@@ -82,6 +86,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_measurements: true,
       enable_hydration: true,
       enable_stats: true,
+      enable_spinning: true, // Spinning - APENAS Kleber e Pamela
     },
     juliana: {
       theme_primary: "#ef4444",
@@ -96,6 +101,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_measurements: true,
       enable_hydration: true,
       enable_stats: true,
+      enable_spinning: false, // SEM Spinning
     },
   }
 
@@ -113,6 +119,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_measurements: true,
       enable_hydration: true,
       enable_stats: true,
+      enable_spinning: false, // Novos usuários SEM Spinning por padrão
     }
   )
 }
@@ -188,6 +195,13 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
       color: preferences.theme_primary,
       enabled: preferences.enable_home_workouts,
     },
+    {
+      id: "spinning",
+      label: "Spinning",
+      icon: Bike,
+      color: "#7c3aed",
+      enabled: preferences.enable_spinning,
+    },
     { id: "ai", label: "IA", icon: Sparkles, color: "#a855f7", enabled: true },
     { id: "more", label: "Mais", icon: MoreHorizontal, color: preferences.theme_accent, enabled: true },
     { id: "profile", label: "Perfil", icon: User, color: preferences.theme_primary, enabled: true },
@@ -261,10 +275,15 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
               <StatsTab userId={userId} preferences={preferences} />
             </TabsContent>
           )}
-          {preferences.enable_home_workouts && (
-            <TabsContent value="calisthenics" className="mt-0">
-              <CalisthenicsTab userId={userId} preferences={preferences} />
-            </TabsContent>
+{preferences.enable_home_workouts && (
+          <TabsContent value="calisthenics" className="mt-0">
+            <CalisthenicsTab userId={userId} preferences={preferences} />
+          </TabsContent>
+          )}
+          {preferences.enable_spinning && (
+          <TabsContent value="spinning" className="mt-0">
+            <SpinningTab userId={userId} preferences={preferences} />
+          </TabsContent>
           )}
           <TabsContent value="ai" className="mt-0">
             <AiTab userId={userId} preferences={preferences} />
