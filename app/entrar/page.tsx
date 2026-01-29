@@ -14,14 +14,14 @@ export default function EntrarPage() {
   const [cpf, setCpf] = useState("")
   const [pin, setPin] = useState("")
   const [userName, setUserName] = useState("")
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const [greeting, setGreeting] = useState("")
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(timer)
+    setMounted(true)
+    const hour = new Date().getHours()
+    setGreeting(hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite")
   }, [])
-
-  const greeting = currentTime.getHours() < 12 ? "Bom dia" : currentTime.getHours() < 18 ? "Boa tarde" : "Boa noite"
 
   const formatCPF = (value: string) => {
     const numbers = value.replace(/\D/g, "")
@@ -180,7 +180,7 @@ export default function EntrarPage() {
             /* CPF Step */
             <div className="space-y-8">
               <div className="text-center">
-                <p className="text-gray-500 text-sm mb-1">{greeting}</p>
+                {greeting && <p className="text-gray-500 text-sm mb-1">{greeting}</p>}
                 <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
                   Bem-vindo de{" "}
                   <span className="bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">volta</span>
