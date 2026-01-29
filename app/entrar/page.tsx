@@ -118,9 +118,13 @@ export default function EntrarPage() {
       }
 
       // Salvar dados no sessionStorage
-      sessionStorage.setItem("userId", data.user.userId || data.user.id)
+      // Usar o primeiro nome (ex: "Kleber" de "Kleber Goncalves") para compatibilidade com preferencias
+      const firstName = data.user.name.split(" ")[0]
+      sessionStorage.setItem("userId", firstName)
+      sessionStorage.setItem("currentUser", firstName)
       sessionStorage.setItem("userName", data.user.name)
       sessionStorage.setItem("userRole", data.user.role)
+      sessionStorage.setItem("userUUID", data.user.userId || data.user.id)
       if (data.user.gymId) {
         sessionStorage.setItem("gymId", data.user.gymId.toString())
       }

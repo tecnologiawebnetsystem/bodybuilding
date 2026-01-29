@@ -161,9 +161,13 @@ export function PinLogin({ onLogin }: PinLoginProps) {
       const data = await response.json()
 
       if (response.ok) {
-        sessionStorage.setItem("userId", data.user.userId)
+        // Usar o primeiro nome (ex: "Kleber" de "Kleber Goncalves") para compatibilidade com preferencias
+        const firstName = data.user.name.split(" ")[0]
+        sessionStorage.setItem("userId", firstName)
+        sessionStorage.setItem("currentUser", firstName)
         sessionStorage.setItem("userName", data.user.name)
         sessionStorage.setItem("userRole", data.user.role)
+        sessionStorage.setItem("userUUID", data.user.userId)
         if (data.user.gymId) {
           sessionStorage.setItem("gymId", data.user.gymId.toString())
         }
@@ -175,7 +179,7 @@ export function PinLogin({ onLogin }: PinLoginProps) {
         } else if (userType === "trainer" || data.user.role === "trainer") {
           router.push("/trainer")
         } else {
-          onLogin(data.user.userId)
+          onLogin(firstName)
         }
       } else {
         setError(data.error || "CPF ou PIN incorretos")

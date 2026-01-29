@@ -40,9 +40,6 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
 
   const userDrink = drinkData[userId.toLowerCase()]
 
-  // Debug para verificar o userId
-  console.log("[v0] HomeTab userId:", userId, "| toLowerCase:", userId.toLowerCase())
-
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text)
     setCopiedField(field)
