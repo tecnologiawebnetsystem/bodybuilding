@@ -4,7 +4,8 @@ import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Trophy, Target, Flame, TrendingDown, Calendar, CheckCircle2, Activity, LogOut } from "lucide-react"
+import { Trophy, Target, Flame, TrendingDown, Calendar, CheckCircle2, Activity, LogOut, Wine, X, Copy, Check } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ProgressionAlert } from "@/components/progression-alert"
 
 interface HomeTabProps {
@@ -20,6 +21,22 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
   const [hasWorkoutToday, setHasWorkoutToday] = useState(false)
   const [hasRunToday, setHasRunToday] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [showDrinkModal, setShowDrinkModal] = useState(false)
+  const [copiedField, setCopiedField] = useState<string | null>(null)
+
+  // Dados do Drink exclusivo para Kleber e Pamela
+  const drinkData: Record<string, { mat: string; senha: string }> = {
+    kleber: { mat: "2216", senha: "1209" },
+    pamela: { mat: "2217", senha: "2805" },
+  }
+
+  const userDrink = drinkData[userId.toLowerCase()]
+
+  const copyToClipboard = (text: string, field: string) => {
+    navigator.clipboard.writeText(text)
+    setCopiedField(field)
+    setTimeout(() => setCopiedField(null), 2000)
+  }
 
   useEffect(() => {
     loadData()
@@ -270,6 +287,90 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
           </div>
         </div>
       </Card>
+
+      {/* Widget Drink - Apenas para Kleber e Pamela */}
+      {userDrink && (
+        <Card
+          className="p-6 cursor-pointer hover:scale-[1.02] transition-transform border-2"
+          style={{
+            borderColor: "#f97316",
+            background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #f97316 100%)",
+          }}
+          onClick={() => setShowDrinkModal(true)}
+        >
+          <div className="flex items-center gap-4 text-white">
+            <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
+              <Wine className="w-8 h-8" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold">Drink</h3>
+              <p className="text-white/80 text-sm">Toque para ver suas credenciais</p>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Modal Drink */}
+      <Dialog open={showDrinkModal} onOpenChange={setShowDrinkModal}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Wine className="w-6 h-6 text-purple-500" />
+              Drink - Credenciais
+            </DialogTitle>
+          </DialogHeader>
+          
+          {userDrink && (
+            <div className="space-y-4 mt-4">
+              <div className="p-4 rounded-xl bg-gradient-to-r from-purple-500/10 to-orange-500/10 border border-purple-500/20">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Matricula</p>
+                    <p className="text-3xl font-bold text-purple-600">{userDrink.mat}</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => copyToClipboard(userDrink.mat, "mat")}
+                    className="h-10 w-10"
+                  >
+                    {copiedField === "mat" ? (
+                      <Check className="w-5 h-5 text-green-500" />
+                    ) : (
+                      <Copy className="w-5 h-5" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-gradient-to-r from-orange-500/10 to-purple-500/10 border border-orange-500/20">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Senha</p>
+                    <p className="text-3xl font-bold text-orange-500">{userDrink.senha}</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => copyToClipboard(userDrink.senha, "senha")}
+                    className="h-10 w-10"
+                  >
+                    {copiedField === "senha" ? (
+                      <Check className="w-5 h-5 text-green-500" />
+                    ) : (
+                      <Copy className="w-5 h-5" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <p className="text-xs text-center text-muted-foreground mt-4">
+                Toque no icone para copiar
+              </p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Card
         className="p-6 text-white border-2"
