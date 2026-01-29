@@ -4,9 +4,10 @@ import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Trophy, Target, Flame, TrendingDown, Calendar, CheckCircle2, Activity, LogOut, Wine, X, Copy, Check } from "lucide-react"
+import { Trophy, Target, Flame, TrendingDown, Calendar, CheckCircle2, Activity, LogOut, Wine, X, Copy, Check, QrCode } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ProgressionAlert } from "@/components/progression-alert"
+import { QRAccessCard } from "@/components/qr-access-card"
 
 interface HomeTabProps {
   userId: string
@@ -22,6 +23,7 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
   const [hasRunToday, setHasRunToday] = useState(false)
   const [loading, setLoading] = useState(true)
   const [showDrinkModal, setShowDrinkModal] = useState(false)
+  const [showQRModal, setShowQRModal] = useState(false)
   const [copiedField, setCopiedField] = useState<string | null>(null)
 
   // Dados do Drink exclusivo para Kleber e Pamela
@@ -288,6 +290,26 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
         </div>
       </Card>
 
+      {/* Widget QR Code Catraca */}
+      <Card
+        className="p-6 cursor-pointer hover:scale-[1.02] transition-transform border-2"
+        style={{
+          borderColor: "#7c3aed",
+          background: "linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #8b5cf6 100%)",
+        }}
+        onClick={() => setShowQRModal(true)}
+      >
+        <div className="flex items-center gap-4 text-white">
+          <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
+            <QrCode className="w-8 h-8" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold">Acesso Catraca</h3>
+            <p className="text-white/80 text-sm">Toque para ver seu QR Code</p>
+          </div>
+        </div>
+      </Card>
+
       {/* Widget Drink - Apenas para Kleber e Pamela */}
       {userDrink && (
         <Card
@@ -309,6 +331,13 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
           </div>
         </Card>
       )}
+
+      {/* Modal QR Code Catraca */}
+      <Dialog open={showQRModal} onOpenChange={setShowQRModal}>
+        <DialogContent className="max-w-sm p-0 overflow-hidden">
+          <QRAccessCard userId={userId} userName={userProfile?.name || userId} />
+        </DialogContent>
+      </Dialog>
 
       {/* Modal Drink */}
       <Dialog open={showDrinkModal} onOpenChange={setShowDrinkModal}>
