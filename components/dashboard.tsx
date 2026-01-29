@@ -30,6 +30,7 @@ import { CalisthenicsTab } from "@/components/tabs/calisthenics-tab"
 import { MoreTab } from "@/components/tabs/more-tab"
 import { AiTab } from "@/components/tabs/ai-tab"
 import { SpinningTab } from "@/components/tabs/spinning-tab"
+import { GinasticaTab } from "@/components/tabs/ginastica-tab"
 import { Chatbot } from "@/components/ai/chatbot"
 
 interface DashboardProps {
@@ -51,6 +52,7 @@ interface UserPreferences {
   enable_hydration: boolean
   enable_stats: boolean
   enable_spinning: boolean
+  enable_ginastica: boolean
 }
 
 const getUserPreferences = (userId: string): UserPreferences => {
@@ -72,6 +74,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_hydration: true,
       enable_stats: true,
       enable_spinning: true, // Spinning - APENAS Kleber e Pamela
+      enable_ginastica: true, // Ginastica - APENAS Kleber e Pamela
     },
     pamela: {
       theme_primary: "#ef4444",
@@ -87,6 +90,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_hydration: true,
       enable_stats: true,
       enable_spinning: true, // Spinning - APENAS Kleber e Pamela
+      enable_ginastica: true, // Ginastica - APENAS Kleber e Pamela
     },
     juliana: {
       theme_primary: "#ef4444",
@@ -102,6 +106,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_hydration: true,
       enable_stats: true,
       enable_spinning: false, // SEM Spinning
+      enable_ginastica: false, // SEM Ginastica
     },
   }
 
@@ -120,6 +125,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_hydration: true,
       enable_stats: true,
       enable_spinning: false, // Novos usuários SEM Spinning por padrão
+      enable_ginastica: false, // Novos usuários SEM Ginastica por padrão
     }
   )
 }
@@ -202,6 +208,13 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
       color: "#7c3aed",
       enabled: preferences.enable_spinning,
     },
+    {
+      id: "ginastica",
+      label: "Ginastica",
+      icon: Dumbbell,
+      color: "#7c3aed",
+      enabled: preferences.enable_ginastica,
+    },
     { id: "ai", label: "IA", icon: Sparkles, color: "#a855f7", enabled: true },
     { id: "more", label: "Mais", icon: MoreHorizontal, color: preferences.theme_accent, enabled: true },
     { id: "profile", label: "Perfil", icon: User, color: preferences.theme_primary, enabled: true },
@@ -283,6 +296,11 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
           {preferences.enable_spinning && (
           <TabsContent value="spinning" className="mt-0">
             <SpinningTab userId={userId} preferences={preferences} />
+          </TabsContent>
+          )}
+          {preferences.enable_ginastica && (
+          <TabsContent value="ginastica" className="mt-0">
+            <GinasticaTab userId={userId} preferences={preferences} />
           </TabsContent>
           )}
           <TabsContent value="ai" className="mt-0">
