@@ -15,6 +15,7 @@ interface HomeTabProps {
 }
 
 export function HomeTab({ userId, onLogout }: HomeTabProps) {
+  console.log("[v0] HomeTab rendering with userId:", userId)
   const [userProfile, setUserProfile] = useState<any>(null)
   const [currentWeight, setCurrentWeight] = useState(0)
   const [todayWorkout, setTodayWorkout] = useState<string | null>(null)
@@ -38,7 +39,7 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
     pamela: { mat: "2217", senha: "2805" },
   }
 
-  const userDrink = drinkData[userId.toLowerCase()]
+  const userDrink = drinkData[userId?.toLowerCase() || ""]
 
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text)
@@ -379,10 +380,10 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
       )}
 
       {/* Widgets Calistenia, Spinning, Ginastica - Apenas para Kleber e Pamela */}
-      {["kleber", "pamela"].includes(userId.toLowerCase()) && (
+      {["kleber", "pamela"].includes(userId?.toLowerCase() || "") && (
         <>
           {/* Widget Calistenia - apenas Kleber tem acesso */}
-          {userId.toLowerCase() === "kleber" && (
+          {(userId?.toLowerCase() || "") === "kleber" && (
             <Card
               className="p-6 cursor-pointer hover:scale-[1.02] transition-transform border-2"
               style={{
