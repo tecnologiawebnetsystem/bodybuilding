@@ -20,6 +20,8 @@ interface HomeTabProps {
 }
 
 export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
+  console.log("[v0] HomeTab rendering with userId:", userId)
+  
   const [userProfile, setUserProfile] = useState<any>(null)
   const [currentWeight, setCurrentWeight] = useState(0)
   const [todayWorkout, setTodayWorkout] = useState<string | null>(null)

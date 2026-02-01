@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, lazy, Suspense } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Home,
@@ -18,22 +18,33 @@ import {
   Bike,
   Coins,
 } from "lucide-react"
-import { HomeTab } from "@/components/tabs/home-tab"
-import { WorkoutsTab } from "@/components/tabs/workouts-tab"
-import { RunningTab } from "@/components/tabs/running-tab"
-import { NutritionTab } from "@/components/tabs/nutrition-tab"
-import { ProfileTab } from "@/components/tabs/profile-tab"
-import { CheckinTab } from "@/components/tabs/checkin-tab"
-import { MeasurementsTab } from "@/components/tabs/measurements-tab"
-import { HydrationTab } from "@/components/tabs/hydration-tab"
-import { StatsTab } from "@/components/tabs/stats-tab"
-import { CalisthenicsTab } from "@/components/tabs/calisthenics-tab"
-import { MoreTab } from "@/components/tabs/more-tab"
-import { AiTab } from "@/components/tabs/ai-tab"
-import { SpinningTab } from "@/components/tabs/spinning-tab"
-import { GinasticaTab } from "@/components/tabs/ginastica-tab"
-import { LoyaltyTab } from "@/components/tabs/loyalty-tab"
-import { Chatbot } from "@/components/ai/chatbot"
+
+// Lazy load das tabs para evitar erros de inicializacao
+const HomeTab = lazy(() => import("@/components/tabs/home-tab").then(m => ({ default: m.HomeTab })))
+const WorkoutsTab = lazy(() => import("@/components/tabs/workouts-tab").then(m => ({ default: m.WorkoutsTab })))
+const RunningTab = lazy(() => import("@/components/tabs/running-tab").then(m => ({ default: m.RunningTab })))
+const NutritionTab = lazy(() => import("@/components/tabs/nutrition-tab").then(m => ({ default: m.NutritionTab })))
+const ProfileTab = lazy(() => import("@/components/tabs/profile-tab").then(m => ({ default: m.ProfileTab })))
+const CheckinTab = lazy(() => import("@/components/tabs/checkin-tab").then(m => ({ default: m.CheckinTab })))
+const MeasurementsTab = lazy(() => import("@/components/tabs/measurements-tab").then(m => ({ default: m.MeasurementsTab })))
+const HydrationTab = lazy(() => import("@/components/tabs/hydration-tab").then(m => ({ default: m.HydrationTab })))
+const StatsTab = lazy(() => import("@/components/tabs/stats-tab").then(m => ({ default: m.StatsTab })))
+const CalisthenicsTab = lazy(() => import("@/components/tabs/calisthenics-tab").then(m => ({ default: m.CalisthenicsTab })))
+const MoreTab = lazy(() => import("@/components/tabs/more-tab").then(m => ({ default: m.MoreTab })))
+const AiTab = lazy(() => import("@/components/tabs/ai-tab").then(m => ({ default: m.AiTab })))
+const SpinningTab = lazy(() => import("@/components/tabs/spinning-tab").then(m => ({ default: m.SpinningTab })))
+const GinasticaTab = lazy(() => import("@/components/tabs/ginastica-tab").then(m => ({ default: m.GinasticaTab })))
+const LoyaltyTab = lazy(() => import("@/components/tabs/loyalty-tab").then(m => ({ default: m.LoyaltyTab })))
+const Chatbot = lazy(() => import("@/components/ai/chatbot").then(m => ({ default: m.Chatbot })))
+
+// Componente de loading para Suspense
+function TabLoading() {
+  return (
+    <div className="flex items-center justify-center min-h-[300px]">
+      <div className="w-8 h-8 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
+    </div>
+  )
+}
 
 interface DashboardProps {
   userId: string
@@ -133,17 +144,24 @@ const getUserPreferences = (userId: string): UserPreferences => {
 }
 
 export function Dashboard({ userId, onLogout }: DashboardProps) {
-  const [activeTab, setActiveTab] = useState(() => {
-    if (typeof window !== "undefined") {
-      const savedTab = sessionStorage.getItem("activeTab")
-      if (savedTab) {
-        sessionStorage.removeItem("activeTab")
-        return savedTab
-      }
-    }
-    return "home"
-  })
+  console.log("[v0] Dashboard rendering with userId:", userId)
+  
+  const [mounted, setMounted] = useState(false)
+  const [activeTab, setActiveTab] = useState("home")
   const preferences = getUserPreferences(userId)
+  
+  // Montagem do componente
+  useEffect(() => {
+    console.log("[v0] Dashboard mounted")
+    setMounted(true)
+    
+    // Verificar tab salva
+    const savedTab = sessionStorage.getItem("activeTab")
+    if (savedTab) {
+      sessionStorage.removeItem("activeTab")
+      setActiveTab(savedTab)
+    }
+  }, [])
 
   // Listener para mudar de tab via evento customizado (usado pelos widgets da home)
   useEffect(() => {
@@ -234,10 +252,23 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
     { id: "profile", label: "Perfil", icon: User, color: preferences.theme_primary, enabled: true },
   ].filter((tab) => tab.enabled)
 
+  // Aguardar montagem antes de renderizar
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
+        <div className="w-12 h-12 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
-      {/* Chatbot flutuante */}
-      <Chatbot context={`Usuario: ${userId}`} userName={userId} />
+      {/* Chatbot flutuante - renderizado apenas apos montagem */}
+      {mounted && (
+        <Suspense fallback={null}>
+          <Chatbot context={`Usuario: ${userId}`} userName={userId} />
+        </Suspense>
+      )}
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="sticky top-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/10">
@@ -264,71 +295,73 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <TabsContent value="home" className="mt-0">
-            <HomeTab userId={userId} onLogout={onLogout} preferences={preferences} />
-          </TabsContent>
-          {preferences.enable_gym_checkin && (
-            <TabsContent value="checkin" className="mt-0">
-              <CheckinTab userId={userId} preferences={preferences} />
+          <Suspense fallback={<TabLoading />}>
+            <TabsContent value="home" className="mt-0">
+              <HomeTab userId={userId} onLogout={onLogout} preferences={preferences} />
             </TabsContent>
-          )}
-          {preferences.enable_gym_workouts && (
-            <TabsContent value="workouts" className="mt-0">
-              <WorkoutsTab userId={userId} preferences={preferences} />
+            {preferences.enable_gym_checkin && (
+              <TabsContent value="checkin" className="mt-0">
+                <CheckinTab userId={userId} preferences={preferences} />
+              </TabsContent>
+            )}
+            {preferences.enable_gym_workouts && (
+              <TabsContent value="workouts" className="mt-0">
+                <WorkoutsTab userId={userId} preferences={preferences} />
+              </TabsContent>
+            )}
+            {preferences.enable_running && (
+              <TabsContent value="running" className="mt-0">
+                <RunningTab userId={userId} preferences={preferences} />
+              </TabsContent>
+            )}
+            {preferences.enable_nutrition && (
+              <TabsContent value="nutrition" className="mt-0">
+                <NutritionTab userId={userId} preferences={preferences} />
+              </TabsContent>
+            )}
+            {preferences.enable_measurements && (
+              <TabsContent value="measurements" className="mt-0">
+                <MeasurementsTab userId={userId} preferences={preferences} />
+              </TabsContent>
+            )}
+            {preferences.enable_hydration && (
+              <TabsContent value="hydration" className="mt-0">
+                <HydrationTab userId={userId} preferences={preferences} />
+              </TabsContent>
+            )}
+            {preferences.enable_stats && (
+              <TabsContent value="stats" className="mt-0">
+                <StatsTab userId={userId} preferences={preferences} />
+              </TabsContent>
+            )}
+            {preferences.enable_home_workouts && (
+              <TabsContent value="calisthenics" className="mt-0">
+                <CalisthenicsTab userId={userId} preferences={preferences} />
+              </TabsContent>
+            )}
+            {preferences.enable_spinning && (
+              <TabsContent value="spinning" className="mt-0">
+                <SpinningTab userId={userId} preferences={preferences} />
+              </TabsContent>
+            )}
+            {preferences.enable_ginastica && (
+              <TabsContent value="ginastica" className="mt-0">
+                <GinasticaTab userId={userId} preferences={preferences} />
+              </TabsContent>
+            )}
+            <TabsContent value="ai" className="mt-0">
+              <AiTab userId={userId} preferences={preferences} />
             </TabsContent>
-          )}
-          {preferences.enable_running && (
-            <TabsContent value="running" className="mt-0">
-              <RunningTab userId={userId} preferences={preferences} />
+            <TabsContent value="loyalty" className="mt-0">
+              <LoyaltyTab userId={userId} preferences={preferences} />
             </TabsContent>
-          )}
-          {preferences.enable_nutrition && (
-            <TabsContent value="nutrition" className="mt-0">
-              <NutritionTab userId={userId} preferences={preferences} />
+            <TabsContent value="more" className="mt-0">
+              <MoreTab userId={userId} preferences={preferences} />
             </TabsContent>
-          )}
-          {preferences.enable_measurements && (
-            <TabsContent value="measurements" className="mt-0">
-              <MeasurementsTab userId={userId} preferences={preferences} />
+            <TabsContent value="profile" className="mt-0">
+              <ProfileTab userId={userId} onLogout={onLogout} preferences={preferences} />
             </TabsContent>
-          )}
-          {preferences.enable_hydration && (
-            <TabsContent value="hydration" className="mt-0">
-              <HydrationTab userId={userId} preferences={preferences} />
-            </TabsContent>
-          )}
-          {preferences.enable_stats && (
-            <TabsContent value="stats" className="mt-0">
-              <StatsTab userId={userId} preferences={preferences} />
-            </TabsContent>
-          )}
-{preferences.enable_home_workouts && (
-          <TabsContent value="calisthenics" className="mt-0">
-            <CalisthenicsTab userId={userId} preferences={preferences} />
-          </TabsContent>
-          )}
-          {preferences.enable_spinning && (
-          <TabsContent value="spinning" className="mt-0">
-            <SpinningTab userId={userId} preferences={preferences} />
-          </TabsContent>
-          )}
-          {preferences.enable_ginastica && (
-          <TabsContent value="ginastica" className="mt-0">
-            <GinasticaTab userId={userId} preferences={preferences} />
-          </TabsContent>
-          )}
-          <TabsContent value="ai" className="mt-0">
-            <AiTab userId={userId} preferences={preferences} />
-          </TabsContent>
-          <TabsContent value="loyalty" className="mt-0">
-            <LoyaltyTab userId={userId} preferences={preferences} />
-          </TabsContent>
-          <TabsContent value="more" className="mt-0">
-            <MoreTab userId={userId} preferences={preferences} />
-          </TabsContent>
-          <TabsContent value="profile" className="mt-0">
-            <ProfileTab userId={userId} onLogout={onLogout} preferences={preferences} />
-          </TabsContent>
+          </Suspense>
         </div>
       </Tabs>
     </div>
