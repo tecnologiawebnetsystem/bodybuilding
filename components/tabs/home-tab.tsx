@@ -12,10 +12,14 @@ import { QRAccessCard } from "@/components/qr-access-card"
 interface HomeTabProps {
   userId: string
   onLogout: () => void
+  preferences?: {
+    theme_primary: string
+    theme_secondary: string
+    theme_accent: string
+  }
 }
 
-export function HomeTab({ userId, onLogout }: HomeTabProps) {
-  console.log("[v0] HomeTab rendering with userId:", userId)
+export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
   const [userProfile, setUserProfile] = useState<any>(null)
   const [currentWeight, setCurrentWeight] = useState(0)
   const [todayWorkout, setTodayWorkout] = useState<string | null>(null)
@@ -32,6 +36,7 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
     cashback_balance: number
     current_streak: number
   } | null>(null)
+  const [progressionData, setProgressionData] = useState<any>(null)
 
   // Dados do Drink exclusivo para Kleber e Pamela
   const drinkData: Record<string, { mat: string; senha: string }> = {
@@ -53,64 +58,40 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
 
   const loadData = async () => {
     try {
-      const profileResponse = await fetch(`/api/user-profile?userId=${userId}`)
-      const profileData = await profileResponse.json()
-      if (profileData.success) {
-        setUserProfile(profileData.data)
-        if (profileData.data.current_weight) {
-          setCurrentWeight(Number.parseFloat(profileData.data.current_weight))
-        }
+      // API OTIMIZADA: Uma única chamada busca todos os dados da home
+      // Reduz latência de 5+ chamadas HTTP para apenas 1
+      const response = await fetch(`/api/home-data?userId=${userId}`)
+      const result = await response.json()
+
+      if (!result.success) {
+        console.error("[v0] Error loading home data:", result.error)
+        return
       }
 
-      if (!profileData.data?.current_weight) {
-        const measurementsResponse = await fetch(`/api/measurements?userId=${userId}`)
-        const measurementsData = await measurementsResponse.json()
-        if (measurementsData.success && measurementsData.data.length > 0) {
-          const latestWeight = Number.parseFloat(measurementsData.data[0].weight)
-          setCurrentWeight(latestWeight)
-        } else {
-          const weightResponse = await fetch(`/api/weight?userId=${userId}`)
-          const weightData = await weightResponse.json()
-          if (weightData.logs && weightData.logs.length > 0) {
-            setCurrentWeight(Number.parseFloat(weightData.logs[0].weight))
-          }
-        }
+      const { profile, today, loyalty, progression } = result.data
+
+      // Processar perfil
+      setUserProfile(profile)
+      if (profile.current_weight) {
+        setCurrentWeight(Number.parseFloat(profile.current_weight))
       }
 
-      const today = new Date().toISOString().split("T")[0]
-      const checkinResponse = await fetch(`/api/checkin?userId=${userId}&limit=5`)
-      const checkinData = await checkinResponse.json()
+      // Processar check-ins de hoje
+      setHasWorkoutToday(today.hasWorkout)
+      setHasRunToday(today.hasRun)
 
-      if (checkinData.success) {
-        const todayCheckins = checkinData.data.filter((c: any) => c.checkin_date.startsWith(today))
-        setHasWorkoutToday(todayCheckins.some((c: any) => c.checkin_type === "workout"))
-        setHasRunToday(todayCheckins.some((c: any) => c.checkin_type === "running"))
+      // Processar cronograma
+      setTodayWorkout(today.schedule.workout_name)
+      setTodayWorkoutDescription(today.schedule.description || "")
+
+      // Processar fidelidade
+      if (loyalty) {
+        setLoyaltyData(loyalty)
       }
 
-      const scheduleResponse = await fetch(`/api/workout-schedule?userId=${userId}`)
-      const scheduleData = await scheduleResponse.json()
-
-      if (scheduleData.success && scheduleData.data.length > 0) {
-        const dayOfWeek = new Date().getDay()
-        const todaySchedule = scheduleData.data.find((s: any) => s.day_of_week === dayOfWeek)
-
-        if (todaySchedule) {
-          setTodayWorkout(todaySchedule.workout_name)
-          setTodayWorkoutDescription(todaySchedule.description || "")
-        } else {
-          setTodayWorkout("Não definido")
-          setTodayWorkoutDescription("Configure seu cronograma semanal")
-        }
-      } else {
-        setTodayWorkout("Não definido")
-        setTodayWorkoutDescription("Configure seu cronograma semanal")
-      }
-
-      // Carregar dados de fidelidade
-      const loyaltyResponse = await fetch(`/api/loyalty?userId=${userId}`)
-      const loyaltyJson = await loyaltyResponse.json()
-      if (loyaltyJson.success) {
-        setLoyaltyData(loyaltyJson.data.points)
+      // Processar progression
+      if (progression) {
+        setProgressionData(progression)
       }
     } catch (error) {
       console.error("[v0] Error loading home data:", error)
@@ -134,7 +115,12 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
   const targetWeight = Number.parseFloat(userProfile.target_weight) || currentWeight
   const heightCm = Number.parseFloat(userProfile.height) || 170
   const userName = userProfile.name
-  const theme = { primary: "#3b82f6", secondary: "#8b5cf6", accent: "#06b6d4", success: "#10b981" }
+  const theme = { 
+    primary: preferences?.theme_primary || "#ef4444", 
+    secondary: preferences?.theme_secondary || "#f97316", 
+    accent: preferences?.theme_accent || "#fb923c", 
+    success: "#10b981" 
+  }
 
   const weightLoss = initialWeight - currentWeight
   const totalGoal = initialWeight - targetWeight
@@ -158,7 +144,7 @@ export function HomeTab({ userId, onLogout }: HomeTabProps) {
 
   return (
     <div className="space-y-6">
-      <ProgressionAlert userId={userId} />
+      <ProgressionAlert userId={userId} initialData={progressionData} preferences={{ theme_primary: theme.primary, theme_secondary: theme.secondary, theme_accent: theme.accent }} />
 
       <Card
         className="p-6 text-white"

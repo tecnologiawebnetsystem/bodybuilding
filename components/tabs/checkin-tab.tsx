@@ -45,9 +45,32 @@ export function CheckinTab({ userId, preferences }: CheckinTabProps) {
   const [checkinToDelete, setCheckinToDelete] = useState<number | null>(null)
 
   useEffect(() => {
-    loadStats()
-    loadLastWorkout()
+    loadInitialData()
   }, [userId])
+
+  const loadInitialData = async () => {
+    try {
+      // Carregar stats e último treino em paralelo
+      const [statsResponse, lastWorkoutResponse] = await Promise.all([
+        fetch(`/api/checkin/stats?userId=${userId}`),
+        fetch(`/api/checkin?userId=${userId}&limit=1&type=workout`)
+      ])
+
+      const [statsResult, lastWorkoutResult] = await Promise.all([
+        statsResponse.json(),
+        lastWorkoutResponse.json()
+      ])
+
+      if (statsResult.success) {
+        setStats(statsResult.data)
+      }
+      if (lastWorkoutResult.success && lastWorkoutResult.data.length > 0) {
+        setLastWorkout(lastWorkoutResult.data[0].workout_name)
+      }
+    } catch (error) {
+      console.error("[v0] Error loading checkin data:", error)
+    }
+  }
 
   const loadStats = async () => {
     try {
@@ -58,18 +81,6 @@ export function CheckinTab({ userId, preferences }: CheckinTabProps) {
       }
     } catch (error) {
       console.error("[v0] Error loading stats:", error)
-    }
-  }
-
-  const loadLastWorkout = async () => {
-    try {
-      const response = await fetch(`/api/checkin?userId=${userId}&limit=1&type=workout`)
-      const result = await response.json()
-      if (result.success && result.data.length > 0) {
-        setLastWorkout(result.data[0].workout_name)
-      }
-    } catch (error) {
-      console.error("[v0] Error loading last workout:", error)
     }
   }
 
