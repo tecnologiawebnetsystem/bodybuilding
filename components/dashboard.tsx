@@ -17,6 +17,7 @@ import {
   Sparkles,
   Bike,
   Coins,
+  CalendarDays,
 } from "lucide-react"
 
 // Lazy load das tabs para evitar erros de inicializacao
@@ -35,6 +36,7 @@ const AiTab = lazy(() => import("@/components/tabs/ai-tab").then(m => ({ default
 const SpinningTab = lazy(() => import("@/components/tabs/spinning-tab").then(m => ({ default: m.SpinningTab })))
 const GinasticaTab = lazy(() => import("@/components/tabs/ginastica-tab").then(m => ({ default: m.GinasticaTab })))
 const LoyaltyTab = lazy(() => import("@/components/tabs/loyalty-tab").then(m => ({ default: m.LoyaltyTab })))
+const CalendarTab = lazy(() => import("@/components/tabs/calendar-tab").then(m => ({ default: m.CalendarTab })))
 const Chatbot = lazy(() => import("@/components/ai/chatbot").then(m => ({ default: m.Chatbot })))
 
 // Componente de loading para Suspense
@@ -66,6 +68,7 @@ interface UserPreferences {
   enable_stats: boolean
   enable_spinning: boolean
   enable_ginastica: boolean
+  enable_calendar: boolean
 }
 
 const getUserPreferences = (userId: string): UserPreferences => {
@@ -88,6 +91,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_stats: true,
       enable_spinning: true, // Spinning - APENAS Kleber e Pamela
       enable_ginastica: true, // Ginastica - APENAS Kleber e Pamela
+      enable_calendar: true,
     },
     pamela: {
       theme_primary: "#ef4444",
@@ -104,6 +108,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_stats: true,
       enable_spinning: true, // Spinning - APENAS Kleber e Pamela
       enable_ginastica: true, // Ginastica - APENAS Kleber e Pamela
+      enable_calendar: true,
     },
     juliana: {
       theme_primary: "#ef4444",
@@ -120,6 +125,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_stats: true,
       enable_spinning: false, // SEM Spinning
       enable_ginastica: false, // SEM Ginastica
+      enable_calendar: true,
     },
   }
 
@@ -131,14 +137,15 @@ const getUserPreferences = (userId: string): UserPreferences => {
       enable_gym_checkin: true,
       enable_gym_workouts: true,
       enable_running: true,
-      enable_home_workouts: false, // Novos usuários SEM Calistenia por padrão
+      enable_home_workouts: false, // Novos usuarios SEM Calistenia por padrao
       enable_nutrition: true,
       enable_supplements: true,
       enable_measurements: true,
       enable_hydration: true,
       enable_stats: true,
-      enable_spinning: false, // Novos usuários SEM Spinning por padrão
-      enable_ginastica: false, // Novos usuários SEM Ginastica por padrão
+      enable_spinning: false, // Novos usuarios SEM Spinning por padrao
+      enable_ginastica: false, // Novos usuarios SEM Ginastica por padrao
+      enable_calendar: true,
     }
   )
 }
@@ -244,6 +251,7 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
       enabled: preferences.enable_ginastica && !["kleber", "pamela"].includes(userId?.toLowerCase() || ""), // Kleber e Pamela acessam via widget
     },
     { id: "ai", label: "IA", icon: Sparkles, color: "#a855f7", enabled: true },
+    { id: "calendar", label: "Agenda", icon: CalendarDays, color: "#06b6d4", enabled: preferences.enable_calendar },
     { id: "loyalty", label: "Pontos", icon: Coins, color: "#f59e0b", enabled: true },
     { id: "more", label: "Mais", icon: MoreHorizontal, color: preferences.theme_accent, enabled: true },
     { id: "profile", label: "Perfil", icon: User, color: preferences.theme_primary, enabled: true },
@@ -349,6 +357,11 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
             <TabsContent value="ai" className="mt-0">
               <AiTab userId={userId} preferences={preferences} />
             </TabsContent>
+            {preferences.enable_calendar && (
+              <TabsContent value="calendar" className="mt-0">
+                <CalendarTab userId={userId} preferences={preferences} />
+              </TabsContent>
+            )}
             <TabsContent value="loyalty" className="mt-0">
               <LoyaltyTab userId={userId} preferences={preferences} />
             </TabsContent>
