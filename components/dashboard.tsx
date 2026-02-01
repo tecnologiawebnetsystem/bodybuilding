@@ -144,15 +144,12 @@ const getUserPreferences = (userId: string): UserPreferences => {
 }
 
 export function Dashboard({ userId, onLogout }: DashboardProps) {
-  console.log("[v0] Dashboard rendering with userId:", userId)
-  
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState("home")
   const preferences = getUserPreferences(userId)
   
   // Montagem do componente
   useEffect(() => {
-    console.log("[v0] Dashboard mounted")
     setMounted(true)
     
     // Verificar tab salva

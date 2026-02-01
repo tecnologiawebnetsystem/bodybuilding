@@ -5,16 +5,12 @@ import { PinLogin } from "@/components/pin-login"
 import { Dashboard } from "@/components/dashboard"
 
 export default function AppMobilePage() {
-  console.log("[v0] AppMobilePage rendering")
-  
   const [currentUser, setCurrentUser] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    console.log("[v0] AppMobilePage useEffect running")
     // Verificar ambas as chaves para compatibilidade com /entrar e pin-login
     const storedUser = sessionStorage.getItem("currentUser") || sessionStorage.getItem("userId")
-    console.log("[v0] storedUser:", storedUser)
     if (storedUser) {
       setCurrentUser(storedUser)
       // Sincronizar ambas as chaves
