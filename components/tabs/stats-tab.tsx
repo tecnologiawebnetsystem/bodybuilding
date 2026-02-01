@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Trophy, Flame, Activity, Target, Trash2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -153,22 +152,8 @@ export function StatsTab({ userId, preferences }: StatsTabProps) {
     }
   }
 
-  // Skeleton loading - mostra interface imediatamente
   if (loading) {
-    return (
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-white">Estatisticas</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="p-4 text-center bg-white/5">
-              <Skeleton className="w-8 h-8 mx-auto mb-2 rounded-full" />
-              <Skeleton className="h-8 w-16 mx-auto mb-1" />
-              <Skeleton className="h-4 w-20 mx-auto" />
-            </Card>
-          ))}
-        </div>
-      </div>
-    )
+    return <p className="text-center py-8">Carregando...</p>
   }
 
   return (
@@ -252,7 +237,7 @@ export function StatsTab({ userId, preferences }: StatsTabProps) {
                       {record.distance && (
                         <p className="text-sm mt-1">
                           <span className="font-semibold" style={{ color: preferences.theme_accent }}>
-                            {Number(record.distance).toFixed(2)}km
+                            {(Number(record.distance) || 0).toFixed(2)}km
                           </span>
                           {record.duration && ` • ${record.duration} min`}
                         </p>
@@ -287,14 +272,11 @@ export function StatsTab({ userId, preferences }: StatsTabProps) {
               <div key={idx} className="flex items-center justify-between">
                 <span className="text-sm text-gray-300">{new Date(log.log_date).toLocaleDateString("pt-BR")}</span>
                 <span className="font-semibold text-white">{log.weight}kg</span>
-                {idx < stats.weightProgress.length - 1 && (
+                {idx < stats.weightProgress.length - 1 && stats.weightProgress[idx + 1]?.weight && (
                   <span
                     className={`text-sm ${Number.parseFloat(log.weight) < Number.parseFloat(stats.weightProgress[idx + 1].weight) ? "text-green-600" : "text-red-600"}`}
                   >
-                    {(Number.parseFloat(log.weight) - Number.parseFloat(stats.weightProgress[idx + 1].weight)).toFixed(
-                      1,
-                    )}
-                    kg
+                    {((Number.parseFloat(log.weight) || 0) - (Number.parseFloat(stats.weightProgress[idx + 1].weight) || 0)).toFixed(1)}kg
                   </span>
                 )}
               </div>

@@ -29,30 +29,42 @@ export function QRAccessCard({ userId, userName }: QRAccessCardProps) {
 
   useEffect(() => {
     if (qrData?.expires_at) {
-      const interval = setInterval(() => {
+      try {
+        const interval = setInterval(() => {
+          try {
+            const now = new Date()
+            const expires = new Date(qrData.expires_at)
+            const diff = expires.getTime() - now.getTime()
+
+            if (diff <= 0 || isNaN(diff)) {
+              setTimeLeft("Expirado")
+              fetchQRCode() // Renovar automaticamente
+            } else {
+              const hours = Math.floor(diff / (1000 * 60 * 60))
+              const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+              setTimeLeft(`${hours}h ${minutes}m`)
+            }
+          } catch {
+            setTimeLeft("--")
+          }
+        }, 60000) // Atualiza a cada minuto
+
+        // Calcular tempo inicial
         const now = new Date()
         const expires = new Date(qrData.expires_at)
         const diff = expires.getTime() - now.getTime()
-
-        if (diff <= 0) {
-          setTimeLeft("Expirado")
-          fetchQRCode() // Renovar automaticamente
-        } else {
+        if (!isNaN(diff) && diff > 0) {
           const hours = Math.floor(diff / (1000 * 60 * 60))
           const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
           setTimeLeft(`${hours}h ${minutes}m`)
+        } else {
+          setTimeLeft("--")
         }
-      }, 60000) // Atualiza a cada minuto
 
-      // Calcular tempo inicial
-      const now = new Date()
-      const expires = new Date(qrData.expires_at)
-      const diff = expires.getTime() - now.getTime()
-      const hours = Math.floor(diff / (1000 * 60 * 60))
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-      setTimeLeft(`${hours}h ${minutes}m`)
-
-      return () => clearInterval(interval)
+        return () => clearInterval(interval)
+      } catch {
+        setTimeLeft("--")
+      }
     }
   }, [qrData])
 
@@ -63,8 +75,8 @@ export function QRAccessCard({ userId, userName }: QRAccessCardProps) {
       if (data.success) {
         setQrData(data)
       }
-    } catch (error) {
-      console.error("[v0] Error fetching QR:", error)
+    } catch {
+      // Erro silencioso
     } finally {
       setLoading(false)
     }
@@ -82,8 +94,8 @@ export function QRAccessCard({ userId, userName }: QRAccessCardProps) {
       if (data.success) {
         await fetchQRCode()
       }
-    } catch (error) {
-      console.error("[v0] Error refreshing QR:", error)
+    } catch {
+      // Erro silencioso
     } finally {
       setRefreshing(false)
     }

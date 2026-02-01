@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Trophy, Target, Flame, TrendingDown, Calendar, CheckCircle2, Activity, LogOut, Wine, X, Copy, Check, QrCode, Coins, Star, Zap, Bike, Dumbbell } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ProgressionAlert } from "@/components/progression-alert"
@@ -59,49 +58,67 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
 
   const loadData = async () => {
     try {
-      // API OTIMIZADA: Uma única chamada busca todos os dados da home
-      // Reduz latência de 5+ chamadas HTTP para apenas 1
-      const response = await fetch(`/api/home-data?userId=${userId}`)
-      const result = await response.json()
+      // Carregar TODOS os dados em paralelo para performance maxima
+      const [profileResponse, checkinResponse, scheduleResponse, loyaltyResponse, progressionResponse] = await Promise.all([
+        fetch(`/api/user-profile?userId=${userId}`),
+        fetch(`/api/checkin?userId=${userId}&limit=5`),
+        fetch(`/api/workout-schedule?userId=${userId}`),
+        fetch(`/api/loyalty?userId=${userId}`),
+        fetch(`/api/progression?userId=${userId}`)
+      ])
 
-      if (!result.success || !result.data) {
-        setLoading(false)
-        return
-      }
+      const [profileData, checkinData, scheduleData, loyaltyJson, progressionJson] = await Promise.all([
+        profileResponse.json(),
+        checkinResponse.json(),
+        scheduleResponse.json(),
+        loyaltyResponse.json(),
+        progressionResponse.json()
+      ])
 
-      const { profile, today, loyalty, progression } = result.data
-
-      // Processar perfil com proteção contra null
-      if (profile) {
-        setUserProfile(profile)
-        if (profile.current_weight) {
-          setCurrentWeight(Number.parseFloat(profile.current_weight))
+      // Processar perfil
+      if (profileData.success && profileData.data) {
+        setUserProfile(profileData.data)
+        if (profileData.data.current_weight) {
+          setCurrentWeight(Number.parseFloat(profileData.data.current_weight))
         }
       }
 
-      // Processar check-ins de hoje com proteção
-      if (today) {
-        setHasWorkoutToday(today.hasWorkout || false)
-        setHasRunToday(today.hasRun || false)
-        
-        // Processar cronograma
-        if (today.schedule) {
-          setTodayWorkout(today.schedule.workout_name || "Nao definido")
-          setTodayWorkoutDescription(today.schedule.description || "")
+      // Processar check-ins de hoje
+      if (checkinData.success && checkinData.data) {
+        const today = new Date().toISOString().split("T")[0]
+        const todayCheckins = checkinData.data.filter((c: any) => c.checkin_date?.startsWith(today))
+        setHasWorkoutToday(todayCheckins.some((c: any) => c.checkin_type === "workout"))
+        setHasRunToday(todayCheckins.some((c: any) => c.checkin_type === "running"))
+      }
+
+      // Processar cronograma
+      if (scheduleData.success && scheduleData.data && scheduleData.data.length > 0) {
+        const dayOfWeek = new Date().getDay()
+        const todaySchedule = scheduleData.data.find((s: any) => s.day_of_week === dayOfWeek)
+
+        if (todaySchedule) {
+          setTodayWorkout(todaySchedule.workout_name)
+          setTodayWorkoutDescription(todaySchedule.description || "")
+        } else {
+          setTodayWorkout("Nao definido")
+          setTodayWorkoutDescription("Configure seu cronograma semanal")
         }
+      } else {
+        setTodayWorkout("Nao definido")
+        setTodayWorkoutDescription("Configure seu cronograma semanal")
       }
 
       // Processar fidelidade
-      if (loyalty) {
-        setLoyaltyData(loyalty)
+      if (loyaltyJson.success && loyaltyJson.data?.points) {
+        setLoyaltyData(loyaltyJson.data.points)
       }
 
       // Processar progression
-      if (progression) {
-        setProgressionData(progression)
+      if (progressionJson.success && progressionJson.data) {
+        setProgressionData(progressionJson.data)
       }
     } catch {
-      // Erro silencioso - dados mostram skeleton
+      // Erro silencioso
     } finally {
       setLoading(false)
     }
@@ -123,8 +140,9 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
 
   const weightLoss = initialWeight - currentWeight
   const totalGoal = initialWeight - targetWeight
-  const progressPercent = Math.max(0, Math.min(100, (weightLoss / totalGoal) * 100))
-  const currentIMC = currentWeight / Math.pow(heightCm / 100, 2)
+  // Proteção contra divisão por zero
+  const progressPercent = totalGoal > 0 ? Math.max(0, Math.min(100, (weightLoss / totalGoal) * 100)) : 0
+  const currentIMC = heightCm > 0 ? currentWeight / Math.pow(heightCm / 100, 2) : 0
 
   const defaultGoals =
     userProfile?.gender === "female"
@@ -173,59 +191,43 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-sm text-muted-foreground mb-1">Peso Atual</p>
-            {loading ? (
-              <Skeleton className="h-10 w-24" />
-            ) : (
-              <h2 className="text-4xl font-bold" style={{ color: theme.primary }}>
-                {currentWeight.toFixed(1)}kg
-              </h2>
-            )}
+            <h2 className="text-4xl font-bold" style={{ color: theme.primary }}>
+              {currentWeight.toFixed(1)}kg
+            </h2>
           </div>
           <div className="text-right">
             <p className="text-sm text-muted-foreground mb-1">Meta</p>
-            {loading ? (
-              <Skeleton className="h-10 w-20 ml-auto" />
-            ) : (
-              <h2 className="text-4xl font-bold" style={{ color: theme.accent }}>
-                {targetWeight}kg
-              </h2>
-            )}
+            <h2 className="text-4xl font-bold" style={{ color: theme.accent }}>
+              {targetWeight}kg
+            </h2>
           </div>
         </div>
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Progresso</span>
-            {loading ? (
-              <Skeleton className="h-4 w-20" />
-            ) : (
-              <span className="font-bold">
-                {weightLoss.toFixed(1)}kg / {totalGoal}kg
-              </span>
-            )}
+            <span className="font-bold">
+              {weightLoss.toFixed(1)}kg / {totalGoal}kg
+            </span>
           </div>
-          {loading ? (
-            <Skeleton className="h-3 w-full" />
-          ) : (
-            <Progress value={progressPercent} className="h-3" />
-          )}
+          <Progress value={progressPercent} className="h-3" />
         </div>
 
         <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t" style={{ borderColor: theme.primary + "20" }}>
           <div className="text-center">
             <TrendingDown className="w-6 h-6 mx-auto mb-1" style={{ color: theme.success }} />
             <p className="text-xs text-muted-foreground">Perdidos</p>
-            {loading ? <Skeleton className="h-6 w-12 mx-auto" /> : <p className="text-lg font-bold">{weightLoss.toFixed(1)}kg</p>}
+            <p className="text-lg font-bold">{(weightLoss || 0).toFixed(1)}kg</p>
           </div>
           <div className="text-center">
             <Target className="w-6 h-6 mx-auto mb-1" style={{ color: theme.primary }} />
             <p className="text-xs text-muted-foreground">Restantes</p>
-            {loading ? <Skeleton className="h-6 w-12 mx-auto" /> : <p className="text-lg font-bold">{Math.max(0, totalGoal - weightLoss).toFixed(1)}kg</p>}
+            <p className="text-lg font-bold">{Math.max(0, (totalGoal - weightLoss) || 0).toFixed(1)}kg</p>
           </div>
           <div className="text-center">
             <Trophy className="w-6 h-6 mx-auto mb-1" style={{ color: theme.accent }} />
             <p className="text-xs text-muted-foreground">IMC Atual</p>
-            {loading ? <Skeleton className="h-6 w-12 mx-auto" /> : <p className="text-lg font-bold">{currentIMC.toFixed(1)}</p>}
+            <p className="text-lg font-bold">{(currentIMC || 0).toFixed(1)}</p>
           </div>
         </div>
       </Card>
@@ -268,17 +270,8 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
                 )}
               </div>
               <div>
-                {loading ? (
-                  <>
-                    <Skeleton className="h-5 w-28 mb-1" />
-                    <Skeleton className="h-4 w-20" />
-                  </>
-                ) : (
-                  <>
-                    <p className="font-semibold">{todayWorkout || "Carregando..."}</p>
-                    <p className="text-sm text-muted-foreground">{todayWorkoutDescription || "Musculação"}</p>
-                  </>
-                )}
+                <p className="font-semibold">{todayWorkout || "Carregando..."}</p>
+                <p className="text-sm text-muted-foreground">{todayWorkoutDescription || "Musculacao"}</p>
               </div>
             </div>
             {hasWorkoutToday && (
@@ -314,49 +307,38 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
         </div>
       </Card>
 
-      {/* Widget Pontos de Fidelidade - Sempre mostra, com skeleton se loading */}
-      <Card
-        className="p-6 cursor-pointer hover:scale-[1.02] transition-transform border-2"
-        style={{
-          borderColor: "#f59e0b",
-          background: "linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%)",
-        }}
-      >
-        <div className="flex items-center justify-between text-white">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
-              <Coins className="w-8 h-8" />
+      {/* Widget Pontos de Fidelidade */}
+      {loyaltyData && (
+        <Card
+          className="p-6 cursor-pointer hover:scale-[1.02] transition-transform border-2"
+          style={{
+            borderColor: "#f59e0b",
+            background: "linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%)",
+          }}
+        >
+          <div className="flex items-center justify-between text-white">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
+                <Coins className="w-8 h-8" />
+              </div>
+              <div>
+                <p className="text-white/70 text-sm">Seus Pontos</p>
+                <h3 className="text-3xl font-bold">{loyaltyData.total_points?.toLocaleString() || 0}</h3>
+              </div>
             </div>
-            <div>
-              <p className="text-white/70 text-sm">Seus Pontos</p>
-              {loading || !loyaltyData ? (
-                <Skeleton className="h-9 w-24 bg-white/20" />
-              ) : (
-                <h3 className="text-3xl font-bold">{loyaltyData.total_points.toLocaleString()}</h3>
+            <div className="text-right">
+              <div className="flex items-center gap-1 justify-end mb-1">
+                <Star className="w-4 h-4" />
+                <span className="font-semibold">{loyaltyData.current_level || "Bronze"}</span>
+              </div>
+              <p className="text-white/70 text-sm">R${Number(loyaltyData.cashback_balance || 0).toFixed(2)} cashback</p>
+              {loyaltyData.current_streak > 0 && (
+                <p className="text-white/70 text-xs mt-1">{loyaltyData.current_streak} dias seguidos</p>
               )}
             </div>
           </div>
-          <div className="text-right">
-            {loading || !loyaltyData ? (
-              <>
-                <Skeleton className="h-5 w-16 ml-auto mb-1 bg-white/20" />
-                <Skeleton className="h-4 w-24 ml-auto bg-white/20" />
-              </>
-            ) : (
-              <>
-                <div className="flex items-center gap-1 justify-end mb-1">
-                  <Star className="w-4 h-4" />
-                  <span className="font-semibold">{loyaltyData.current_level}</span>
-                </div>
-                <p className="text-white/70 text-sm">R${Number(loyaltyData.cashback_balance).toFixed(2)} cashback</p>
-                {loyaltyData.current_streak > 0 && (
-                  <p className="text-white/70 text-xs mt-1">{loyaltyData.current_streak} dias seguidos</p>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-      </Card>
+        </Card>
+      )}
 
       {/* Widget QR Code Catraca */}
       <Card
