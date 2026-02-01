@@ -24,8 +24,7 @@ export async function POST(request: NextRequest) {
     `
 
     return NextResponse.json({ success: true, data: result[0] })
-  } catch (error) {
-    console.error("[v0] Error creating checkin:", error)
+  } catch {
     return NextResponse.json({ success: false, error: "Failed to create checkin" }, { status: 500 })
   }
 }
@@ -59,8 +58,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data: checkins })
-  } catch (error) {
-    console.error("[v0] Error fetching checkins:", error)
+  } catch {
     return NextResponse.json({ success: false, error: "Failed to fetch checkins" }, { status: 500 })
   }
 }
@@ -77,8 +75,7 @@ export async function DELETE(request: NextRequest) {
     await sql`DELETE FROM daily_checkins WHERE id = ${Number.parseInt(id)}`
 
     return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error("[v0] Error deleting checkin:", error)
+  } catch {
     return NextResponse.json({ success: false, error: "Failed to delete checkin" }, { status: 500 })
   }
 }

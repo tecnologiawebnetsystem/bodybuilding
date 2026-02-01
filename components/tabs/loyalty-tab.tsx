@@ -146,10 +146,40 @@ export function LoyaltyTab({ userId, preferences }: LoyaltyTabProps) {
     ? rewards 
     : rewards.filter(r => r.category === activeCategory)
 
+  // Skeleton loading - mostra interface imediatamente
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderColor: preferences.theme_primary }} />
+      <div className="space-y-6 p-4 pb-24">
+        {/* Header skeleton */}
+        <Card className="p-6 bg-gradient-to-r from-amber-600 to-orange-600">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-16 h-16 rounded-full bg-white/20 animate-pulse" />
+            <div>
+              <div className="h-4 w-20 bg-white/20 rounded animate-pulse mb-2" />
+              <div className="h-6 w-24 bg-white/20 rounded animate-pulse" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white/10 rounded-xl p-4">
+              <div className="h-4 w-16 bg-white/20 rounded animate-pulse mb-2" />
+              <div className="h-8 w-20 bg-white/20 rounded animate-pulse" />
+            </div>
+            <div className="bg-white/10 rounded-xl p-4">
+              <div className="h-4 w-16 bg-white/20 rounded animate-pulse mb-2" />
+              <div className="h-8 w-20 bg-white/20 rounded animate-pulse" />
+            </div>
+          </div>
+        </Card>
+        {/* Stats skeleton */}
+        <div className="grid grid-cols-3 gap-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="p-4 text-center">
+              <div className="w-6 h-6 mx-auto mb-2 bg-muted rounded animate-pulse" />
+              <div className="h-6 w-12 mx-auto bg-muted rounded animate-pulse mb-1" />
+              <div className="h-3 w-16 mx-auto bg-muted rounded animate-pulse" />
+            </Card>
+          ))}
+        </div>
       </div>
     )
   }

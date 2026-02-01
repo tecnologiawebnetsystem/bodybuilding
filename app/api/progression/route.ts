@@ -21,8 +21,7 @@ export async function GET(request: NextRequest) {
     `
 
     return NextResponse.json({ success: true, data: progression[0] || null })
-  } catch (error) {
-    console.error("[v0] Error fetching progression:", error)
+  } catch {
     return NextResponse.json({ success: false, error: "Failed to fetch progression" }, { status: 500 })
   }
 }
@@ -59,8 +58,7 @@ export async function POST(request: NextRequest) {
     `
 
     return NextResponse.json({ success: true, data: result[0] })
-  } catch (error) {
-    console.error("[v0] Error creating progression:", error)
+  } catch {
     return NextResponse.json({ success: false, error: "Failed to create progression" }, { status: 500 })
   }
 }

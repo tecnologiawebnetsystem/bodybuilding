@@ -10,32 +10,41 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    console.log("[v0] Fetching stats for user:", userId)
+    // OTIMIZADO: Todas as queries em paralelo para maxima performance
+    const [workouts, running, checkins, weightLogs] = await Promise.all([
+      // Total workouts
+      sql`
+        SELECT COUNT(*) as total FROM daily_checkins
+        WHERE user_id = ${userId} AND checkin_type = 'workout'
+      `,
+      // Total running sessions and distance
+      sql`
+        SELECT 
+          COUNT(*) as total_runs,
+          COALESCE(SUM(distance), 0) as total_distance,
+          COALESCE(SUM(duration), 0) as total_duration
+        FROM daily_checkins
+        WHERE user_id = ${userId} AND checkin_type = 'running'
+      `,
+      // Checkins para calcular streak (limitado a ultimos 60 dias)
+      sql`
+        SELECT DISTINCT checkin_date
+        FROM daily_checkins
+        WHERE user_id = ${userId}
+        ORDER BY checkin_date DESC
+        LIMIT 60
+      `,
+      // Weight logs (limitado a ultimos 30)
+      sql`
+        SELECT weight, date as log_date
+        FROM weight_logs
+        WHERE user_id = ${userId}
+        ORDER BY date DESC
+        LIMIT 30
+      `
+    ])
 
-    // Total workouts
-    const workouts = await sql`
-      SELECT COUNT(*) as total FROM daily_checkins
-      WHERE user_id = ${userId} AND checkin_type = 'workout'
-    `
-
-    // Total running sessions and distance
-    const running = await sql`
-      SELECT 
-        COUNT(*) as total_runs,
-        COALESCE(SUM(distance), 0) as total_distance,
-        COALESCE(SUM(duration), 0) as total_duration
-      FROM daily_checkins
-      WHERE user_id = ${userId} AND checkin_type = 'running'
-    `
-
-    // Current streak
-    const checkins = await sql`
-      SELECT DISTINCT checkin_date
-      FROM daily_checkins
-      WHERE user_id = ${userId}
-      ORDER BY checkin_date DESC
-    `
-
+    // Calcular streak no servidor
     let currentStreak = 0
     if (checkins.length > 0) {
       const today = new Date()
@@ -57,13 +66,6 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const weightLogs = await sql`
-      SELECT weight, date
-      FROM weight_logs
-      WHERE user_id = ${userId}
-      ORDER BY date ASC
-    `
-
     const stats = {
       totalWorkouts: Number.parseInt(workouts[0].total),
       totalRuns: Number.parseInt(running[0].total_runs),
@@ -73,11 +75,9 @@ export async function GET(request: NextRequest) {
       weightProgress: weightLogs,
     }
 
-    console.log("[v0] Stats fetched successfully:", stats)
-
     return NextResponse.json({ success: true, data: stats })
   } catch (error) {
-    console.error("[v0] Error fetching stats:", error)
+    console.error("Error fetching stats:", error)
     return NextResponse.json({ error: "Erro ao buscar estatísticas" }, { status: 500 })
   }
 }

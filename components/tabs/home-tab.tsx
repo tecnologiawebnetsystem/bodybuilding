@@ -65,7 +65,6 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
       const result = await response.json()
 
       if (!result.success) {
-        console.error("[v0] Error loading home data:", result.error)
         return
       }
 
@@ -94,8 +93,8 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
       if (progression) {
         setProgressionData(progression)
       }
-    } catch (error) {
-      console.error("[v0] Error loading home data:", error)
+    } catch {
+      // Erro silencioso - dados mostram skeleton
     } finally {
       setLoading(false)
     }

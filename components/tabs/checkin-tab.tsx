@@ -67,8 +67,8 @@ export function CheckinTab({ userId, preferences }: CheckinTabProps) {
       if (lastWorkoutResult.success && lastWorkoutResult.data.length > 0) {
         setLastWorkout(lastWorkoutResult.data[0].workout_name)
       }
-    } catch (error) {
-      console.error("[v0] Error loading checkin data:", error)
+    } catch {
+      // Erro silencioso
     }
   }
 
@@ -79,8 +79,8 @@ export function CheckinTab({ userId, preferences }: CheckinTabProps) {
       if (result.success) {
         setStats(result.data)
       }
-    } catch (error) {
-      console.error("[v0] Error loading stats:", error)
+    } catch {
+      // Erro silencioso
     }
   }
 
@@ -128,72 +128,54 @@ export function CheckinTab({ userId, preferences }: CheckinTabProps) {
         setModalOpen(true)
         setShowWorkoutSelector(false)
       }
-    } catch (error) {
-      console.error("[v0] Error checking in:", error)
+    } catch {
+      // Erro silencioso
     } finally {
       setLoading(false)
     }
   }
 
   const confirmDelete = (checkinId: number) => {
-    console.log("[v0] confirmDelete called with ID:", checkinId)
     setCheckinToDelete(checkinId)
-    console.log("[v0] State will be set to:", checkinId)
     setDeleteConfirmOpen(true)
   }
 
   const handleDeleteCheckin = async () => {
-    console.log("[v0] handleDeleteCheckin called, checkinToDelete state:", checkinToDelete)
+    if (!checkinToDelete) return
 
-    if (!checkinToDelete) {
-      console.log("[v0] No checkin to delete, returning")
-      return
-    }
-
-    console.log("[v0] Starting delete process for ID:", checkinToDelete)
     setLoading(true)
 
     try {
-      const url = `/api/checkin?id=${checkinToDelete}`
-      console.log("[v0] Calling DELETE endpoint:", url)
-
-      const response = await fetch(url, {
+      const response = await fetch(`/api/checkin?id=${checkinToDelete}`, {
         method: "DELETE",
       })
 
-      console.log("[v0] Response status:", response.status)
       const result = await response.json()
-      console.log("[v0] Delete result:", result)
 
       if (result.success) {
-        console.log("[v0] Delete successful, closing dialog and reloading stats")
         setDeleteConfirmOpen(false)
         setCheckinToDelete(null)
-
         await loadStats()
-
         setModalContent({
-          title: "Check-in Excluído!",
+          title: "Check-in Excluido!",
           message: "O registro foi removido com sucesso.",
           type: "success",
         })
         setModalOpen(true)
       } else {
-        console.log("[v0] Delete failed:", result.error)
         setModalContent({
           title: "Erro!",
-          message: "Não foi possível excluir o registro.",
+          message: "Nao foi possivel excluir o registro.",
           type: "warning",
         })
         setModalOpen(true)
         setDeleteConfirmOpen(false)
         setCheckinToDelete(null)
       }
-    } catch (error) {
-      console.error("[v0] Error deleting checkin:", error)
+    } catch {
       setModalContent({
         title: "Erro!",
-        message: "Não foi possível excluir o registro.",
+        message: "Nao foi possivel excluir o registro.",
         type: "warning",
       })
       setModalOpen(true)
@@ -403,7 +385,6 @@ export function CheckinTab({ userId, preferences }: CheckinTabProps) {
               variant="outline"
               className="flex-1 bg-transparent"
               onClick={() => {
-                console.log("[v0] Cancel button clicked")
                 setDeleteConfirmOpen(false)
                 setCheckinToDelete(null)
               }}
@@ -414,10 +395,7 @@ export function CheckinTab({ userId, preferences }: CheckinTabProps) {
             <Button
               size="lg"
               className="flex-1 bg-destructive hover:bg-destructive/90"
-              onClick={() => {
-                console.log("[v0] Excluir button clicked! Current checkinToDelete:", checkinToDelete)
-                handleDeleteCheckin()
-              }}
+              onClick={handleDeleteCheckin}
               disabled={loading}
             >
               {loading ? "Excluindo..." : "Excluir"}

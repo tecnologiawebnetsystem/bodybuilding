@@ -43,8 +43,8 @@ export function RunningTab({ userId, preferences }: RunningTabProps) {
       if (result.success) {
         setHistory(result.data)
       }
-    } catch (error) {
-      console.error("[v0] Error loading running history:", error)
+    } catch {
+      // Erro silencioso
     }
   }
 
@@ -75,8 +75,7 @@ export function RunningTab({ userId, preferences }: RunningTabProps) {
         setModalMessage("Corrida registrada com sucesso! Continue assim! 🏃‍♂️")
         setModalOpen(true)
       }
-    } catch (error) {
-      console.error("[v0] Error logging run:", error)
+    } catch {
       setModalMessage("Erro ao registrar corrida. Tente novamente.")
       setModalOpen(true)
     }
@@ -96,8 +95,8 @@ export function RunningTab({ userId, preferences }: RunningTabProps) {
         setModalMessage("Corrida excluída com sucesso!")
         setModalOpen(true)
       }
-    } catch (error) {
-      console.error("[v0] Error deleting run:", error)
+    } catch {
+      // Erro silencioso
     }
   }
 
@@ -115,8 +114,8 @@ export function RunningTab({ userId, preferences }: RunningTabProps) {
         setModalMessage("Histórico limpo com sucesso!")
         setModalOpen(true)
       }
-    } catch (error) {
-      console.error("[v0] Error clearing history:", error)
+    } catch {
+      // Erro silencioso
     }
   }
 

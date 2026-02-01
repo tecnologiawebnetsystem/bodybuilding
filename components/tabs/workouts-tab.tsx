@@ -56,8 +56,7 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
       const blob = generator.generateGymWorkoutPDF(userName, schedule, { primary: "#3b82f6", secondary: "#1e40af" })
 
       await sharePDF(blob, `treino-musculacao-${userId}.pdf`)
-    } catch (error) {
-      console.error("[v0] Error generating PDF:", error)
+    } catch {
       alert("Erro ao gerar PDF. Tente novamente.")
     } finally {
       setGeneratingPDF(null)
@@ -79,8 +78,7 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
 
       const blob = generator.generateGymWorkoutPDF(userName, workout, theme)
       await sharePDF(blob, `${workout.name.toLowerCase().replace(/\s+/g, "-")}-${userId}.pdf`)
-    } catch (error) {
-      console.error("[v0] Error generating PDF:", error)
+    } catch {
       alert("Erro ao gerar PDF. Tente novamente.")
     } finally {
       setGeneratingPDF(null)

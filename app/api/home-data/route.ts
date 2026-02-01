@@ -114,8 +114,7 @@ export async function GET(request: NextRequest) {
         progression: progression[0] || null
       }
     })
-  } catch (error) {
-    console.error("[v0] Error fetching home data:", error)
+  } catch {
     return NextResponse.json({ success: false, error: "Failed to fetch home data" }, { status: 500 })
   }
 }
