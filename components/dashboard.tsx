@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, lazy, Suspense } from "react"
+import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Home,
@@ -33,9 +33,7 @@ import { AiTab } from "@/components/tabs/ai-tab"
 import { SpinningTab } from "@/components/tabs/spinning-tab"
 import { GinasticaTab } from "@/components/tabs/ginastica-tab"
 import { LoyaltyTab } from "@/components/tabs/loyalty-tab"
-
-// Lazy load do Chatbot - carrega somente apos o dashboard renderizar
-const Chatbot = lazy(() => import("@/components/ai/chatbot").then(mod => ({ default: mod.Chatbot })))
+import { Chatbot } from "@/components/ai/chatbot"
 
 interface DashboardProps {
   userId: string
@@ -238,10 +236,8 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
 
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
-      {/* Chatbot flutuante - lazy loaded para nao bloquear renderizacao inicial */}
-      <Suspense fallback={null}>
-        <Chatbot context={`Usuario: ${userId}`} userName={userId} />
-      </Suspense>
+      {/* Chatbot flutuante */}
+      <Chatbot context={`Usuario: ${userId}`} userName={userId} />
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="sticky top-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/10">
