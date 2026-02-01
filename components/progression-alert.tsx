@@ -14,15 +14,32 @@ interface UserPreferences {
 interface ProgressionAlertProps {
   userId: string
   preferences: UserPreferences
+  initialData?: any // Dados pré-carregados para evitar chamada de API
 }
 
-export function ProgressionAlert({ userId, preferences }: ProgressionAlertProps) {
+export function ProgressionAlert({ userId, preferences, initialData }: ProgressionAlertProps) {
   const [showAlert, setShowAlert] = useState(false)
   const [progression, setProgression] = useState<any>(null)
 
   useEffect(() => {
-    checkProgression()
-  }, [userId])
+    // Se já temos dados pré-carregados, usa eles diretamente
+    if (initialData) {
+      processProgressionData(initialData)
+    } else {
+      checkProgression()
+    }
+  }, [userId, initialData])
+
+  const processProgressionData = (data: any) => {
+    const endDate = new Date(data.end_date)
+    const today = new Date()
+    const daysUntilEnd = Math.floor((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+
+    setProgression(data)
+    if (daysUntilEnd <= 7 && daysUntilEnd >= 0) {
+      setShowAlert(true)
+    }
+  }
 
   const checkProgression = async () => {
     try {
@@ -30,14 +47,7 @@ export function ProgressionAlert({ userId, preferences }: ProgressionAlertProps)
       const result = await response.json()
 
       if (result.success && result.data) {
-        const endDate = new Date(result.data.end_date)
-        const today = new Date()
-        const daysUntilEnd = Math.floor((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-
-        setProgression(result.data)
-        if (daysUntilEnd <= 7 && daysUntilEnd >= 0) {
-          setShowAlert(true)
-        }
+        processProgressionData(result.data)
       } else {
         await createFirstProgression()
       }

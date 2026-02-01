@@ -11,7 +11,6 @@ export default function AppMobilePage() {
   useEffect(() => {
     // Verificar ambas as chaves para compatibilidade com /entrar e pin-login
     const storedUser = sessionStorage.getItem("currentUser") || sessionStorage.getItem("userId")
-    console.log("[v0] app-mobile storedUser:", storedUser)
     if (storedUser) {
       setCurrentUser(storedUser)
       // Sincronizar ambas as chaves
