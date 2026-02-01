@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Trophy, Target, Flame, TrendingDown, Calendar, CheckCircle2, Activity, LogOut, Wine, X, Copy, Check, QrCode, Coins, Star, Zap, Bike, Dumbbell } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ProgressionAlert } from "@/components/progression-alert"
@@ -100,21 +101,7 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
     }
   }
 
-  if (loading || !userProfile) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Carregando dados...</p>
-        </div>
-      </div>
-    )
-  }
-
-  const initialWeight = Number.parseFloat(userProfile.initial_weight) || currentWeight
-  const targetWeight = Number.parseFloat(userProfile.target_weight) || currentWeight
-  const heightCm = Number.parseFloat(userProfile.height) || 170
-  const userName = userProfile.name
+  // Theme sempre disponivel, nao depende do loading
   const theme = { 
     primary: preferences?.theme_primary || "#ef4444", 
     secondary: preferences?.theme_secondary || "#f97316", 
@@ -122,13 +109,19 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
     success: "#10b981" 
   }
 
+  // Valores com fallback para skeleton - mostrar interface imediatamente
+  const initialWeight = userProfile ? Number.parseFloat(userProfile.initial_weight) || currentWeight : 0
+  const targetWeight = userProfile ? Number.parseFloat(userProfile.target_weight) || currentWeight : 0
+  const heightCm = userProfile ? Number.parseFloat(userProfile.height) || 170 : 170
+  const userName = userProfile?.name || userId
+
   const weightLoss = initialWeight - currentWeight
   const totalGoal = initialWeight - targetWeight
   const progressPercent = Math.max(0, Math.min(100, (weightLoss / totalGoal) * 100))
   const currentIMC = currentWeight / Math.pow(heightCm / 100, 2)
 
   const defaultGoals =
-    userProfile.gender === "female"
+    userProfile?.gender === "female"
       ? [
           "Perder gordura de forma saudável",
           "Ganhar definição muscular",
@@ -174,43 +167,59 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-sm text-muted-foreground mb-1">Peso Atual</p>
-            <h2 className="text-4xl font-bold" style={{ color: theme.primary }}>
-              {currentWeight.toFixed(1)}kg
-            </h2>
+            {loading ? (
+              <Skeleton className="h-10 w-24" />
+            ) : (
+              <h2 className="text-4xl font-bold" style={{ color: theme.primary }}>
+                {currentWeight.toFixed(1)}kg
+              </h2>
+            )}
           </div>
           <div className="text-right">
             <p className="text-sm text-muted-foreground mb-1">Meta</p>
-            <h2 className="text-4xl font-bold" style={{ color: theme.accent }}>
-              {targetWeight}kg
-            </h2>
+            {loading ? (
+              <Skeleton className="h-10 w-20 ml-auto" />
+            ) : (
+              <h2 className="text-4xl font-bold" style={{ color: theme.accent }}>
+                {targetWeight}kg
+              </h2>
+            )}
           </div>
         </div>
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Progresso</span>
-            <span className="font-bold">
-              {weightLoss.toFixed(1)}kg / {totalGoal}kg
-            </span>
+            {loading ? (
+              <Skeleton className="h-4 w-20" />
+            ) : (
+              <span className="font-bold">
+                {weightLoss.toFixed(1)}kg / {totalGoal}kg
+              </span>
+            )}
           </div>
-          <Progress value={progressPercent} className="h-3" />
+          {loading ? (
+            <Skeleton className="h-3 w-full" />
+          ) : (
+            <Progress value={progressPercent} className="h-3" />
+          )}
         </div>
 
         <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t" style={{ borderColor: theme.primary + "20" }}>
           <div className="text-center">
             <TrendingDown className="w-6 h-6 mx-auto mb-1" style={{ color: theme.success }} />
             <p className="text-xs text-muted-foreground">Perdidos</p>
-            <p className="text-lg font-bold">{weightLoss.toFixed(1)}kg</p>
+            {loading ? <Skeleton className="h-6 w-12 mx-auto" /> : <p className="text-lg font-bold">{weightLoss.toFixed(1)}kg</p>}
           </div>
           <div className="text-center">
             <Target className="w-6 h-6 mx-auto mb-1" style={{ color: theme.primary }} />
             <p className="text-xs text-muted-foreground">Restantes</p>
-            <p className="text-lg font-bold">{Math.max(0, totalGoal - weightLoss).toFixed(1)}kg</p>
+            {loading ? <Skeleton className="h-6 w-12 mx-auto" /> : <p className="text-lg font-bold">{Math.max(0, totalGoal - weightLoss).toFixed(1)}kg</p>}
           </div>
           <div className="text-center">
             <Trophy className="w-6 h-6 mx-auto mb-1" style={{ color: theme.accent }} />
             <p className="text-xs text-muted-foreground">IMC Atual</p>
-            <p className="text-lg font-bold">{currentIMC.toFixed(1)}</p>
+            {loading ? <Skeleton className="h-6 w-12 mx-auto" /> : <p className="text-lg font-bold">{currentIMC.toFixed(1)}</p>}
           </div>
         </div>
       </Card>
@@ -253,13 +262,22 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
                 )}
               </div>
               <div>
-                <p className="font-semibold">{todayWorkout}</p>
-                <p className="text-sm text-muted-foreground">{todayWorkoutDescription || "Musculação"}</p>
+                {loading ? (
+                  <>
+                    <Skeleton className="h-5 w-28 mb-1" />
+                    <Skeleton className="h-4 w-20" />
+                  </>
+                ) : (
+                  <>
+                    <p className="font-semibold">{todayWorkout || "Carregando..."}</p>
+                    <p className="text-sm text-muted-foreground">{todayWorkoutDescription || "Musculação"}</p>
+                  </>
+                )}
               </div>
             </div>
             {hasWorkoutToday && (
               <span className="text-sm font-medium" style={{ color: theme.success }}>
-                Completo ✓
+                Completo
               </span>
             )}
           </div>
@@ -278,50 +296,61 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
               </div>
               <div>
                 <p className="font-semibold">Corrida</p>
-                <p className="text-sm text-muted-foreground">Cardio diário</p>
+                <p className="text-sm text-muted-foreground">Cardio diario</p>
               </div>
             </div>
             {hasRunToday && (
               <span className="text-sm font-medium" style={{ color: theme.success }}>
-                Completo ✓
+                Completo
               </span>
             )}
           </div>
         </div>
       </Card>
 
-      {/* Widget Pontos de Fidelidade */}
-      {loyaltyData && (
-        <Card
-          className="p-6 cursor-pointer hover:scale-[1.02] transition-transform border-2"
-          style={{
-            borderColor: "#f59e0b",
-            background: "linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%)",
-          }}
-        >
-          <div className="flex items-center justify-between text-white">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
-                <Coins className="w-8 h-8" />
-              </div>
-              <div>
-                <p className="text-white/70 text-sm">Seus Pontos</p>
-                <h3 className="text-3xl font-bold">{loyaltyData.total_points.toLocaleString()}</h3>
-              </div>
+      {/* Widget Pontos de Fidelidade - Sempre mostra, com skeleton se loading */}
+      <Card
+        className="p-6 cursor-pointer hover:scale-[1.02] transition-transform border-2"
+        style={{
+          borderColor: "#f59e0b",
+          background: "linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%)",
+        }}
+      >
+        <div className="flex items-center justify-between text-white">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
+              <Coins className="w-8 h-8" />
             </div>
-            <div className="text-right">
-              <div className="flex items-center gap-1 justify-end mb-1">
-                <Star className="w-4 h-4" />
-                <span className="font-semibold">{loyaltyData.current_level}</span>
-              </div>
-              <p className="text-white/70 text-sm">R${Number(loyaltyData.cashback_balance).toFixed(2)} cashback</p>
-              {loyaltyData.current_streak > 0 && (
-                <p className="text-white/70 text-xs mt-1">{loyaltyData.current_streak} dias seguidos</p>
+            <div>
+              <p className="text-white/70 text-sm">Seus Pontos</p>
+              {loading || !loyaltyData ? (
+                <Skeleton className="h-9 w-24 bg-white/20" />
+              ) : (
+                <h3 className="text-3xl font-bold">{loyaltyData.total_points.toLocaleString()}</h3>
               )}
             </div>
           </div>
-        </Card>
-      )}
+          <div className="text-right">
+            {loading || !loyaltyData ? (
+              <>
+                <Skeleton className="h-5 w-16 ml-auto mb-1 bg-white/20" />
+                <Skeleton className="h-4 w-24 ml-auto bg-white/20" />
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-1 justify-end mb-1">
+                  <Star className="w-4 h-4" />
+                  <span className="font-semibold">{loyaltyData.current_level}</span>
+                </div>
+                <p className="text-white/70 text-sm">R${Number(loyaltyData.cashback_balance).toFixed(2)} cashback</p>
+                {loyaltyData.current_streak > 0 && (
+                  <p className="text-white/70 text-xs mt-1">{loyaltyData.current_streak} dias seguidos</p>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </Card>
 
       {/* Widget QR Code Catraca */}
       <Card
