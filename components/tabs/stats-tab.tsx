@@ -252,7 +252,7 @@ export function StatsTab({ userId, preferences }: StatsTabProps) {
                       {record.distance && (
                         <p className="text-sm mt-1">
                           <span className="font-semibold" style={{ color: preferences.theme_accent }}>
-                            {Number(record.distance).toFixed(2)}km
+                            {(Number(record.distance) || 0).toFixed(2)}km
                           </span>
                           {record.duration && ` • ${record.duration} min`}
                         </p>
@@ -287,14 +287,11 @@ export function StatsTab({ userId, preferences }: StatsTabProps) {
               <div key={idx} className="flex items-center justify-between">
                 <span className="text-sm text-gray-300">{new Date(log.log_date).toLocaleDateString("pt-BR")}</span>
                 <span className="font-semibold text-white">{log.weight}kg</span>
-                {idx < stats.weightProgress.length - 1 && (
+                {idx < stats.weightProgress.length - 1 && stats.weightProgress[idx + 1]?.weight && (
                   <span
                     className={`text-sm ${Number.parseFloat(log.weight) < Number.parseFloat(stats.weightProgress[idx + 1].weight) ? "text-green-600" : "text-red-600"}`}
                   >
-                    {(Number.parseFloat(log.weight) - Number.parseFloat(stats.weightProgress[idx + 1].weight)).toFixed(
-                      1,
-                    )}
-                    kg
+                    {((Number.parseFloat(log.weight) || 0) - (Number.parseFloat(stats.weightProgress[idx + 1].weight) || 0)).toFixed(1)}kg
                   </span>
                 )}
               </div>

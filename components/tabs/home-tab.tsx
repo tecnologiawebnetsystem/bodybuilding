@@ -59,12 +59,15 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
 
   const loadData = async () => {
     try {
+      console.log("[v0] HomeTab loadData starting for userId:", userId)
       // API OTIMIZADA: Uma única chamada busca todos os dados da home
       // Reduz latência de 5+ chamadas HTTP para apenas 1
       const response = await fetch(`/api/home-data?userId=${userId}`)
       const result = await response.json()
+      console.log("[v0] HomeTab API response:", result)
 
       if (!result.success || !result.data) {
+        console.log("[v0] HomeTab API failed or no data")
         setLoading(false)
         return
       }
@@ -100,9 +103,10 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
       if (progression) {
         setProgressionData(progression)
       }
-    } catch {
-      // Erro silencioso - dados mostram skeleton
+    } catch (error) {
+      console.log("[v0] HomeTab loadData error:", error)
     } finally {
+      console.log("[v0] HomeTab loadData finished")
       setLoading(false)
     }
   }
@@ -123,8 +127,9 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
 
   const weightLoss = initialWeight - currentWeight
   const totalGoal = initialWeight - targetWeight
-  const progressPercent = Math.max(0, Math.min(100, (weightLoss / totalGoal) * 100))
-  const currentIMC = currentWeight / Math.pow(heightCm / 100, 2)
+  // Proteção contra divisão por zero
+  const progressPercent = totalGoal > 0 ? Math.max(0, Math.min(100, (weightLoss / totalGoal) * 100)) : 0
+  const currentIMC = heightCm > 0 ? currentWeight / Math.pow(heightCm / 100, 2) : 0
 
   const defaultGoals =
     userProfile?.gender === "female"
@@ -215,17 +220,17 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
           <div className="text-center">
             <TrendingDown className="w-6 h-6 mx-auto mb-1" style={{ color: theme.success }} />
             <p className="text-xs text-muted-foreground">Perdidos</p>
-            {loading ? <Skeleton className="h-6 w-12 mx-auto" /> : <p className="text-lg font-bold">{weightLoss.toFixed(1)}kg</p>}
+            {loading ? <Skeleton className="h-6 w-12 mx-auto" /> : <p className="text-lg font-bold">{(weightLoss || 0).toFixed(1)}kg</p>}
           </div>
           <div className="text-center">
             <Target className="w-6 h-6 mx-auto mb-1" style={{ color: theme.primary }} />
             <p className="text-xs text-muted-foreground">Restantes</p>
-            {loading ? <Skeleton className="h-6 w-12 mx-auto" /> : <p className="text-lg font-bold">{Math.max(0, totalGoal - weightLoss).toFixed(1)}kg</p>}
+            {loading ? <Skeleton className="h-6 w-12 mx-auto" /> : <p className="text-lg font-bold">{Math.max(0, (totalGoal - weightLoss) || 0).toFixed(1)}kg</p>}
           </div>
           <div className="text-center">
             <Trophy className="w-6 h-6 mx-auto mb-1" style={{ color: theme.accent }} />
             <p className="text-xs text-muted-foreground">IMC Atual</p>
-            {loading ? <Skeleton className="h-6 w-12 mx-auto" /> : <p className="text-lg font-bold">{currentIMC.toFixed(1)}</p>}
+            {loading ? <Skeleton className="h-6 w-12 mx-auto" /> : <p className="text-lg font-bold">{(currentIMC || 0).toFixed(1)}</p>}
           </div>
         </div>
       </Card>

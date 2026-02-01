@@ -31,13 +31,22 @@ export function ProgressionAlert({ userId, preferences, initialData }: Progressi
   }, [userId, initialData])
 
   const processProgressionData = (data: any) => {
-    const endDate = new Date(data.end_date)
-    const today = new Date()
-    const daysUntilEnd = Math.floor((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+    if (!data || !data.end_date) {
+      setProgression(data)
+      return
+    }
+    
+    try {
+      const endDate = new Date(data.end_date)
+      const today = new Date()
+      const daysUntilEnd = Math.floor((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 
-    setProgression(data)
-    if (daysUntilEnd <= 7 && daysUntilEnd >= 0) {
-      setShowAlert(true)
+      setProgression(data)
+      if (daysUntilEnd <= 7 && daysUntilEnd >= 0) {
+        setShowAlert(true)
+      }
+    } catch {
+      setProgression(data)
     }
   }
 
@@ -51,8 +60,8 @@ export function ProgressionAlert({ userId, preferences, initialData }: Progressi
       } else {
         await createFirstProgression()
       }
-    } catch (error) {
-      console.error("[v0] Error checking progression:", error)
+    } catch {
+      // Erro silencioso
     }
   }
 
@@ -67,8 +76,8 @@ export function ProgressionAlert({ userId, preferences, initialData }: Progressi
           difficultyLevel: 1,
         }),
       })
-    } catch (error) {
-      console.error("[v0] Error creating first progression:", error)
+    } catch {
+      // Erro silencioso
     }
   }
 
@@ -86,8 +95,8 @@ export function ProgressionAlert({ userId, preferences, initialData }: Progressi
       })
       setShowAlert(false)
       window.location.reload()
-    } catch (error) {
-      console.error("[v0] Error creating new cycle:", error)
+    } catch {
+      // Erro silencioso
     }
   }
 

@@ -133,6 +133,7 @@ const getUserPreferences = (userId: string): UserPreferences => {
 }
 
 export function Dashboard({ userId, onLogout }: DashboardProps) {
+  console.log("[v0] Dashboard rendering with userId:", userId)
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== "undefined") {
       const savedTab = sessionStorage.getItem("activeTab")
