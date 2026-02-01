@@ -535,9 +535,9 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
         }}
       >
         <p className="text-lg font-medium text-center text-balance italic">
-          {userProfile.gender === "female"
-            ? '"Você é mais forte do que pensa. Cada treino te aproxima da melhor versão de você! 💪"'
-            : '"O corpo alcança o que a mente acredita. Você já começou, continue forte! 💪"'}
+          {userProfile?.gender === "female"
+            ? '"Voce e mais forte do que pensa. Cada treino te aproxima da melhor versao de voce!"'
+            : '"O corpo alcanca o que a mente acredita. Voce ja comecou, continue forte!"'}
         </p>
       </Card>
     </div>

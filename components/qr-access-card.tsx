@@ -4,8 +4,7 @@ import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { QrCode, RefreshCw, CheckCircle2, XCircle, Clock, Smartphone } from "lucide-react"
-import QRCode from "react-qr-code"
+import { QrCode, RefreshCw, XCircle, Clock, Smartphone } from "lucide-react"
 
 interface QRAccessCardProps {
   userId: string
@@ -141,10 +140,13 @@ export function QRAccessCard({ userId, userName }: QRAccessCardProps) {
         {isPaymentOk ? (
           <>
             <div className="bg-white p-4 rounded-xl shadow-lg">
-              <QRCode 
-                value={qrData?.qr_data || ""} 
-                size={200}
-                level="H"
+              {/* QR Code usando API do Google Charts */}
+              <img 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData?.qr_data || "")}`}
+                alt="QR Code de Acesso"
+                width={200}
+                height={200}
+                className="rounded"
               />
             </div>
             
