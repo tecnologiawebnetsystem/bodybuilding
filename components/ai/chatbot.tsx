@@ -3,8 +3,6 @@
 import React from "react"
 
 import { useState, useRef, useEffect } from "react"
-import { useChat } from "@ai-sdk/react"
-import { DefaultChatTransport } from "ai"
 import { Button } from "@/components/ui/button"
 import { MessageCircle, X, Send, Loader2, Bot, User, Minimize2, Maximize2 } from "lucide-react"
 
@@ -13,28 +11,63 @@ interface ChatbotProps {
   userName?: string
 }
 
-// Helper para extrair texto de uma mensagem
-function getMessageText(message: { parts?: Array<{ type: string; text?: string }> }): string {
-  if (!message.parts || !Array.isArray(message.parts)) return '';
-  return message.parts
-    .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
-    .map((p) => p.text)
-    .join('');
+interface Message {
+  id: string
+  role: "user" | "assistant"
+  content: string
 }
 
 export function Chatbot({ context, userName }: ChatbotProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
   const [input, setInput] = useState('')
+  const [messages, setMessages] = useState<Message[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({ 
-      api: "/api/ai/chat",
-    }),
-  })
-
-  const isLoading = status === 'streaming' || status === 'submitted'
+  const sendMessage = async (text: string) => {
+    if (!text.trim() || isLoading) return
+    
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: text
+    }
+    
+    setMessages(prev => [...prev, userMessage])
+    setIsLoading(true)
+    
+    try {
+      const response = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          messages: [...messages, userMessage].map(m => ({ role: m.role, content: m.content })),
+          context 
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (data.content || data.message) {
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: data.content || data.message || "Desculpe, nao consegui processar sua mensagem."
+        }
+        setMessages(prev => [...prev, assistantMessage])
+      }
+    } catch {
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: "Desculpe, ocorreu um erro. Tente novamente mais tarde."
+      }
+      setMessages(prev => [...prev, errorMessage])
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -47,12 +80,12 @@ export function Chatbot({ context, userName }: ChatbotProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
-    sendMessage({ text: input })
+    sendMessage(input)
     setInput('')
   }
 
   const handleSuggestion = (suggestion: string) => {
-    sendMessage({ text: suggestion })
+    sendMessage(suggestion)
   }
 
   return (
@@ -145,48 +178,44 @@ export function Chatbot({ context, userName }: ChatbotProps) {
                 )}
 
                 {/* Chat messages */}
-                {messages.map((message) => {
-                  const messageText = getMessageText(message);
-                  
-                  return (
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex gap-3 ${
+                      message.role === "user" ? "flex-row-reverse" : ""
+                    }`}
+                  >
                     <div
-                      key={message.id}
-                      className={`flex gap-3 ${
-                        message.role === "user" ? "flex-row-reverse" : ""
+                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                        message.role === "user"
+                          ? "bg-gradient-to-r from-blue-500 to-purple-600"
+                          : "bg-gradient-to-r from-orange-500 to-red-600"
                       }`}
                     >
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                          message.role === "user"
-                            ? "bg-gradient-to-r from-blue-500 to-purple-600"
-                            : "bg-gradient-to-r from-orange-500 to-red-600"
-                        }`}
-                      >
-                        {message.role === "user" ? (
-                          <User className="w-4 h-4 text-white" />
-                        ) : (
-                          <Bot className="w-4 h-4 text-white" />
-                        )}
-                      </div>
-                      <div
-                        className={`max-w-[80%] p-3 rounded-2xl ${
-                          message.role === "user"
-                            ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-tr-sm"
-                            : "bg-white/[0.05] text-gray-200 rounded-tl-sm"
-                        }`}
-                      >
-                        <div 
-                          className="text-sm whitespace-pre-wrap prose prose-invert prose-sm max-w-none"
-                          dangerouslySetInnerHTML={{ 
-                            __html: (messageText || "")
-                              .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                              .replace(/\n/g, "<br />")
-                          }}
-                        />
-                      </div>
+                      {message.role === "user" ? (
+                        <User className="w-4 h-4 text-white" />
+                      ) : (
+                        <Bot className="w-4 h-4 text-white" />
+                      )}
                     </div>
-                  );
-                })}
+                    <div
+                      className={`max-w-[80%] p-3 rounded-2xl ${
+                        message.role === "user"
+                          ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-tr-sm"
+                          : "bg-white/[0.05] text-gray-200 rounded-tl-sm"
+                      }`}
+                    >
+                      <div 
+                        className="text-sm whitespace-pre-wrap prose prose-invert prose-sm max-w-none"
+                        dangerouslySetInnerHTML={{ 
+                          __html: (message.content || "")
+                            .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                            .replace(/\n/g, "<br />")
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
 
                 {/* Loading indicator */}
                 {isLoading && (
