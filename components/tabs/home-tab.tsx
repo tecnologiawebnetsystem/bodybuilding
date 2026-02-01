@@ -64,25 +64,32 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
       const response = await fetch(`/api/home-data?userId=${userId}`)
       const result = await response.json()
 
-      if (!result.success) {
+      if (!result.success || !result.data) {
+        setLoading(false)
         return
       }
 
       const { profile, today, loyalty, progression } = result.data
 
-      // Processar perfil
-      setUserProfile(profile)
-      if (profile.current_weight) {
-        setCurrentWeight(Number.parseFloat(profile.current_weight))
+      // Processar perfil com proteção contra null
+      if (profile) {
+        setUserProfile(profile)
+        if (profile.current_weight) {
+          setCurrentWeight(Number.parseFloat(profile.current_weight))
+        }
       }
 
-      // Processar check-ins de hoje
-      setHasWorkoutToday(today.hasWorkout)
-      setHasRunToday(today.hasRun)
-
-      // Processar cronograma
-      setTodayWorkout(today.schedule.workout_name)
-      setTodayWorkoutDescription(today.schedule.description || "")
+      // Processar check-ins de hoje com proteção
+      if (today) {
+        setHasWorkoutToday(today.hasWorkout || false)
+        setHasRunToday(today.hasRun || false)
+        
+        // Processar cronograma
+        if (today.schedule) {
+          setTodayWorkout(today.schedule.workout_name || "Nao definido")
+          setTodayWorkoutDescription(today.schedule.description || "")
+        }
+      }
 
       // Processar fidelidade
       if (loyalty) {
