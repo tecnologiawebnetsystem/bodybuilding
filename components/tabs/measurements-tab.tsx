@@ -268,7 +268,7 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
         <div className="flex gap-2">
           <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-gray-700 hover:bg-gray-600 text-white border-0">
+              <Button style={{ backgroundColor: "#000000", color: "#ffffff" }}>
                 <User className="w-4 h-4 mr-2" />
                 Perfil
               </Button>
@@ -334,7 +334,7 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
 
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button style={{ backgroundColor: themeColor, color: "white" }}>
+              <Button style={{ backgroundColor: "#c2410c", color: "#ffffff" }}>
                 <Plus className="w-4 h-4 mr-2" />
                 Nova Medição
               </Button>
