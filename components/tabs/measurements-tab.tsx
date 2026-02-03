@@ -52,9 +52,60 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
   })
 
   useEffect(() => {
-    loadUserProfile()
-    loadMeasurements()
+    const loadData = async () => {
+      setLoading(true)
+      try {
+        // Carregar tudo em paralelo para evitar lentidao
+        const [profileRes, measurementsRes, idealWeightRes] = await Promise.all([
+          fetch(`/api/user-profile?userId=${userId}`),
+          fetch(`/api/measurements?userId=${userId}`),
+          fetch(`/api/ideal-weight?userId=${userId}`)
+        ])
+
+        const [profileData, measurementsData, idealWeightData] = await Promise.all([
+          profileRes.json(),
+          measurementsRes.json(),
+          idealWeightRes.json()
+        ])
+
+        if (profileData.success) {
+          setUserProfile(profileData.data)
+          setProfileForm({
+            height: profileData.data.height || "",
+            targetWeight: profileData.data.target_weight || "",
+            currentWeight: profileData.data.current_weight || "",
+            gender: profileData.data.gender || "",
+          })
+        }
+
+        if (measurementsData.success) {
+          setMeasurements(measurementsData.data)
+        }
+
+        if (idealWeightData.success) {
+          setIdealWeightData(idealWeightData.data)
+        }
+      } catch (error) {
+        console.error("[v0] Error loading measurements data:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadData()
   }, [userId])
+
+  const loadMeasurements = async () => {
+    try {
+      const response = await fetch(`/api/measurements?userId=${userId}`)
+      const data = await response.json()
+      if (data.success) {
+        setMeasurements(data.data)
+      }
+    } catch (error) {
+      console.error("[v0] Error loading measurements:", error)
+    }
+  }
 
   const loadUserProfile = async () => {
     try {
@@ -68,36 +119,9 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
           currentWeight: data.data.current_weight || "",
           gender: data.data.gender || "",
         })
-        loadIdealWeight()
       }
     } catch (error) {
       console.error("[v0] Error loading user profile:", error)
-    }
-  }
-
-  const loadIdealWeight = async () => {
-    try {
-      const response = await fetch(`/api/ideal-weight?userId=${userId}`)
-      const data = await response.json()
-      if (data.success) {
-        setIdealWeightData(data.data)
-      }
-    } catch (error) {
-      console.error("[v0] Error loading ideal weight:", error)
-    }
-  }
-
-  const loadMeasurements = async () => {
-    try {
-      const response = await fetch(`/api/measurements?userId=${userId}`)
-      const data = await response.json()
-      if (data.success) {
-        setMeasurements(data.data)
-      }
-    } catch (error) {
-      console.error("[v0] Error loading measurements:", error)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -210,11 +234,18 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
         ).toFixed(1)
       : null
 
-  if (!userProfile) {
+  if (loading || !userProfile) {
     return <div className="text-center py-8">Carregando perfil...</div>
   }
 
-  const themeColor = userProfile.theme ? JSON.parse(userProfile.theme).primary : "#3b82f6"
+  let themeColor = "#3b82f6"
+  try {
+    if (userProfile.theme) {
+      themeColor = JSON.parse(userProfile.theme).primary || "#3b82f6"
+    }
+  } catch {
+    // Usar cor padrao se falhar o parse
+  }
 
   return (
     <div className="space-y-6">
