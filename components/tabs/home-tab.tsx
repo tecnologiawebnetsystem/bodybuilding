@@ -196,8 +196,8 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
             </h2>
           </div>
           <div className="text-right">
-            <p className="text-sm text-muted-foreground mb-1">Meta</p>
-            <h2 className="text-4xl font-bold" style={{ color: theme.accent }}>
+            <p className="text-sm text-white/60 mb-1">Meta</p>
+            <h2 className="text-4xl font-bold text-white">
               {targetWeight}kg
             </h2>
           </div>
@@ -205,8 +205,8 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Progresso</span>
-            <span className="font-bold">
+            <span className="text-white/60">Progresso</span>
+            <span className="font-bold text-white">
               {weightLoss.toFixed(1)}kg / {totalGoal}kg
             </span>
           </div>
