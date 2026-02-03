@@ -96,7 +96,7 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
           size="sm"
           onClick={handleExportPDF}
           disabled={generatingPDF === "Plano Completo"}
-          className="bg-orange-500 hover:bg-orange-600 text-white"
+          style={{ backgroundColor: "#c2410c", color: "#ffffff" }}
         >
           {generatingPDF === "Plano Completo" ? (
             <>Gerando...</>
@@ -148,7 +148,7 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
                   size="sm"
                   onClick={() => handleExportSingleWorkout(workout)}
                   disabled={generatingPDF === workout.name}
-                  className="bg-orange-500 hover:bg-orange-600 text-white"
+                  style={{ backgroundColor: "#c2410c", color: "#ffffff" }}
                 >
                   {generatingPDF === workout.name ? (
                     <>Gerando...</>
@@ -160,9 +160,7 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
                 </Button>
                 <Button
                   onClick={() => setExpandedWorkout(expandedWorkout === workout.name ? null : workout.name)}
-                  className={expandedWorkout === workout.name 
-                    ? "bg-orange-600 hover:bg-orange-700 text-white" 
-                    : "bg-orange-500 hover:bg-orange-600 text-white"}
+                  style={{ backgroundColor: "#c2410c", color: "#ffffff" }}
                 >
                   {expandedWorkout === workout.name ? "Fechar" : "Ver Exercícios"}
                 </Button>
