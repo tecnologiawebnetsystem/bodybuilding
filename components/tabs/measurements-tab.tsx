@@ -325,7 +325,7 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
                     </SelectContent>
                   </Select>
                 </div>
-                <Button type="submit" className="w-full" style={{ backgroundColor: themeColor }}>
+                <Button type="submit" className="w-full text-white" style={{ backgroundColor: themeColor }}>
                   Salvar Perfil
                 </Button>
               </form>
@@ -482,7 +482,7 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
                 <p className="text-sm text-muted-foreground">
                   * Campos obrigatórios para cálculo automático do percentual de gordura
                 </p>
-                <Button type="submit" className="w-full" style={{ backgroundColor: themeColor }}>
+                <Button type="submit" className="w-full text-white" style={{ backgroundColor: themeColor }}>
                   Salvar Medidas
                 </Button>
               </form>

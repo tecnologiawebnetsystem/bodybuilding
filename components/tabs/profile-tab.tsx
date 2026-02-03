@@ -406,6 +406,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
                 <Button
                   onClick={handleChangeCpf}
                   className="w-full"
+                  className="w-full text-white"
                   style={{ backgroundColor: preferences.theme_primary }}
                 >
                   Confirmar Alteração
@@ -450,6 +451,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
                 <Button
                   onClick={handleChangeEmail}
                   className="w-full"
+                  className="w-full text-white"
                   style={{ backgroundColor: preferences.theme_primary }}
                 >
                   Confirmar Alteração
@@ -506,6 +508,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
                 <Button
                   onClick={handleChangePassword}
                   className="w-full"
+                  className="w-full text-white"
                   style={{ backgroundColor: preferences.theme_primary }}
                 >
                   Confirmar Alteração

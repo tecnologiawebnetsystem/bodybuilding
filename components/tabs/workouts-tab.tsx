@@ -97,7 +97,7 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
           size="sm"
           onClick={handleExportPDF}
           disabled={generatingPDF === "Plano Completo"}
-          className="text-white bg-transparent"
+          className="text-white border-white/30 hover:bg-white/10"
         >
           {generatingPDF === "Plano Completo" ? (
             <>Gerando...</>
@@ -150,7 +150,7 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
                   size="sm"
                   onClick={() => handleExportSingleWorkout(workout)}
                   disabled={generatingPDF === workout.name}
-                  className="text-white"
+                  className="text-white border-white/30 hover:bg-white/10"
                 >
                   {generatingPDF === workout.name ? (
                     <>Gerando...</>
@@ -163,7 +163,7 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
                 <Button
                   variant={expandedWorkout === workout.name ? "secondary" : "outline"}
                   onClick={() => setExpandedWorkout(expandedWorkout === workout.name ? null : workout.name)}
-                  className="text-white"
+                  className="text-white border-white/30 hover:bg-white/10"
                 >
                   {expandedWorkout === workout.name ? "Fechar" : "Ver Exercícios"}
                 </Button>
