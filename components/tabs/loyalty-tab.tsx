@@ -201,7 +201,7 @@ export function LoyaltyTab({ userId, preferences }: LoyaltyTabProps) {
               <TrendingUp className="w-4 h-4" />
               <span className="text-sm text-white/70">Cashback</span>
             </div>
-            <p className="text-3xl font-bold">R${loyaltyData.points.cashback_balance.toFixed(2)}</p>
+            <p className="text-3xl font-bold">R${(Number(loyaltyData.points.cashback_balance) || 0).toFixed(2)}</p>
           </div>
         </div>
 
