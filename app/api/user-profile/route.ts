@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const users = await sql`
-      SELECT user_id, name, pin, height, target_weight, current_weight, gender, age, initial_weight, start_date, email, profile_photo_url, cpf, theme_primary, theme_secondary, theme_accent
+      SELECT user_id, name, pin, height, target_weight, current_weight, gender, age, initial_weight, start_date, email, profile_photo_url, cpf
       FROM users
       WHERE user_id = ${userId}
     `
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: users[0] })
   } catch (error) {
-    console.error("[v0] Error fetching user profile:", error)
+    console.error("Error fetching user profile:", error)
     return NextResponse.json({ error: "Erro ao buscar perfil" }, { status: 500 })
   }
 }
@@ -49,7 +49,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: result[0] })
   } catch (error) {
-    console.error("[v0] Error updating user profile:", error)
+    console.error(" Error updating user profile:", error)
     return NextResponse.json({ error: "Erro ao atualizar perfil" }, { status: 500 })
   }
 }
@@ -165,7 +165,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ error: "Nenhum campo para atualizar" }, { status: 400 })
   } catch (error) {
-    console.error("[v0] Error updating user:", error)
+    console.error(" Error updating user:", error)
     return NextResponse.json({ error: "Erro ao atualizar usuário" }, { status: 500 })
   }
 }
