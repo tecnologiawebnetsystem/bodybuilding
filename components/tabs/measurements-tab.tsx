@@ -265,74 +265,7 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Medidas Corporais</h2>
-        <div className="flex gap-2">
-          <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
-            <DialogTrigger asChild>
-              <Button style={{ backgroundColor: "#000000", color: "#ffffff" }}>
-                <User className="w-4 h-4 mr-2" />
-                Perfil
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Configurar Perfil</DialogTitle>
-                <DialogDescription>Atualize seus dados pessoais para cálculos precisos</DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleProfileUpdate} className="space-y-4">
-                <div>
-                  <Label>Altura (cm)</Label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    value={profileForm.height}
-                    onChange={(e) => setProfileForm({ ...profileForm, height: e.target.value })}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label>Peso Atual (kg)</Label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    value={profileForm.currentWeight}
-                    onChange={(e) => setProfileForm({ ...profileForm, currentWeight: e.target.value })}
-                    placeholder="Seu peso atual"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label>Peso Desejado (kg)</Label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    value={profileForm.targetWeight}
-                    onChange={(e) => setProfileForm({ ...profileForm, targetWeight: e.target.value })}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label>Sexo</Label>
-                  <Select
-                    value={profileForm.gender}
-                    onValueChange={(value) => setProfileForm({ ...profileForm, gender: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o sexo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="male">Masculino</SelectItem>
-                      <SelectItem value="female">Feminino</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button type="submit" className="w-full text-white" style={{ backgroundColor: themeColor }}>
-                  Salvar Perfil
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button style={{ backgroundColor: "#c2410c", color: "#ffffff" }}>
                 <Plus className="w-4 h-4 mr-2" />
@@ -488,7 +421,6 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
               </form>
             </DialogContent>
           </Dialog>
-        </div>
       </div>
 
       {idealWeightData && (
