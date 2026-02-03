@@ -93,11 +93,10 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
           <p className="text-gray-300">Plano ABC personalizado</p>
         </div>
         <Button
-          variant="outline"
           size="sm"
           onClick={handleExportPDF}
           disabled={generatingPDF === "Plano Completo"}
-          className="text-white border-white/30 hover:bg-white/10"
+          className="bg-orange-500 hover:bg-orange-600 text-white"
         >
           {generatingPDF === "Plano Completo" ? (
             <>Gerando...</>
@@ -146,11 +145,10 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
               </div>
               <div className="flex gap-2">
                 <Button
-                  variant="outline"
                   size="sm"
                   onClick={() => handleExportSingleWorkout(workout)}
                   disabled={generatingPDF === workout.name}
-                  className="text-white border-white/30 hover:bg-white/10"
+                  className="bg-orange-500 hover:bg-orange-600 text-white"
                 >
                   {generatingPDF === workout.name ? (
                     <>Gerando...</>
@@ -161,9 +159,10 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
                   )}
                 </Button>
                 <Button
-                  variant={expandedWorkout === workout.name ? "secondary" : "outline"}
                   onClick={() => setExpandedWorkout(expandedWorkout === workout.name ? null : workout.name)}
-                  className="text-white border-white/30 hover:bg-white/10"
+                  className={expandedWorkout === workout.name 
+                    ? "bg-orange-600 hover:bg-orange-700 text-white" 
+                    : "bg-orange-500 hover:bg-orange-600 text-white"}
                 >
                   {expandedWorkout === workout.name ? "Fechar" : "Ver Exercícios"}
                 </Button>

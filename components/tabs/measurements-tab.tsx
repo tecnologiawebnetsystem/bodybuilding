@@ -268,7 +268,7 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
         <div className="flex gap-2">
           <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline">
+              <Button className="bg-gray-700 hover:bg-gray-600 text-white border-0">
                 <User className="w-4 h-4 mr-2" />
                 Perfil
               </Button>
