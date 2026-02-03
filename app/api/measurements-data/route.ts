@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   try {
     // Buscar usuário primeiro
     const usersResult = await sql`
-      SELECT user_id, name, pin, height, target_weight, current_weight, gender, age, initial_weight, start_date, email, profile_photo_url, cpf, theme
+      SELECT user_id, name, pin, height, target_weight, current_weight, gender, age, initial_weight, start_date, email, profile_photo_url, cpf, theme_primary, theme_secondary, theme_accent
       FROM users
       WHERE user_id = ${userId}
     `
