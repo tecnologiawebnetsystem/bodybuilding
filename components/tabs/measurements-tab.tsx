@@ -55,14 +55,9 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
     const loadData = async () => {
       setLoading(true)
       try {
-        console.log("[v0] Measurements: Iniciando carregamento para userId:", userId)
-        
         // Usar API combinada para uma única chamada (mais rápido)
         const response = await fetch(`/api/measurements-data?userId=${userId}`)
-        console.log("[v0] Measurements: Response status:", response.status)
-        
         const result = await response.json()
-        console.log("[v0] Measurements: Result:", result)
 
         if (result.success && result.data?.userProfile) {
           const { userProfile: profile, measurements: meas, idealWeight } = result.data
@@ -76,10 +71,8 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
           })
           setMeasurements(meas || [])
           setIdealWeightData(idealWeight)
-          console.log("[v0] Measurements: Dados carregados com sucesso")
         } else {
           // Se a API combinada falhar, tentar carregar direto do user-profile
-          console.log("[v0] Measurements: API combinada falhou, tentando fallback...")
           const profileRes = await fetch(`/api/user-profile?userId=${userId}`)
           const profileData = await profileRes.json()
           
@@ -91,13 +84,12 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
               currentWeight: profileData.data.current_weight || "",
               gender: profileData.data.gender || "",
             })
-            console.log("[v0] Measurements: Fallback carregou perfil com sucesso")
           } else {
-            console.error("[v0] Measurements: Fallback também falhou")
+            // Perfil não existe ainda - criar perfil vazio para permitir configuração
+            setUserProfile({ id: null, user_id: userId, needsSetup: true })
           }
         }
       } catch (error) {
-        console.error("[v0] Error loading measurements data:", error)
         // Tentar fallback em caso de erro
         try {
           const profileRes = await fetch(`/api/user-profile?userId=${userId}`)
@@ -112,7 +104,8 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
             })
           }
         } catch (fallbackError) {
-          console.error("[v0] Fallback error:", fallbackError)
+          // Erro silencioso no fallback - criar perfil vazio
+          setUserProfile({ id: null, user_id: userId, needsSetup: true })
         }
       } finally {
         setLoading(false)
@@ -130,7 +123,7 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
         setMeasurements(data.data)
       }
     } catch (error) {
-      console.error("[v0] Error loading measurements:", error)
+      console.error(" Error loading measurements:", error)
     }
   }
 
@@ -148,7 +141,7 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
         })
       }
     } catch (error) {
-      console.error("[v0] Error loading user profile:", error)
+      console.error(" Error loading user profile:", error)
     }
   }
 
@@ -172,7 +165,7 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
         loadUserProfile()
       }
     } catch (error) {
-      console.error("[v0] Error updating profile:", error)
+      console.error(" Error updating profile:", error)
     }
   }
 
@@ -237,7 +230,7 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
         loadMeasurements()
       }
     } catch (error) {
-      console.error("[v0] Error saving measurement:", error)
+      console.error(" Error saving measurement:", error)
     }
   }
 
@@ -248,7 +241,7 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
       await fetch(`/api/measurements?id=${id}`, { method: "DELETE" })
       loadMeasurements()
     } catch (error) {
-      console.error("[v0] Error deleting measurement:", error)
+      console.error(" Error deleting measurement:", error)
     }
   }
 
