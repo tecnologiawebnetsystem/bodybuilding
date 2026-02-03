@@ -69,7 +69,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
       if (statsData.success) setStats(statsData.data)
       if (gymData.success) setGymInfo(gymData.data)
     } catch (error) {
-      console.error("[v0] Error loading profile data:", error)
+      console.error(" Error loading profile data:", error)
     } finally {
       setLoading(false)
     }
@@ -104,7 +104,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
         alert(data.message || "PIN atual incorreto")
       }
     } catch (error) {
-      console.error("[v0] Error changing PIN:", error)
+      console.error(" Error changing PIN:", error)
       alert("Erro ao alterar PIN")
     }
   }
@@ -131,7 +131,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
         alert("Erro ao alterar e-mail")
       }
     } catch (error) {
-      console.error("[v0] Error changing email:", error)
+      console.error(" Error changing email:", error)
       alert("Erro ao alterar e-mail")
     }
   }
@@ -169,7 +169,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
         alert(data.message || "Erro ao alterar CPF. Verifique seu PIN.")
       }
     } catch (error) {
-      console.error("[v0] Error changing CPF:", error)
+      console.error(" Error changing CPF:", error)
       alert("Erro ao alterar CPF")
     }
   }
@@ -214,7 +214,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
       }
       reader.readAsDataURL(file)
     } catch (error) {
-      console.error("[v0] Error uploading photo:", error)
+      console.error(" Error uploading photo:", error)
       alert("Erro ao fazer upload da foto")
       setUploadingPhoto(false)
     }
@@ -236,7 +236,23 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
   }
 
   if (!userProfile) {
-    return <p className="text-center py-8">Erro ao carregar perfil</p>
+    return (
+      <div className="flex flex-col items-center justify-center py-16 space-y-4">
+        <div
+          className="w-20 h-20 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: preferences.theme_primary }}
+        >
+          <UserIcon className="w-10 h-10 text-white" />
+        </div>
+        <h3 className="text-xl font-semibold">Perfil não configurado</h3>
+        <p className="text-muted-foreground text-center max-w-sm">
+          Configure seu perfil na aba Medidas para ver suas informações aqui.
+        </p>
+        <Button onClick={onLogout} variant="outline">
+          Trocar Perfil
+        </Button>
+      </div>
+    )
   }
 
   const weightProgress =
