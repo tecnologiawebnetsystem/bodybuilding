@@ -263,15 +263,31 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header com icone */}
+      <div className="text-center mb-2">
+        <div
+          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg"
+          style={{ backgroundColor: themeColor }}
+        >
+          <Ruler className="w-8 h-8 text-white" />
+        </div>
         <h2 className="text-2xl font-bold">Medidas Corporais</h2>
+        <p className="text-muted-foreground text-sm mt-1">Acompanhe sua evolucao fisica</p>
+      </div>
+
+      {/* Botao Nova Medicao */}
+      <div className="flex justify-center">
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button style={{ backgroundColor: "#c2410c", color: "#ffffff" }}>
-                <Plus className="w-4 h-4 mr-2" />
-                Nova Medição
-              </Button>
-            </DialogTrigger>
+          <DialogTrigger asChild>
+            <Button 
+              size="lg"
+              className="shadow-md"
+              style={{ backgroundColor: "#c2410c", color: "#ffffff" }}
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Nova Medicao
+            </Button>
+          </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Registrar Medidas</DialogTitle>
@@ -415,19 +431,24 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
                 <p className="text-sm text-muted-foreground">
                   * Campos obrigatórios para cálculo automático do percentual de gordura
                 </p>
-                <Button type="submit" className="w-full text-white" style={{ backgroundColor: themeColor }}>
+                <Button type="submit" className="w-full" style={{ backgroundColor: "#c2410c", color: "#ffffff" }}>
                   Salvar Medidas
                 </Button>
               </form>
             </DialogContent>
-          </Dialog>
+        </Dialog>
       </div>
 
       {idealWeightData && (
-        <Card className="p-6 border-2" style={{ borderColor: themeColor + "30" }}>
-          <div className="flex items-center gap-2 mb-4">
-            <Target className="w-5 h-5" style={{ color: themeColor }} />
-            <h3 className="text-lg font-bold">Análise de Peso</h3>
+        <Card className="p-6 border-0 shadow-lg" style={{ background: `linear-gradient(135deg, ${themeColor}10 0%, transparent 100%)` }}>
+          <div className="flex items-center gap-3 mb-4">
+            <div 
+              className="w-10 h-10 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: themeColor }}
+            >
+              <Target className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-lg font-bold">Analise de Peso</h3>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
@@ -462,9 +483,17 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
       )}
 
       {latestMeasurement && (
-        <Card className="p-6 border-2" style={{ borderColor: themeColor + "30" }}>
+        <Card className="p-6 border-0 shadow-lg">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold">Medidas Atuais</h3>
+            <div className="flex items-center gap-3">
+              <div 
+                className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: themeColor }}
+              >
+                <TrendingUp className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-lg font-bold">Medidas Atuais</h3>
+            </div>
             {currentIMC && (
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">IMC Atual</p>
@@ -473,6 +502,7 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
                 </p>
               </div>
             )}
+          </div>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {latestMeasurement.weight && (
@@ -522,13 +552,29 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
       )}
 
       <div className="space-y-4">
-        <h3 className="text-lg font-bold">Histórico de Medidas</h3>
+        <div className="flex items-center gap-2">
+          <div className="w-1 h-6 rounded-full" style={{ backgroundColor: themeColor }} />
+          <h3 className="text-lg font-bold">Historico de Medidas</h3>
+        </div>
         {loading ? (
-          <p className="text-center text-muted-foreground py-8">Carregando...</p>
-        ) : measurements.length === 0 ? (
           <Card className="p-8 text-center">
-            <Ruler className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground">Nenhuma medida registrada ainda</p>
+            <div className="animate-pulse">
+              <div className="w-12 h-12 rounded-full bg-muted mx-auto mb-4" />
+              <div className="h-4 bg-muted rounded w-32 mx-auto" />
+            </div>
+          </Card>
+        ) : measurements.length === 0 ? (
+          <Card className="p-12 text-center border-dashed border-2">
+            <div 
+              className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+              style={{ backgroundColor: themeColor + "20" }}
+            >
+              <Ruler className="w-8 h-8" style={{ color: themeColor }} />
+            </div>
+            <h4 className="font-semibold mb-2">Nenhuma medida registrada</h4>
+            <p className="text-muted-foreground text-sm mb-4">
+              Clique em "Nova Medicao" para comecar a acompanhar seu progresso
+            </p>
           </Card>
         ) : (
           <div className="grid gap-4">
