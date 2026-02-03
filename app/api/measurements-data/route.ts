@@ -11,23 +11,29 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Executar todas as queries em paralelo
-    const [usersResult, measurementsResult] = await Promise.all([
-      sql`
-        SELECT user_id, name, pin, height, target_weight, current_weight, gender, age, initial_weight, start_date, email, profile_photo_url, cpf, theme
-        FROM users
-        WHERE user_id = ${userId}
-      `,
-      sql`
+    // Buscar usuário primeiro
+    const usersResult = await sql`
+      SELECT user_id, name, pin, height, target_weight, current_weight, gender, age, initial_weight, start_date, email, profile_photo_url, cpf, theme
+      FROM users
+      WHERE user_id = ${userId}
+    `
+
+    if (usersResult.length === 0) {
+      return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
+    }
+
+    // Buscar medidas (pode não existir a tabela ou não ter dados)
+    let measurementsResult: any[] = []
+    try {
+      measurementsResult = await sql`
         SELECT * FROM body_measurements
         WHERE user_id = ${userId}
         ORDER BY measurement_date DESC
         LIMIT 50
       `
-    ])
-
-    if (usersResult.length === 0) {
-      return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
+    } catch {
+      // Tabela pode não existir ainda
+      measurementsResult = []
     }
 
     const user = usersResult[0]
