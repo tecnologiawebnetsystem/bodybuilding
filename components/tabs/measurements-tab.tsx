@@ -55,35 +55,22 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
     const loadData = async () => {
       setLoading(true)
       try {
-        // Carregar tudo em paralelo para evitar lentidao
-        const [profileRes, measurementsRes, idealWeightRes] = await Promise.all([
-          fetch(`/api/user-profile?userId=${userId}`),
-          fetch(`/api/measurements?userId=${userId}`),
-          fetch(`/api/ideal-weight?userId=${userId}`)
-        ])
+        // Usar API combinada para uma única chamada (mais rápido)
+        const response = await fetch(`/api/measurements-data?userId=${userId}`)
+        const result = await response.json()
 
-        const [profileData, measurementsData, idealWeightData] = await Promise.all([
-          profileRes.json(),
-          measurementsRes.json(),
-          idealWeightRes.json()
-        ])
-
-        if (profileData.success) {
-          setUserProfile(profileData.data)
+        if (result.success) {
+          const { userProfile: profile, measurements: meas, idealWeight } = result.data
+          
+          setUserProfile(profile)
           setProfileForm({
-            height: profileData.data.height || "",
-            targetWeight: profileData.data.target_weight || "",
-            currentWeight: profileData.data.current_weight || "",
-            gender: profileData.data.gender || "",
+            height: profile.height || "",
+            targetWeight: profile.target_weight || "",
+            currentWeight: profile.current_weight || "",
+            gender: profile.gender || "",
           })
-        }
-
-        if (measurementsData.success) {
-          setMeasurements(measurementsData.data)
-        }
-
-        if (idealWeightData.success) {
-          setIdealWeightData(idealWeightData.data)
+          setMeasurements(meas || [])
+          setIdealWeightData(idealWeight)
         }
       } catch (error) {
         console.error("[v0] Error loading measurements data:", error)
