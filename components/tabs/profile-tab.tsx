@@ -248,7 +248,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
         <p className="text-muted-foreground text-center max-w-sm">
           Configure seu perfil na aba Medidas para ver suas informações aqui.
         </p>
-        <Button onClick={onLogout} variant="outline">
+        <Button onClick={onLogout} style={{ backgroundColor: "#c2410c", color: "#ffffff" }}>
           Trocar Perfil
         </Button>
       </div>
