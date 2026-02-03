@@ -52,9 +52,87 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
   })
 
   useEffect(() => {
-    loadUserProfile()
-    loadMeasurements()
+    const loadData = async () => {
+      setLoading(true)
+      try {
+        console.log("[v0] Measurements: Iniciando carregamento para userId:", userId)
+        
+        // Usar API combinada para uma única chamada (mais rápido)
+        const response = await fetch(`/api/measurements-data?userId=${userId}`)
+        console.log("[v0] Measurements: Response status:", response.status)
+        
+        const result = await response.json()
+        console.log("[v0] Measurements: Result:", result)
+
+        if (result.success && result.data?.userProfile) {
+          const { userProfile: profile, measurements: meas, idealWeight } = result.data
+          
+          setUserProfile(profile)
+          setProfileForm({
+            height: profile.height || "",
+            targetWeight: profile.target_weight || "",
+            currentWeight: profile.current_weight || "",
+            gender: profile.gender || "",
+          })
+          setMeasurements(meas || [])
+          setIdealWeightData(idealWeight)
+          console.log("[v0] Measurements: Dados carregados com sucesso")
+        } else {
+          // Se a API combinada falhar, tentar carregar direto do user-profile
+          console.log("[v0] Measurements: API combinada falhou, tentando fallback...")
+          const profileRes = await fetch(`/api/user-profile?userId=${userId}`)
+          const profileData = await profileRes.json()
+          
+          if (profileData.success && profileData.data) {
+            setUserProfile(profileData.data)
+            setProfileForm({
+              height: profileData.data.height || "",
+              targetWeight: profileData.data.target_weight || "",
+              currentWeight: profileData.data.current_weight || "",
+              gender: profileData.data.gender || "",
+            })
+            console.log("[v0] Measurements: Fallback carregou perfil com sucesso")
+          } else {
+            console.error("[v0] Measurements: Fallback também falhou")
+          }
+        }
+      } catch (error) {
+        console.error("[v0] Error loading measurements data:", error)
+        // Tentar fallback em caso de erro
+        try {
+          const profileRes = await fetch(`/api/user-profile?userId=${userId}`)
+          const profileData = await profileRes.json()
+          if (profileData.success && profileData.data) {
+            setUserProfile(profileData.data)
+            setProfileForm({
+              height: profileData.data.height || "",
+              targetWeight: profileData.data.target_weight || "",
+              currentWeight: profileData.data.current_weight || "",
+              gender: profileData.data.gender || "",
+            })
+          }
+        } catch (fallbackError) {
+          console.error("[v0] Fallback error:", fallbackError)
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadData()
   }, [userId])
+
+  const loadMeasurements = async () => {
+    try {
+      const response = await fetch(`/api/measurements?userId=${userId}`)
+      const data = await response.json()
+      if (data.success) {
+        setMeasurements(data.data)
+      }
+    } catch (error) {
+      console.error("[v0] Error loading measurements:", error)
+    }
+  }
 
   const loadUserProfile = async () => {
     try {
@@ -68,36 +146,9 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
           currentWeight: data.data.current_weight || "",
           gender: data.data.gender || "",
         })
-        loadIdealWeight()
       }
     } catch (error) {
       console.error("[v0] Error loading user profile:", error)
-    }
-  }
-
-  const loadIdealWeight = async () => {
-    try {
-      const response = await fetch(`/api/ideal-weight?userId=${userId}`)
-      const data = await response.json()
-      if (data.success) {
-        setIdealWeightData(data.data)
-      }
-    } catch (error) {
-      console.error("[v0] Error loading ideal weight:", error)
-    }
-  }
-
-  const loadMeasurements = async () => {
-    try {
-      const response = await fetch(`/api/measurements?userId=${userId}`)
-      const data = await response.json()
-      if (data.success) {
-        setMeasurements(data.data)
-      }
-    } catch (error) {
-      console.error("[v0] Error loading measurements:", error)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -210,11 +261,12 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
         ).toFixed(1)
       : null
 
-  if (!userProfile) {
+  if (loading || !userProfile) {
     return <div className="text-center py-8">Carregando perfil...</div>
   }
 
-  const themeColor = userProfile.theme ? JSON.parse(userProfile.theme).primary : "#3b82f6"
+  // Usar theme_primary diretamente (não é JSON)
+  const themeColor = userProfile?.theme_primary || "#3b82f6"
 
   return (
     <div className="space-y-6">

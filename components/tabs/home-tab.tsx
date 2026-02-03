@@ -196,8 +196,8 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
             </h2>
           </div>
           <div className="text-right">
-            <p className="text-sm text-muted-foreground mb-1">Meta</p>
-            <h2 className="text-4xl font-bold" style={{ color: theme.accent }}>
+            <p className="text-sm text-white/60 mb-1">Meta</p>
+            <h2 className="text-4xl font-bold text-white">
               {targetWeight}kg
             </h2>
           </div>
@@ -205,29 +205,29 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Progresso</span>
-            <span className="font-bold">
+            <span className="text-white/60">Progresso</span>
+            <span className="font-bold text-white">
               {weightLoss.toFixed(1)}kg / {totalGoal}kg
             </span>
           </div>
           <Progress value={progressPercent} className="h-3" />
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t" style={{ borderColor: theme.primary + "20" }}>
+        <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/10">
           <div className="text-center">
-            <TrendingDown className="w-6 h-6 mx-auto mb-1" style={{ color: theme.success }} />
-            <p className="text-xs text-muted-foreground">Perdidos</p>
-            <p className="text-lg font-bold">{(weightLoss || 0).toFixed(1)}kg</p>
+            <TrendingDown className="w-6 h-6 mx-auto mb-1 text-white/70" />
+            <p className="text-xs text-white/60">Perdidos</p>
+            <p className="text-lg font-bold text-white">{(weightLoss || 0).toFixed(1)}kg</p>
           </div>
           <div className="text-center">
-            <Target className="w-6 h-6 mx-auto mb-1" style={{ color: theme.primary }} />
-            <p className="text-xs text-muted-foreground">Restantes</p>
-            <p className="text-lg font-bold">{Math.max(0, (totalGoal - weightLoss) || 0).toFixed(1)}kg</p>
+            <Target className="w-6 h-6 mx-auto mb-1 text-white/70" />
+            <p className="text-xs text-white/60">Restantes</p>
+            <p className="text-lg font-bold text-white">{Math.max(0, (totalGoal - weightLoss) || 0).toFixed(1)}kg</p>
           </div>
           <div className="text-center">
-            <Trophy className="w-6 h-6 mx-auto mb-1" style={{ color: theme.accent }} />
-            <p className="text-xs text-muted-foreground">IMC Atual</p>
-            <p className="text-lg font-bold">{(currentIMC || 0).toFixed(1)}</p>
+            <Trophy className="w-6 h-6 mx-auto mb-1 text-white/70" />
+            <p className="text-xs text-white/60">IMC Atual</p>
+            <p className="text-lg font-bold text-white">{(currentIMC || 0).toFixed(1)}</p>
           </div>
         </div>
       </Card>
