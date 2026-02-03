@@ -179,35 +179,11 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
   }, [])
 
   const tabs = [
+    // 1. Inicio
     { id: "home", label: "Início", icon: Home, color: preferences.theme_primary, enabled: true },
-    {
-      id: "checkin",
-      label: "Check-in",
-      icon: CheckCircle2,
-      color: preferences.theme_accent,
-      enabled: preferences.enable_gym_checkin,
-    },
-    {
-      id: "workouts",
-      label: "Treinos",
-      icon: Dumbbell,
-      color: preferences.theme_secondary,
-      enabled: preferences.enable_gym_workouts,
-    },
-    {
-      id: "running",
-      label: "Corrida",
-      icon: Activity,
-      color: preferences.theme_accent,
-      enabled: preferences.enable_running,
-    },
-    {
-      id: "nutrition",
-      label: "Nutrição",
-      icon: BookOpen,
-      color: preferences.theme_accent,
-      enabled: preferences.enable_nutrition,
-    },
+    // 2. IA
+    { id: "ai", label: "IA", icon: Sparkles, color: "#a855f7", enabled: true },
+    // 3. Medidas
     {
       id: "measurements",
       label: "Medidas",
@@ -215,6 +191,7 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
       color: preferences.theme_primary,
       enabled: preferences.enable_measurements,
     },
+    // 4. Agua
     {
       id: "hydration",
       label: "Água",
@@ -222,6 +199,43 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
       color: preferences.theme_accent,
       enabled: preferences.enable_hydration,
     },
+    // 5. Nutricao
+    {
+      id: "nutrition",
+      label: "Nutrição",
+      icon: BookOpen,
+      color: preferences.theme_accent,
+      enabled: preferences.enable_nutrition,
+    },
+    // 6. Check-in
+    {
+      id: "checkin",
+      label: "Check-in",
+      icon: CheckCircle2,
+      color: preferences.theme_accent,
+      enabled: preferences.enable_gym_checkin,
+    },
+    // 7. Treinos
+    {
+      id: "workouts",
+      label: "Treinos",
+      icon: Dumbbell,
+      color: preferences.theme_secondary,
+      enabled: preferences.enable_gym_workouts,
+    },
+    // 8. Corrida
+    {
+      id: "running",
+      label: "Corrida",
+      icon: Activity,
+      color: preferences.theme_accent,
+      enabled: preferences.enable_running,
+    },
+    // 9. Agenda
+    { id: "calendar", label: "Agenda", icon: CalendarDays, color: "#06b6d4", enabled: preferences.enable_calendar },
+    // 10. Pontos
+    { id: "loyalty", label: "Pontos", icon: Coins, color: "#f59e0b", enabled: true },
+    // 11. Stats
     {
       id: "stats",
       label: "Stats",
@@ -229,32 +243,32 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
       color: preferences.theme_secondary,
       enabled: preferences.enable_stats,
     },
+    // 12. Mais
+    { id: "more", label: "Mais", icon: MoreHorizontal, color: preferences.theme_accent, enabled: true },
+    // 13. Perfil
+    { id: "profile", label: "Perfil", icon: User, color: preferences.theme_primary, enabled: true },
+    // Tabs ocultas no menu (acessadas via widgets)
     {
       id: "calisthenics",
       label: "Calistenia",
       icon: Zap,
       color: preferences.theme_primary,
-      enabled: preferences.enable_home_workouts && !["kleber", "pamela"].includes(userId?.toLowerCase() || ""), // Kleber e Pamela acessam via widget
+      enabled: preferences.enable_home_workouts && !["kleber", "pamela"].includes(userId?.toLowerCase() || ""),
     },
     {
       id: "spinning",
       label: "Spinning",
       icon: Bike,
       color: "#7c3aed",
-      enabled: preferences.enable_spinning && !["kleber", "pamela"].includes(userId?.toLowerCase() || ""), // Kleber e Pamela acessam via widget
+      enabled: preferences.enable_spinning && !["kleber", "pamela"].includes(userId?.toLowerCase() || ""),
     },
     {
       id: "ginastica",
       label: "Ginastica",
       icon: Dumbbell,
       color: "#7c3aed",
-      enabled: preferences.enable_ginastica && !["kleber", "pamela"].includes(userId?.toLowerCase() || ""), // Kleber e Pamela acessam via widget
+      enabled: preferences.enable_ginastica && !["kleber", "pamela"].includes(userId?.toLowerCase() || ""),
     },
-    { id: "ai", label: "IA", icon: Sparkles, color: "#a855f7", enabled: true },
-    { id: "calendar", label: "Agenda", icon: CalendarDays, color: "#06b6d4", enabled: preferences.enable_calendar },
-    { id: "loyalty", label: "Pontos", icon: Coins, color: "#f59e0b", enabled: true },
-    { id: "more", label: "Mais", icon: MoreHorizontal, color: preferences.theme_accent, enabled: true },
-    { id: "profile", label: "Perfil", icon: User, color: preferences.theme_primary, enabled: true },
   ].filter((tab) => tab.enabled)
 
   // Aguardar montagem antes de renderizar
