@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Dumbbell, Loader2, Sparkles, Clock, Target, Zap, ChevronDown, ChevronUp } from "lucide-react"
+import { Dumbbell, Loader2, Sparkles, Clock, Target, Zap, ChevronDown, ChevronUp, Save, Share2, Check, User } from "lucide-react"
 
 interface Exercise {
   name: string
@@ -34,6 +34,19 @@ interface Workout {
   tips: string[]
 }
 
+interface UserProfile {
+  height?: number
+  current_weight?: number
+  target_weight?: number
+  gender?: string
+  age?: number
+}
+
+interface WorkoutGeneratorProps {
+  userProfile?: UserProfile | null
+  onSave?: (title: string, data: Workout) => void
+}
+
 const goals = [
   { value: "hipertrofia", label: "Ganho de Massa" },
   { value: "emagrecimento", label: "Emagrecimento" },
@@ -58,10 +71,20 @@ const focusAreas = [
   { value: "corpo-inteiro", label: "Corpo Inteiro" },
 ]
 
-export function WorkoutGenerator() {
+const loadingSteps = [
+  { text: "Analisando seu perfil...", duration: 1500 },
+  { text: "Selecionando exercicios ideais...", duration: 2000 },
+  { text: "Otimizando sequencia de treino...", duration: 2000 },
+  { text: "Gerando instrucoes detalhadas...", duration: 1500 },
+  { text: "Finalizando seu treino...", duration: 1000 },
+]
+
+export function WorkoutGenerator({ userProfile, onSave }: WorkoutGeneratorProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [workout, setWorkout] = useState<Workout | null>(null)
   const [expandedExercise, setExpandedExercise] = useState<number | null>(null)
+  const [loadingStep, setLoadingStep] = useState(0)
+  const [saved, setSaved] = useState(false)
   
   const [formData, setFormData] = useState({
     goal: "hipertrofia",
@@ -74,13 +97,44 @@ export function WorkoutGenerator() {
 
   const [error, setError] = useState<string | null>(null)
 
+  // Pre-preencher dados do perfil
+  useEffect(() => {
+    if (userProfile) {
+      // Determinar objetivo baseado no peso atual vs desejado
+      if (userProfile.current_weight && userProfile.target_weight) {
+        if (userProfile.target_weight > userProfile.current_weight) {
+          setFormData(prev => ({ ...prev, goal: "hipertrofia" }))
+        } else if (userProfile.target_weight < userProfile.current_weight) {
+          setFormData(prev => ({ ...prev, goal: "emagrecimento" }))
+        }
+      }
+    }
+  }, [userProfile])
+
+  // Simular etapas de loading
+  useEffect(() => {
+    if (isGenerating) {
+      let currentStep = 0
+      setLoadingStep(0)
+      
+      const stepInterval = setInterval(() => {
+        currentStep++
+        if (currentStep < loadingSteps.length) {
+          setLoadingStep(currentStep)
+        }
+      }, loadingSteps[0].duration)
+      
+      return () => clearInterval(stepInterval)
+    }
+  }, [isGenerating])
+
   const handleGenerate = async () => {
     setIsGenerating(true)
     setWorkout(null)
     setError(null)
+    setSaved(false)
 
     try {
-      console.log("[v0] Gerando treino com dados:", formData)
       const response = await fetch("/api/ai/generate-workout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -88,7 +142,6 @@ export function WorkoutGenerator() {
       })
 
       const data = await response.json()
-      console.log("[v0] Resposta da API:", data)
       
       if (data.error) {
         setError(data.error)
@@ -98,24 +151,61 @@ export function WorkoutGenerator() {
         setError("Resposta inesperada do servidor")
       }
     } catch (err) {
-      console.error("[v0] Erro ao gerar treino:", err)
+      console.error("Erro ao gerar treino:", err)
       setError("Erro ao conectar com o servidor. Tente novamente.")
     } finally {
       setIsGenerating(false)
     }
   }
 
+  const handleSave = () => {
+    if (workout && onSave) {
+      onSave(workout.name, workout)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    }
+  }
+
+  const handleShare = async () => {
+    if (!workout) return
+    
+    const text = `Treino: ${workout.name}\n\nExercicios:\n${workout.exercises.map((e, i) => 
+      `${i + 1}. ${e.name} - ${e.sets}x${e.reps}`
+    ).join('\n')}\n\nGerado por IA - Bodybuilding App`
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: workout.name, text })
+      } catch (err) {
+        // Fallback para clipboard
+        navigator.clipboard.writeText(text)
+      }
+    } else {
+      navigator.clipboard.writeText(text)
+      alert("Treino copiado para a area de transferencia!")
+    }
+  }
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-full border border-orange-500/30">
-          <Sparkles className="w-4 h-4 text-orange-400" />
-          <span className="text-sm font-medium text-orange-300">Powered by AI</span>
+      {/* Dados do Perfil */}
+      {userProfile && (userProfile.current_weight || userProfile.height) && (
+        <div className="flex items-center gap-3 p-3 bg-white/[0.03] rounded-lg border border-white/[0.08]">
+          <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+            <User className="w-5 h-5 text-purple-400" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm text-gray-400">Dados do seu perfil</p>
+            <p className="text-white text-sm">
+              {userProfile.current_weight && `${userProfile.current_weight}kg`}
+              {userProfile.height && userProfile.current_weight && " • "}
+              {userProfile.height && `${userProfile.height}cm`}
+              {userProfile.gender && ` • ${userProfile.gender === "male" ? "Masculino" : "Feminino"}`}
+            </p>
+          </div>
+          <Check className="w-5 h-5 text-green-400" />
         </div>
-        <h2 className="text-2xl font-bold text-white">Gerador de Treinos Inteligente</h2>
-        <p className="text-gray-400">Crie treinos personalizados com inteligencia artificial</p>
-      </div>
+      )}
 
       {/* Form */}
       <Card className="bg-white/[0.03] border-white/[0.08]">
@@ -223,6 +313,38 @@ export function WorkoutGenerator() {
         </CardContent>
       </Card>
 
+      {/* Loading com Etapas */}
+      {isGenerating && (
+        <Card className="bg-white/[0.03] border-white/[0.08] overflow-hidden">
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              {loadingSteps.map((step, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                    index < loadingStep 
+                      ? "bg-green-500 text-white" 
+                      : index === loadingStep 
+                        ? "bg-orange-500 text-white animate-pulse" 
+                        : "bg-white/[0.05] text-gray-500"
+                  }`}>
+                    {index < loadingStep ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      <span className="text-sm">{index + 1}</span>
+                    )}
+                  </div>
+                  <span className={`text-sm ${
+                    index <= loadingStep ? "text-white" : "text-gray-500"
+                  }`}>
+                    {step.text}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Erro */}
       {error && (
         <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-center">
@@ -233,6 +355,38 @@ export function WorkoutGenerator() {
       {/* Resultado */}
       {workout && (
         <div className="space-y-4 animate-fade-in">
+          {/* Botoes de Acao */}
+          <div className="flex gap-3">
+            <Button
+              onClick={handleSave}
+              disabled={saved}
+              className={`flex-1 ${
+                saved 
+                  ? "bg-green-500 hover:bg-green-500" 
+                  : "bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1]"
+              }`}
+            >
+              {saved ? (
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  Salvo!
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Salvar Treino
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={handleShare}
+              className="flex-1 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1]"
+            >
+              <Share2 className="w-4 h-4 mr-2" />
+              Compartilhar
+            </Button>
+          </div>
+
           {/* Header do Treino */}
           <Card className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500/20">
             <CardContent className="p-6">
