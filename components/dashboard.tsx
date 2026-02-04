@@ -235,16 +235,16 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
     { id: "calendar", label: "Agenda", icon: CalendarDays, color: "#06b6d4", enabled: preferences.enable_calendar },
     // 10. Pontos
     { id: "loyalty", label: "Pontos", icon: Coins, color: "#f59e0b", enabled: true },
-    // 11. Stats
+    // 11. Stats (oculto temporariamente)
     {
       id: "stats",
       label: "Stats",
       icon: BarChart3,
       color: preferences.theme_secondary,
-      enabled: preferences.enable_stats,
+      enabled: false, // preferences.enable_stats - oculto para todos os perfis
     },
-    // 12. Mais
-    { id: "more", label: "Mais", icon: MoreHorizontal, color: preferences.theme_accent, enabled: true },
+    // 12. Mais (oculto temporariamente)
+    { id: "more", label: "Mais", icon: MoreHorizontal, color: preferences.theme_accent, enabled: false },
     // 13. Perfil
     { id: "profile", label: "Perfil", icon: User, color: preferences.theme_primary, enabled: true },
     // Tabs ocultas no menu (acessadas via widgets)
