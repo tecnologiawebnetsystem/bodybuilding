@@ -380,12 +380,12 @@ export function HydrationTab({ userId, preferences }: HydrationTabProps) {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2 bg-white/5">
-          <TabsTrigger value="hoje" className="data-[state=active]:bg-blue-600">
+        <TabsList className="grid w-full grid-cols-2 bg-orange-100 p-1">
+          <TabsTrigger value="hoje" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-black font-medium">
             <Droplet className="w-4 h-4 mr-2" />
             Hoje
           </TabsTrigger>
-          <TabsTrigger value="historico" className="data-[state=active]:bg-blue-600">
+          <TabsTrigger value="historico" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-black font-medium">
             <Calendar className="w-4 h-4 mr-2" />
             Semana
           </TabsTrigger>
