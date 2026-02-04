@@ -7,7 +7,8 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { UserIcon, Bell, Lock, Mail, Trophy, TrendingUp, Dumbbell, Calendar, Award, Camera } from "lucide-react"
+import { UserIcon, Bell, Lock, Mail, Trophy, TrendingUp, Dumbbell, Calendar, Award, Camera, Ruler, Target, Scale } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { NotificationSettings } from "@/components/notification-settings"
 import { GymBadge } from "@/components/gym-badge"
 import {
@@ -48,6 +49,13 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
   const [currentPin, setCurrentPin] = useState("")
   const [newCpf, setNewCpf] = useState("")
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [savingProfile, setSavingProfile] = useState(false)
+  const [profileForm, setProfileForm] = useState({
+    height: "",
+    currentWeight: "",
+    targetWeight: "",
+    gender: "",
+  })
 
   useEffect(() => {
     loadData()
@@ -69,7 +77,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
       if (statsData.success) setStats(statsData.data)
       if (gymData.success) setGymInfo(gymData.data)
     } catch (error) {
-      console.error("[v0] Error loading profile data:", error)
+      console.error(" Error loading profile data:", error)
     } finally {
       setLoading(false)
     }
@@ -104,7 +112,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
         alert(data.message || "PIN atual incorreto")
       }
     } catch (error) {
-      console.error("[v0] Error changing PIN:", error)
+      console.error(" Error changing PIN:", error)
       alert("Erro ao alterar PIN")
     }
   }
@@ -131,7 +139,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
         alert("Erro ao alterar e-mail")
       }
     } catch (error) {
-      console.error("[v0] Error changing email:", error)
+      console.error(" Error changing email:", error)
       alert("Erro ao alterar e-mail")
     }
   }
@@ -169,7 +177,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
         alert(data.message || "Erro ao alterar CPF. Verifique seu PIN.")
       }
     } catch (error) {
-      console.error("[v0] Error changing CPF:", error)
+      console.error(" Error changing CPF:", error)
       alert("Erro ao alterar CPF")
     }
   }
@@ -214,9 +222,39 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
       }
       reader.readAsDataURL(file)
     } catch (error) {
-      console.error("[v0] Error uploading photo:", error)
+      console.error(" Error uploading photo:", error)
       alert("Erro ao fazer upload da foto")
       setUploadingPhoto(false)
+    }
+  }
+
+  const handleProfileSetup = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSavingProfile(true)
+    
+    try {
+      const response = await fetch("/api/user-profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          height: profileForm.height,
+          currentWeight: profileForm.currentWeight,
+          targetWeight: profileForm.targetWeight,
+          gender: profileForm.gender,
+        }),
+      })
+
+      if (response.ok) {
+        loadData()
+      } else {
+        alert("Erro ao salvar perfil")
+      }
+    } catch (error) {
+      console.error("Error saving profile:", error)
+      alert("Erro ao salvar perfil")
+    } finally {
+      setSavingProfile(false)
     }
   }
 
@@ -236,7 +274,125 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
   }
 
   if (!userProfile) {
-    return <p className="text-center py-8">Erro ao carregar perfil</p>
+    return (
+      <div className="max-w-md mx-auto py-8 px-4">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div
+            className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg"
+            style={{ backgroundColor: preferences.theme_primary }}
+          >
+            <UserIcon className="w-12 h-12 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold mb-2">Configure seu Perfil</h2>
+          <p className="text-muted-foreground">
+            Preencha seus dados para personalizar sua experiencia
+          </p>
+        </div>
+
+        {/* Formulario */}
+        <Card className="p-6">
+          <form onSubmit={handleProfileSetup} className="space-y-5">
+            {/* Altura */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <Ruler className="w-4 h-4" style={{ color: preferences.theme_primary }} />
+                Altura
+              </Label>
+              <div className="relative">
+                <Input
+                  type="number"
+                  step="0.1"
+                  placeholder="Ex: 175"
+                  value={profileForm.height}
+                  onChange={(e) => setProfileForm({ ...profileForm, height: e.target.value })}
+                  className="pr-12"
+                  required
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">cm</span>
+              </div>
+            </div>
+
+            {/* Peso Atual */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <Scale className="w-4 h-4" style={{ color: preferences.theme_primary }} />
+                Peso Atual
+              </Label>
+              <div className="relative">
+                <Input
+                  type="number"
+                  step="0.1"
+                  placeholder="Ex: 70"
+                  value={profileForm.currentWeight}
+                  onChange={(e) => setProfileForm({ ...profileForm, currentWeight: e.target.value })}
+                  className="pr-12"
+                  required
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">kg</span>
+              </div>
+            </div>
+
+            {/* Peso Desejado */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <Target className="w-4 h-4" style={{ color: preferences.theme_primary }} />
+                Peso Desejado
+              </Label>
+              <div className="relative">
+                <Input
+                  type="number"
+                  step="0.1"
+                  placeholder="Ex: 65"
+                  value={profileForm.targetWeight}
+                  onChange={(e) => setProfileForm({ ...profileForm, targetWeight: e.target.value })}
+                  className="pr-12"
+                  required
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">kg</span>
+              </div>
+            </div>
+
+            {/* Sexo */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <UserIcon className="w-4 h-4" style={{ color: preferences.theme_primary }} />
+                Sexo
+              </Label>
+              <Select
+                value={profileForm.gender}
+                onValueChange={(value) => setProfileForm({ ...profileForm, gender: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Masculino</SelectItem>
+                  <SelectItem value="female">Feminino</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Botao Salvar */}
+            <Button 
+              type="submit" 
+              className="w-full mt-6"
+              style={{ backgroundColor: "#c2410c", color: "#ffffff" }}
+              disabled={savingProfile}
+            >
+              {savingProfile ? "Salvando..." : "Salvar e Continuar"}
+            </Button>
+          </form>
+        </Card>
+
+        {/* Botao Trocar Perfil */}
+        <div className="text-center mt-6">
+          <Button onClick={onLogout} variant="ghost" className="text-muted-foreground">
+            Trocar Perfil
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   const weightProgress =
@@ -390,6 +546,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
                 <Button
                   onClick={handleChangeCpf}
                   className="w-full"
+                  className="w-full text-white"
                   style={{ backgroundColor: preferences.theme_primary }}
                 >
                   Confirmar Alteração
@@ -434,6 +591,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
                 <Button
                   onClick={handleChangeEmail}
                   className="w-full"
+                  className="w-full text-white"
                   style={{ backgroundColor: preferences.theme_primary }}
                 >
                   Confirmar Alteração
@@ -490,6 +648,7 @@ export function ProfileTab({ userId, onLogout, preferences }: ProfileTabProps) {
                 <Button
                   onClick={handleChangePassword}
                   className="w-full"
+                  className="w-full text-white"
                   style={{ backgroundColor: preferences.theme_primary }}
                 >
                   Confirmar Alteração

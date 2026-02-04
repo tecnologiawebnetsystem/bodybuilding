@@ -1,5 +1,6 @@
 import { generateObject } from 'ai';
 import { z } from 'zod';
+import { model } from "@/lib/ai-config";
 
 export const maxDuration = 60;
 
@@ -79,11 +80,9 @@ Inclua opcoes praticas e acessiveis no Brasil.
 Adicione dicas de hidratacao e suplementacao se necessario.`;
 
       const { object } = await generateObject({
-        model: 'openai/gpt-5-mini',
+        model: model("openai/gpt-4o-mini"),
         schema: mealPlanSchema,
         prompt,
-        maxTokens: 4000,
-        temperature: 0.7,
       });
 
       return Response.json({ mealPlan: object });
@@ -99,21 +98,20 @@ RESTRICOES: ${restrictions || 'Nenhuma'}
 Crie uma receita completa, saborosa e nutritiva com instrucoes de preparo.`;
 
       const { object } = await generateObject({
-        model: 'openai/gpt-5-mini',
+        model: model("openai/gpt-4o-mini"),
         schema: mealSuggestionSchema,
         prompt,
-        maxTokens: 2000,
-        temperature: 0.8,
       });
 
       return Response.json({ suggestion: object.suggestion });
     }
 
     return Response.json({ error: 'Tipo de requisicao invalido' }, { status: 400 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[v0] Erro no assistente de nutricao:', error);
+    console.error('[v0] Detalhes do erro:', error?.message, error?.cause);
     return Response.json(
-      { error: 'Erro ao processar requisicao. Tente novamente.' },
+      { error: error?.message || 'Erro ao processar requisicao. Tente novamente.' },
       { status: 500 }
     );
   }

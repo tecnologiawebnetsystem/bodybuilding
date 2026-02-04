@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Loader2, Sparkles, Utensils, Droplets, Apple, Clock, ChefHat } from "lucide-react"
+import { Loader2, Sparkles, Utensils, Droplets, Clock, ChefHat, Save, Share2, Check, User } from "lucide-react"
 
 interface Food {
   name: string
@@ -74,6 +74,27 @@ const activityLevels = [
   { value: "muito-intenso", label: "Muito Intenso" },
 ]
 
+interface UserProfile {
+  height?: number
+  current_weight?: number
+  target_weight?: number
+  gender?: string
+  age?: number
+}
+
+interface NutritionAssistantProps {
+  userProfile?: UserProfile | null
+  onSave?: (title: string, data: MealPlan | MealSuggestion) => void
+}
+
+const loadingSteps = [
+  { text: "Calculando suas necessidades caloricas...", duration: 1500 },
+  { text: "Definindo distribuicao de macros...", duration: 2000 },
+  { text: "Selecionando alimentos ideais...", duration: 2000 },
+  { text: "Montando suas refeicoes...", duration: 1500 },
+  { text: "Finalizando plano alimentar...", duration: 1000 },
+]
+
 const mealTypes = [
   { value: "cafe-da-manha", label: "Cafe da Manha" },
   { value: "lanche-manha", label: "Lanche da Manha" },
@@ -85,11 +106,13 @@ const mealTypes = [
   { value: "pos-treino", label: "Pos-Treino" },
 ]
 
-export function NutritionAssistant() {
+export function NutritionAssistant({ userProfile, onSave }: NutritionAssistantProps) {
   const [activeTab, setActiveTab] = useState<"plan" | "suggestion">("plan")
   const [isLoading, setIsLoading] = useState(false)
   const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
   const [suggestion, setSuggestion] = useState<MealSuggestion | null>(null)
+  const [loadingStep, setLoadingStep] = useState(0)
+  const [saved, setSaved] = useState(false)
 
   const [planForm, setPlanForm] = useState({
     goal: "ganho-massa",
@@ -101,15 +124,57 @@ export function NutritionAssistant() {
     restrictions: "",
   })
 
+  // Pre-preencher dados do perfil
+  useEffect(() => {
+    if (userProfile) {
+      setPlanForm(prev => ({
+        ...prev,
+        weight: userProfile.current_weight?.toString() || prev.weight,
+        height: userProfile.height?.toString() || prev.height,
+        age: userProfile.age?.toString() || prev.age,
+        gender: userProfile.gender === "male" ? "masculino" : userProfile.gender === "female" ? "feminino" : prev.gender,
+      }))
+
+      // Determinar objetivo baseado no peso
+      if (userProfile.current_weight && userProfile.target_weight) {
+        if (userProfile.target_weight > userProfile.current_weight) {
+          setPlanForm(prev => ({ ...prev, goal: "ganho-massa" }))
+        } else if (userProfile.target_weight < userProfile.current_weight) {
+          setPlanForm(prev => ({ ...prev, goal: "emagrecimento" }))
+        }
+      }
+    }
+  }, [userProfile])
+
+  // Simular etapas de loading
+  useEffect(() => {
+    if (isLoading) {
+      let currentStep = 0
+      setLoadingStep(0)
+      
+      const stepInterval = setInterval(() => {
+        currentStep++
+        if (currentStep < loadingSteps.length) {
+          setLoadingStep(currentStep)
+        }
+      }, loadingSteps[0].duration)
+      
+      return () => clearInterval(stepInterval)
+    }
+  }, [isLoading])
+
   const [suggestionForm, setSuggestionForm] = useState({
     mealType: "almoco",
     goal: "ganho-massa",
     restrictions: "",
   })
 
+  const [error, setError] = useState<string | null>(null)
+
   const handleGeneratePlan = async () => {
     setIsLoading(true)
     setMealPlan(null)
+    setError(null)
 
     try {
       const response = await fetch("/api/ai/nutrition-assistant", {
@@ -119,9 +184,17 @@ export function NutritionAssistant() {
       })
 
       const data = await response.json()
+      
+      if (!response.ok || data.error) {
+        console.error("[v0] Erro da API:", data.error)
+        setError(data.error || "Erro ao gerar plano alimentar")
+        return
+      }
+      
       setMealPlan(data.mealPlan)
-    } catch (error) {
-      console.error("Erro ao gerar plano:", error)
+    } catch (error: any) {
+      console.error("[v0] Erro ao gerar plano:", error)
+      setError(error?.message || "Erro de conexao. Tente novamente.")
     } finally {
       setIsLoading(false)
     }
@@ -130,6 +203,7 @@ export function NutritionAssistant() {
   const handleGenerateSuggestion = async () => {
     setIsLoading(true)
     setSuggestion(null)
+    setSaved(false)
 
     try {
       const response = await fetch("/api/ai/nutrition-assistant", {
@@ -152,17 +226,59 @@ export function NutritionAssistant() {
     }
   }
 
+  const handleSave = () => {
+    if (onSave) {
+      if (mealPlan) {
+        onSave(`Plano ${mealPlan.dailyCalories}kcal`, mealPlan)
+      } else if (suggestion) {
+        onSave(suggestion.name, suggestion)
+      }
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    }
+  }
+
+  const handleShare = async () => {
+    let text = ""
+    
+    if (mealPlan) {
+      text = `Plano Alimentar - ${mealPlan.dailyCalories}kcal/dia\n\nMacros:\n- Proteina: ${mealPlan.macros.protein}g\n- Carboidratos: ${mealPlan.macros.carbs}g\n- Gorduras: ${mealPlan.macros.fat}g\n\nRefeicoes:\n${mealPlan.meals.map(m => `- ${m.name} (${m.time}): ${m.calories}kcal`).join('\n')}\n\nGerado por IA - Bodybuilding App`
+    } else if (suggestion) {
+      text = `Receita: ${suggestion.name}\n\n${suggestion.description}\n\nIngredientes:\n${suggestion.ingredients.map(i => `- ${i.quantity} ${i.item}`).join('\n')}\n\nGerado por IA - Bodybuilding App`
+    }
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "Plano Alimentar", text })
+      } catch {
+        navigator.clipboard.writeText(text)
+      }
+    } else {
+      navigator.clipboard.writeText(text)
+      alert("Plano copiado para a area de transferencia!")
+    }
+  }
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full border border-green-500/30">
-          <Sparkles className="w-4 h-4 text-green-400" />
-          <span className="text-sm font-medium text-green-300">Powered by AI</span>
+      {/* Dados do Perfil */}
+      {userProfile && (userProfile.current_weight || userProfile.height) && (
+        <div className="flex items-center gap-3 p-3 bg-white/[0.03] rounded-lg border border-white/[0.08]">
+          <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+            <User className="w-5 h-5 text-green-400" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm text-gray-400">Dados do seu perfil aplicados</p>
+            <p className="text-white text-sm">
+              {userProfile.current_weight && `${userProfile.current_weight}kg`}
+              {userProfile.height && userProfile.current_weight && " • "}
+              {userProfile.height && `${userProfile.height}cm`}
+              {userProfile.age && ` • ${userProfile.age} anos`}
+            </p>
+          </div>
+          <Check className="w-5 h-5 text-green-400" />
         </div>
-        <h2 className="text-2xl font-bold text-white">Assistente de Nutricao</h2>
-        <p className="text-gray-400">Planos alimentares e receitas personalizadas com IA</p>
-      </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-2 p-1 bg-white/[0.03] rounded-lg border border-white/[0.08]">
@@ -296,9 +412,90 @@ export function NutritionAssistant() {
             </CardContent>
           </Card>
 
+          {/* Mensagem de Erro */}
+          {error && (
+            <Card className="bg-red-500/10 border-red-500/30">
+              <CardContent className="p-4">
+                <p className="text-red-400 text-sm">{error}</p>
+                <Button
+                  onClick={() => setError(null)}
+                  variant="ghost"
+                  size="sm"
+                  className="mt-2 text-red-300 hover:text-red-200"
+                >
+                  Fechar
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Loading com Etapas */}
+          {isLoading && (
+            <Card className="bg-white/[0.03] border-white/[0.08] overflow-hidden">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  {loadingSteps.map((step, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                        index < loadingStep 
+                          ? "bg-green-500 text-white" 
+                          : index === loadingStep 
+                            ? "bg-emerald-500 text-white animate-pulse" 
+                            : "bg-white/[0.05] text-gray-500"
+                      }`}>
+                        {index < loadingStep ? (
+                          <Check className="w-4 h-4" />
+                        ) : (
+                          <span className="text-sm">{index + 1}</span>
+                        )}
+                      </div>
+                      <span className={`text-sm ${
+                        index <= loadingStep ? "text-white" : "text-gray-500"
+                      }`}>
+                        {step.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Resultado do Plano */}
           {mealPlan && (
             <div className="space-y-4 animate-fade-in">
+              {/* Botoes de Acao */}
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleSave}
+                  disabled={saved}
+                  className={`flex-1 ${
+                    saved 
+                      ? "bg-green-500 hover:bg-green-500" 
+                      : "bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1]"
+                  }`}
+                >
+                  {saved ? (
+                    <>
+                      <Check className="w-4 h-4 mr-2" />
+                      Salvo!
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Salvar Plano
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={handleShare}
+                  className="flex-1 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1]"
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Compartilhar
+                </Button>
+              </div>
+
               {/* Resumo */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20">
