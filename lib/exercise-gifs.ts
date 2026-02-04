@@ -1,5 +1,5 @@
 // Mapeamento de exercicios para GIFs animados
-// Fonte: ExerciseDB API (gratuita) - https://exercisedb.io
+// Fonte: fitnessprogramer.com (dominio publico)
 
 export interface ExerciseMedia {
   gifUrl: string
@@ -9,11 +9,11 @@ export interface ExerciseMedia {
 }
 
 // Mapeamento de nomes de exercicios em portugues para GIFs
-// Os GIFs sao da API ExerciseDB (dominio publico)
+// GIFs de alta qualidade de fontes publicas
 export const exerciseGifs: Record<string, ExerciseMedia> = {
   // PEITO
   "Supino Reto com Barra": {
-    gifUrl: "https://v2.exercisedb.io/image/rKPi79SZu4W3RB",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Bench-Press.gif",
     muscleTarget: "Peitoral",
     equipment: "Barra",
     instructions: [
@@ -24,7 +24,7 @@ export const exerciseGifs: Record<string, ExerciseMedia> = {
     ]
   },
   "Supino Inclinado com Halteres": {
-    gifUrl: "https://v2.exercisedb.io/image/yxHxMYQNirzXbL",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Dumbbell-Press.gif",
     muscleTarget: "Peitoral Superior",
     equipment: "Halteres",
     instructions: [
@@ -35,29 +35,29 @@ export const exerciseGifs: Record<string, ExerciseMedia> = {
     ]
   },
   "Supino Declinado com Barra": {
-    gifUrl: "https://v2.exercisedb.io/image/WE0Ufh6h5tCQxj",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Decline-Barbell-Bench-Press.gif",
     muscleTarget: "Peitoral Inferior",
     equipment: "Barra"
   },
   "Crucifixo Reto com Halteres": {
-    gifUrl: "https://v2.exercisedb.io/image/g-0RSeDSLXJMDG",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Fly.gif",
     muscleTarget: "Peitoral",
     equipment: "Halteres"
   },
   "Crossover na Polia": {
-    gifUrl: "https://v2.exercisedb.io/image/TEijYuuPzAIvZx",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Crossover.gif",
     muscleTarget: "Peitoral",
     equipment: "Polia"
   },
   "Flexão com Sobrecarga": {
-    gifUrl: "https://v2.exercisedb.io/image/2g0H2c1XJswYez",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Push-Up.gif",
     muscleTarget: "Peitoral",
     equipment: "Peso Corporal"
   },
 
   // OMBROS
   "Desenvolvimento com Barra (Militar)": {
-    gifUrl: "https://v2.exercisedb.io/image/KBYMk3Y0cJ5L9N",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Shoulder-Press.gif",
     muscleTarget: "Deltoides",
     equipment: "Barra",
     instructions: [
@@ -67,7 +67,7 @@ export const exerciseGifs: Record<string, ExerciseMedia> = {
     ]
   },
   "Elevação Lateral com Halteres": {
-    gifUrl: "https://v2.exercisedb.io/image/WpSHwL1RrVxpyj",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lateral-Raise.gif",
     muscleTarget: "Deltoide Lateral",
     equipment: "Halteres",
     instructions: [
@@ -78,36 +78,36 @@ export const exerciseGifs: Record<string, ExerciseMedia> = {
     ]
   },
   "Elevação Frontal com Barra": {
-    gifUrl: "https://v2.exercisedb.io/image/hTlPnRcJpLBVoS",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Front-Raise.gif",
     muscleTarget: "Deltoide Anterior",
     equipment: "Barra"
   },
   "Remada Alta com Barra": {
-    gifUrl: "https://v2.exercisedb.io/image/nxFRv2kUdH-RYf",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Upright-Row.gif",
     muscleTarget: "Deltoides e Trapezio",
     equipment: "Barra"
   },
 
   // TRICEPS
   "Tríceps na Polia": {
-    gifUrl: "https://v2.exercisedb.io/image/D6pxvXjwOzrfby",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Pushdown.gif",
     muscleTarget: "Triceps",
     equipment: "Polia"
   },
   "Tríceps na Polia (Corda)": {
-    gifUrl: "https://v2.exercisedb.io/image/XRrk7h5IA3tqe4",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Rope-Pushdown.gif",
     muscleTarget: "Triceps",
     equipment: "Polia com Corda"
   },
   "Tríceps Francês": {
-    gifUrl: "https://v2.exercisedb.io/image/Lx4d9GEJiVnphA",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lying-Triceps-Extension.gif",
     muscleTarget: "Triceps",
     equipment: "Halteres"
   },
 
   // COSTAS
   "Barra Fixa (Pegada Aberta)": {
-    gifUrl: "https://v2.exercisedb.io/image/Vur9iYKi4O2bxk",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Pull-Up.gif",
     muscleTarget: "Dorsais",
     equipment: "Barra Fixa",
     instructions: [
@@ -117,32 +117,32 @@ export const exerciseGifs: Record<string, ExerciseMedia> = {
     ]
   },
   "Remada Curvada com Barra": {
-    gifUrl: "https://v2.exercisedb.io/image/nLTXJrPMG8A7ho",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Bent-Over-Row.gif",
     muscleTarget: "Dorsais",
     equipment: "Barra"
   },
   "Remada Curvada com Halteres": {
-    gifUrl: "https://v2.exercisedb.io/image/QVQD6sWTYOOvXj",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Row.gif",
     muscleTarget: "Dorsais",
     equipment: "Halteres"
   },
   "Remada Sentado na Polia": {
-    gifUrl: "https://v2.exercisedb.io/image/HqFKj2rdT49ywZ",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Cable-Row.gif",
     muscleTarget: "Dorsais",
     equipment: "Polia"
   },
   "Pulldown com Corda": {
-    gifUrl: "https://v2.exercisedb.io/image/WJl-R2QLz97MkP",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Straight-Arm-Pulldown.gif",
     muscleTarget: "Dorsais",
     equipment: "Polia"
   },
   "Puxada Frontal (Pegada Aberta)": {
-    gifUrl: "https://v2.exercisedb.io/image/hZTKfYJKyHxr3T",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lat-Pulldown.gif",
     muscleTarget: "Dorsais",
     equipment: "Polia"
   },
   "Levantamento Terra": {
-    gifUrl: "https://v2.exercisedb.io/image/HnZ5YX7XtP1EK2",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Deadlift.gif",
     muscleTarget: "Costas e Pernas",
     equipment: "Barra",
     instructions: [
@@ -153,41 +153,41 @@ export const exerciseGifs: Record<string, ExerciseMedia> = {
     ]
   },
   "Pullover com Halteres": {
-    gifUrl: "https://v2.exercisedb.io/image/89HNqL0OgYlPij",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Pullover.gif",
     muscleTarget: "Dorsais e Peitoral",
     equipment: "Halter"
   },
   "Remada Unilateral com Halteres": {
-    gifUrl: "https://v2.exercisedb.io/image/Vy2rJh9FBQX8xC",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Row.gif",
     muscleTarget: "Dorsais",
     equipment: "Halter"
   },
   "Hiperextensão Lombar": {
-    gifUrl: "https://v2.exercisedb.io/image/lR5MnKWZ8qyYgT",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hyperextension.gif",
     muscleTarget: "Lombar",
     equipment: "Banco Romano"
   },
 
   // BICEPS
   "Rosca Direta com Barra": {
-    gifUrl: "https://v2.exercisedb.io/image/TpGhKLBtP0oyzF",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Curl.gif",
     muscleTarget: "Biceps",
     equipment: "Barra"
   },
   "Rosca Martelo": {
-    gifUrl: "https://v2.exercisedb.io/image/KvJHwNYiP9rjf4",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hammer-Curl.gif",
     muscleTarget: "Biceps e Braquial",
     equipment: "Halteres"
   },
   "Rosca Concentrada": {
-    gifUrl: "https://v2.exercisedb.io/image/Xh8jKPV2R0yNbw",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Concentration-Curl.gif",
     muscleTarget: "Biceps",
     equipment: "Halter"
   },
 
   // PERNAS
   "Agachamento Livre": {
-    gifUrl: "https://v2.exercisedb.io/image/Yh9RP2LKtMOxvz",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Squat.gif",
     muscleTarget: "Quadriceps e Gluteos",
     equipment: "Barra",
     instructions: [
@@ -199,69 +199,69 @@ export const exerciseGifs: Record<string, ExerciseMedia> = {
     ]
   },
   "Agachamento Frontal": {
-    gifUrl: "https://v2.exercisedb.io/image/N3VPkrHwL7j5Mf",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Front-Squat.gif",
     muscleTarget: "Quadriceps",
     equipment: "Barra"
   },
   "Agachamento Sumô com Halteres": {
-    gifUrl: "https://v2.exercisedb.io/image/R5tKyLwH8NjPMx",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Sumo-Squat.gif",
     muscleTarget: "Gluteos e Adutores",
     equipment: "Halter"
   },
   "Leg Press 45°": {
-    gifUrl: "https://v2.exercisedb.io/image/9hVKLwRyP2MtNj",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Leg-Press.gif",
     muscleTarget: "Quadriceps",
     equipment: "Leg Press"
   },
   "Leg Press 45° (Pés Altos)": {
-    gifUrl: "https://v2.exercisedb.io/image/9hVKLwRyP2MtNj",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Leg-Press.gif",
     muscleTarget: "Gluteos",
     equipment: "Leg Press"
   },
   "Hack Machine": {
-    gifUrl: "https://v2.exercisedb.io/image/Pj2RKyLwH8NtVx",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hack-Squat.gif",
     muscleTarget: "Quadriceps",
     equipment: "Hack Squat"
   },
   "Cadeira Extensora": {
-    gifUrl: "https://v2.exercisedb.io/image/Lk8RYtPwH2NjMv",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Leg-Extension.gif",
     muscleTarget: "Quadriceps",
     equipment: "Maquina"
   },
   "Mesa Flexora": {
-    gifUrl: "https://v2.exercisedb.io/image/Mj9RKyPwL2HtNx",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lying-Leg-Curl.gif",
     muscleTarget: "Isquiotibiais",
     equipment: "Maquina"
   },
   "Stiff": {
-    gifUrl: "https://v2.exercisedb.io/image/Xk2RPyLwH8NjTv",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Stiff-Leg-Deadlift.gif",
     muscleTarget: "Isquiotibiais e Gluteos",
     equipment: "Barra"
   },
   "Stiff com Barra": {
-    gifUrl: "https://v2.exercisedb.io/image/Xk2RPyLwH8NjTv",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Stiff-Leg-Deadlift.gif",
     muscleTarget: "Isquiotibiais e Gluteos",
     equipment: "Barra"
   },
   "Agachamento Búlgaro": {
-    gifUrl: "https://v2.exercisedb.io/image/Vj8RKyPwL2HtNm",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Bulgarian-Split-Squat.gif",
     muscleTarget: "Quadriceps e Gluteos",
     equipment: "Halteres"
   },
   "Panturrilha em Pé": {
-    gifUrl: "https://v2.exercisedb.io/image/Wk9RPyLwH2NjTx",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Standing-Calf-Raise.gif",
     muscleTarget: "Panturrilha",
     equipment: "Maquina"
   },
   "Panturrilha Sentada": {
-    gifUrl: "https://v2.exercisedb.io/image/Yk2RPyLwH8NjTm",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Calf-Raise.gif",
     muscleTarget: "Soleo",
     equipment: "Maquina"
   },
 
   // GLUTEOS
   "Hip Thrust na Barra": {
-    gifUrl: "https://v2.exercisedb.io/image/Zj8RKyPwL2HtNv",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Hip-Thrust.gif",
     muscleTarget: "Gluteos",
     equipment: "Barra",
     instructions: [
@@ -273,39 +273,39 @@ export const exerciseGifs: Record<string, ExerciseMedia> = {
     ]
   },
   "Elevação Pélvica no Solo": {
-    gifUrl: "https://v2.exercisedb.io/image/Ak9RPyLwH2NjTy",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Glute-Bridge.gif",
     muscleTarget: "Gluteos",
     equipment: "Peso Corporal"
   },
   "Afundo com Halteres": {
-    gifUrl: "https://v2.exercisedb.io/image/Bk2RPyLwH8NjTz",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Lunge.gif",
     muscleTarget: "Quadriceps e Gluteos",
     equipment: "Halteres"
   },
   "Abdução na Máquina": {
-    gifUrl: "https://v2.exercisedb.io/image/Ck8RKyPwL2HtNa",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hip-Abduction-Machine.gif",
     muscleTarget: "Gluteo Medio",
     equipment: "Maquina"
   },
   "Adução na Máquina": {
-    gifUrl: "https://v2.exercisedb.io/image/Dk9RPyLwH2NjTb",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hip-Adduction-Machine.gif",
     muscleTarget: "Adutores",
     equipment: "Maquina"
   },
   "Cadeira Adutora": {
-    gifUrl: "https://v2.exercisedb.io/image/Dk9RPyLwH2NjTb",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hip-Adduction-Machine.gif",
     muscleTarget: "Adutores",
     equipment: "Maquina"
   },
   "Coice na Polia (Glute Kickback)": {
-    gifUrl: "https://v2.exercisedb.io/image/Ek2RPyLwH8NjTc",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Glute-Kickback.gif",
     muscleTarget: "Gluteos",
     equipment: "Polia"
   },
 
   // ABDOMEN
   "Prancha Isométrica": {
-    gifUrl: "https://v2.exercisedb.io/image/Fk8RKyPwL2HtNd",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Front-Plank.gif",
     muscleTarget: "Core",
     equipment: "Peso Corporal",
     instructions: [
@@ -316,72 +316,72 @@ export const exerciseGifs: Record<string, ExerciseMedia> = {
     ]
   },
   "Abdominal Supra (Crunch)": {
-    gifUrl: "https://v2.exercisedb.io/image/Gk9RPyLwH2NjTe",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Crunch.gif",
     muscleTarget: "Reto Abdominal",
     equipment: "Peso Corporal"
   },
   "Abdominal Crunch": {
-    gifUrl: "https://v2.exercisedb.io/image/Gk9RPyLwH2NjTe",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Crunch.gif",
     muscleTarget: "Reto Abdominal",
     equipment: "Peso Corporal"
   },
   "Elevação de Pernas Suspenso": {
-    gifUrl: "https://v2.exercisedb.io/image/Hk2RPyLwH8NjTf",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Hanging-Leg-Raise.gif",
     muscleTarget: "Abdomen Inferior",
     equipment: "Barra Fixa"
   },
   "Abdominal Oblíquo na Polia": {
-    gifUrl: "https://v2.exercisedb.io/image/Ik8RKyPwL2HtNg",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Wood-Chop.gif",
     muscleTarget: "Obliquos",
     equipment: "Polia"
   },
   "Abdominal Oblíquo": {
-    gifUrl: "https://v2.exercisedb.io/image/Jk9RPyLwH2NjTh",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Oblique-Crunch.gif",
     muscleTarget: "Obliquos",
     equipment: "Peso Corporal"
   },
   "Abdominal na Polia Alta": {
-    gifUrl: "https://v2.exercisedb.io/image/Kk2RPyLwH8NjTi",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Cable-Crunch.gif",
     muscleTarget: "Reto Abdominal",
     equipment: "Polia"
   },
   "Prancha com Elevação de Braço": {
-    gifUrl: "https://v2.exercisedb.io/image/Lk8RKyPwL2HtNj",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Plank-Arm-Reach.gif",
     muscleTarget: "Core",
     equipment: "Peso Corporal"
   },
   "Prancha Lateral": {
-    gifUrl: "https://v2.exercisedb.io/image/Mk9RPyLwH2NjTk",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Side-Plank.gif",
     muscleTarget: "Obliquos",
     equipment: "Peso Corporal"
   },
   "Russian Twist com Anilha": {
-    gifUrl: "https://v2.exercisedb.io/image/Nk2RPyLwH8NjTl",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Russian-Twist.gif",
     muscleTarget: "Obliquos",
     equipment: "Anilha"
   },
   "Mountain Climbers": {
-    gifUrl: "https://v2.exercisedb.io/image/Ok8RKyPwL2HtNm",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Mountain-Climber.gif",
     muscleTarget: "Core e Cardio",
     equipment: "Peso Corporal"
   },
   "Abdominal Infra (Elevação de Pernas)": {
-    gifUrl: "https://v2.exercisedb.io/image/Pk9RPyLwH2NjTn",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lying-Leg-Raise.gif",
     muscleTarget: "Abdomen Inferior",
     equipment: "Peso Corporal"
   },
   "Abdominal Infra (Pernas Elevadas)": {
-    gifUrl: "https://v2.exercisedb.io/image/Pk9RPyLwH2NjTn",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Lying-Leg-Raise.gif",
     muscleTarget: "Abdomen Inferior",
     equipment: "Peso Corporal"
   },
   "Abdominal Bicicleta": {
-    gifUrl: "https://v2.exercisedb.io/image/Qk2RPyLwH8NjTo",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Bicycle-Crunch.gif",
     muscleTarget: "Obliquos",
     equipment: "Peso Corporal"
   },
   "Dead Bug": {
-    gifUrl: "https://v2.exercisedb.io/image/Rk8RKyPwL2HtNp",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dead-Bug.gif",
     muscleTarget: "Core",
     equipment: "Peso Corporal"
   },
@@ -393,12 +393,12 @@ export const exerciseGifs: Record<string, ExerciseMedia> = {
 
   // OUTROS
   "Supino Reto com Halteres": {
-    gifUrl: "https://v2.exercisedb.io/image/Sk9RPyLwH2NjTq",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Dumbbell-Bench-Press.gif",
     muscleTarget: "Peitoral",
     equipment: "Halteres"
   },
   "Crucifixo Inclinado": {
-    gifUrl: "https://v2.exercisedb.io/image/Tk2RPyLwH8NjTr",
+    gifUrl: "https://fitnessprogramer.com/wp-content/uploads/2021/02/Incline-Dumbbell-Fly.gif",
     muscleTarget: "Peitoral Superior",
     equipment: "Halteres"
   },
