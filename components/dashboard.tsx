@@ -239,12 +239,12 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
     },
     // 9. Agenda
     { id: "calendar", label: "Agenda", icon: CalendarDays, color: "#06b6d4", enabled: preferences.enable_calendar },
-    // 10. Pontos
-    { id: "loyalty", label: "Pontos", icon: Coins, color: "#f59e0b", enabled: true },
+    // 10. Pontos (oculto temporariamente)
+    { id: "loyalty", label: "Pontos", icon: Coins, color: "#f59e0b", enabled: false },
     // 11. Avaliacao Fisica
     { id: "assessment", label: "Avaliacao", icon: ClipboardList, color: "#10b981", enabled: true },
-    // 12. Gamificacao
-    { id: "gamification", label: "Conquistas", icon: Trophy, color: "#eab308", enabled: true },
+    // 12. Gamificacao (oculto temporariamente)
+    { id: "gamification", label: "Conquistas", icon: Trophy, color: "#eab308", enabled: false },
     // 13. Chat
     { id: "chat", label: "Chat", icon: MessageCircle, color: "#8b5cf6", enabled: true },
     // 14. Stats (oculto temporariamente)
