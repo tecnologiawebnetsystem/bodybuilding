@@ -419,20 +419,20 @@ export function RunningTab({ userId, preferences }: RunningTabProps) {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4 bg-white/5">
-          <TabsTrigger value="registrar" className="data-[state=active]:bg-green-600 text-xs">
+        <TabsList className="grid w-full grid-cols-4 bg-orange-100 p-1">
+          <TabsTrigger value="registrar" className="data-[state=active]:bg-green-600 data-[state=active]:text-white text-black text-xs font-medium">
             <Activity className="w-4 h-4 mr-1" />
             Historico
           </TabsTrigger>
-          <TabsTrigger value="planos" className="data-[state=active]:bg-green-600 text-xs">
+          <TabsTrigger value="planos" className="data-[state=active]:bg-green-600 data-[state=active]:text-white text-black text-xs font-medium">
             <Calendar className="w-4 h-4 mr-1" />
             Planos
           </TabsTrigger>
-          <TabsTrigger value="desafios" className="data-[state=active]:bg-green-600 text-xs">
+          <TabsTrigger value="desafios" className="data-[state=active]:bg-green-600 data-[state=active]:text-white text-black text-xs font-medium">
             <Target className="w-4 h-4 mr-1" />
             Desafios
           </TabsTrigger>
-          <TabsTrigger value="prs" className="data-[state=active]:bg-green-600 text-xs">
+          <TabsTrigger value="prs" className="data-[state=active]:bg-green-600 data-[state=active]:text-white text-black text-xs font-medium">
             <Trophy className="w-4 h-4 mr-1" />
             PRs
           </TabsTrigger>
