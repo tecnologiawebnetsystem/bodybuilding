@@ -42,9 +42,17 @@ interface UserProfile {
   age?: number
 }
 
+interface WorkoutPlan {
+  type: string // "AB", "ABC", "ABCD", "ABCDE"
+  description: string
+  workouts: Workout[]
+}
+
 interface WorkoutGeneratorProps {
+  userId?: string
   userProfile?: UserProfile | null
-  onSave?: (title: string, data: Workout) => void
+  onSave?: (title: string, data: WorkoutPlan) => void
+  onSaveToWorkouts?: (plan: WorkoutPlan) => void
 }
 
 const goals = [
@@ -61,14 +69,12 @@ const levels = [
   { value: "avancado", label: "Avancado" },
 ]
 
-const focusAreas = [
-  { value: "peito", label: "Peito" },
-  { value: "costas", label: "Costas" },
-  { value: "ombros", label: "Ombros" },
-  { value: "bracos", label: "Bracos" },
-  { value: "pernas", label: "Pernas" },
-  { value: "abdomen", label: "Abdomen" },
-  { value: "corpo-inteiro", label: "Corpo Inteiro" },
+const splitTypes = [
+  { value: "AB", label: "AB (2 treinos)", description: "Superior/Inferior" },
+  { value: "ABC", label: "ABC (3 treinos)", description: "Push/Pull/Legs" },
+  { value: "ABCD", label: "ABCD (4 treinos)", description: "Divisao classica" },
+  { value: "ABCDE", label: "ABCDE (5 treinos)", description: "Um grupo por dia" },
+  { value: "single", label: "Treino Unico", description: "Treino avulso" },
 ]
 
 const loadingSteps = [
@@ -79,17 +85,19 @@ const loadingSteps = [
   { text: "Finalizando seu treino...", duration: 1000 },
 ]
 
-export function WorkoutGenerator({ userProfile, onSave }: WorkoutGeneratorProps) {
+export function WorkoutGenerator({ userId, userProfile, onSave, onSaveToWorkouts }: WorkoutGeneratorProps) {
   const [isGenerating, setIsGenerating] = useState(false)
-  const [workout, setWorkout] = useState<Workout | null>(null)
+  const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null)
+  const [expandedWorkout, setExpandedWorkout] = useState<number>(0)
   const [expandedExercise, setExpandedExercise] = useState<number | null>(null)
   const [loadingStep, setLoadingStep] = useState(0)
   const [saved, setSaved] = useState(false)
+  const [savedToWorkouts, setSavedToWorkouts] = useState(false)
   
   const [formData, setFormData] = useState({
     goal: "hipertrofia",
     level: "intermediario",
-    focusArea: "corpo-inteiro",
+    splitType: "ABC",
     duration: "60",
     equipment: "Academia completa",
     restrictions: "",
@@ -130,12 +138,13 @@ export function WorkoutGenerator({ userProfile, onSave }: WorkoutGeneratorProps)
 
   const handleGenerate = async () => {
     setIsGenerating(true)
-    setWorkout(null)
+    setWorkoutPlan(null)
     setError(null)
     setSaved(false)
+    setSavedToWorkouts(false)
 
     try {
-      const response = await fetch("/api/ai/generate-workout", {
+      const response = await fetch("/api/ai/generate-workout-plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -145,8 +154,9 @@ export function WorkoutGenerator({ userProfile, onSave }: WorkoutGeneratorProps)
       
       if (data.error) {
         setError(data.error)
-      } else if (data.workout) {
-        setWorkout(data.workout)
+      } else if (data.plan) {
+        setWorkoutPlan(data.plan)
+        setExpandedWorkout(0)
       } else {
         setError("Resposta inesperada do servidor")
       }
@@ -159,30 +169,55 @@ export function WorkoutGenerator({ userProfile, onSave }: WorkoutGeneratorProps)
   }
 
   const handleSave = () => {
-    if (workout && onSave) {
-      onSave(workout.name, workout)
+    if (workoutPlan && onSave) {
+      onSave(`Plano ${workoutPlan.type}`, workoutPlan)
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     }
   }
 
+  const handleSaveToWorkouts = async () => {
+    if (workoutPlan && userId) {
+      try {
+        const response = await fetch("/api/user-workouts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId,
+            plan: workoutPlan,
+          }),
+        })
+
+        if (response.ok) {
+          setSavedToWorkouts(true)
+          if (onSaveToWorkouts) {
+            onSaveToWorkouts(workoutPlan)
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao salvar treinos:", error)
+      }
+    }
+  }
+
   const handleShare = async () => {
-    if (!workout) return
+    if (!workoutPlan) return
     
-    const text = `Treino: ${workout.name}\n\nExercicios:\n${workout.exercises.map((e, i) => 
-      `${i + 1}. ${e.name} - ${e.sets}x${e.reps}`
-    ).join('\n')}\n\nGerado por IA - Bodybuilding App`
+    const text = `Plano de Treino ${workoutPlan.type}\n\n${workoutPlan.workouts.map((w, i) => 
+      `Treino ${String.fromCharCode(65 + i)}:\n${w.exercises.map((e, j) => 
+        `  ${j + 1}. ${e.name} - ${e.sets}x${e.reps}`
+      ).join('\n')}`
+    ).join('\n\n')}\n\nGerado por IA - Bodybuilding App`
     
     if (navigator.share) {
       try {
-        await navigator.share({ title: workout.name, text })
-      } catch (err) {
-        // Fallback para clipboard
+        await navigator.share({ title: `Plano ${workoutPlan.type}`, text })
+      } catch {
         navigator.clipboard.writeText(text)
       }
     } else {
       navigator.clipboard.writeText(text)
-      alert("Treino copiado para a area de transferencia!")
+      alert("Plano copiado para a area de transferencia!")
     }
   }
 
@@ -239,16 +274,16 @@ export function WorkoutGenerator({ userProfile, onSave }: WorkoutGeneratorProps)
               </select>
             </div>
 
-            {/* Area de Foco */}
+            {/* Tipo de Divisao */}
             <div className="space-y-2">
-              <Label className="text-gray-300">Area de Foco</Label>
+              <Label className="text-gray-300">Tipo de Serie</Label>
               <select
-                value={formData.focusArea}
-                onChange={(e) => setFormData({ ...formData, focusArea: e.target.value })}
+                value={formData.splitType}
+                onChange={(e) => setFormData({ ...formData, splitType: e.target.value })}
                 className="w-full h-10 px-3 rounded-lg bg-white/[0.05] border border-white/[0.1] text-white focus:border-orange-500 focus:outline-none"
               >
-                {focusAreas.map((f) => (
-                  <option key={f.value} value={f.value} className="bg-gray-900">{f.label}</option>
+                {splitTypes.map((s) => (
+                  <option key={s.value} value={s.value} className="bg-gray-900">{s.label}</option>
                 ))}
               </select>
             </div>
@@ -353,186 +388,202 @@ export function WorkoutGenerator({ userProfile, onSave }: WorkoutGeneratorProps)
       )}
 
       {/* Resultado */}
-      {workout && (
+      {workoutPlan && (
         <div className="space-y-4 animate-fade-in">
           {/* Botoes de Acao */}
           <div className="flex gap-3">
             <Button
-              onClick={handleSave}
-              disabled={saved}
+              onClick={handleSaveToWorkouts}
+              disabled={savedToWorkouts}
               className={`flex-1 ${
-                saved 
+                savedToWorkouts 
                   ? "bg-green-500 hover:bg-green-500" 
-                  : "bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1]"
+                  : "bg-gradient-to-r from-orange-500 to-red-600"
               }`}
             >
-              {saved ? (
+              {savedToWorkouts ? (
                 <>
                   <Check className="w-4 h-4 mr-2" />
-                  Salvo!
+                  Salvo em Treinos!
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4 mr-2" />
-                  Salvar Treino
+                  Salvar em Treinos
                 </>
               )}
             </Button>
             <Button
               onClick={handleShare}
-              className="flex-1 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1]"
+              className="bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.1]"
             >
-              <Share2 className="w-4 h-4 mr-2" />
-              Compartilhar
+              <Share2 className="w-4 h-4" />
             </Button>
           </div>
 
-          {/* Header do Treino */}
+          {/* Header do Plano */}
           <Card className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500/20">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-white">{workout.name}</h3>
-                  <p className="text-gray-400 mt-1">{workout.description}</p>
+                  <h3 className="text-xl font-bold text-white">Plano {workoutPlan.type}</h3>
+                  <p className="text-gray-400 mt-1">{workoutPlan.description}</p>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1 bg-orange-500/20 rounded-full">
-                  <span className="text-orange-300 text-sm font-medium capitalize">{workout.difficulty}</span>
-                </div>
-              </div>
-              <div className="flex gap-6 mt-4">
-                <div className="flex items-center gap-2 text-gray-300">
-                  <Clock className="w-4 h-4 text-orange-400" />
-                  <span>{workout.duration}</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-300">
-                  <Target className="w-4 h-4 text-orange-400" />
-                  <span>{workout.exercises.length} exercicios</span>
+                <div className="px-3 py-1 bg-orange-500/20 rounded-full">
+                  <span className="text-orange-300 text-sm font-medium">{workoutPlan.workouts.length} treinos</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Aquecimento */}
-          <Card className="bg-white/[0.03] border-white/[0.08]">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg text-orange-400 flex items-center gap-2">
-                <Zap className="w-5 h-5" />
-                Aquecimento
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {workout.warmup.map((item, index) => (
-                <div key={index} className="p-3 bg-white/[0.02] rounded-lg border border-white/[0.05]">
-                  <div className="flex justify-between items-center">
-                    <span className="text-white font-medium">{item.exercise}</span>
-                    <span className="text-gray-400 text-sm">{item.duration}</span>
-                  </div>
-                  <p className="text-gray-400 text-sm mt-1">{item.instructions}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* Exercicios Principais */}
-          <Card className="bg-white/[0.03] border-white/[0.08]">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg text-white flex items-center gap-2">
-                <Dumbbell className="w-5 h-5 text-orange-400" />
-                Exercicios Principais
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {workout.exercises.map((exercise, index) => (
-                <div 
-                  key={index} 
-                  className="p-4 bg-white/[0.02] rounded-lg border border-white/[0.05] hover:border-orange-500/30 transition-colors"
+          {/* Seletor de Treinos */}
+          {workoutPlan.workouts.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {workoutPlan.workouts.map((workout, index) => (
+                <button
+                  key={index}
+                  onClick={() => setExpandedWorkout(index)}
+                  className={`flex-shrink-0 px-4 py-2 rounded-lg font-medium transition-all ${
+                    expandedWorkout === index
+                      ? "bg-gradient-to-r from-orange-500 to-red-600 text-white"
+                      : "bg-white/[0.05] text-gray-400 hover:text-white"
+                  }`}
                 >
-                  <div 
-                    className="flex justify-between items-center cursor-pointer"
-                    onClick={() => setExpandedExercise(expandedExercise === index ? null : index)}
-                  >
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <span className="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 font-bold text-sm">
-                          {index + 1}
-                        </span>
-                        <div>
-                          <h4 className="text-white font-medium">{exercise.name}</h4>
-                          <p className="text-gray-500 text-sm">{exercise.muscleGroup}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-orange-400 font-medium">{exercise.sets} x {exercise.reps}</p>
-                        <p className="text-gray-500 text-sm">Descanso: {exercise.rest}</p>
-                      </div>
-                      {expandedExercise === index ? (
-                        <ChevronUp className="w-5 h-5 text-gray-400" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-gray-400" />
-                      )}
-                    </div>
-                  </div>
-                  
-                  {expandedExercise === index && (
-                    <div className="mt-4 pt-4 border-t border-white/[0.05] space-y-2">
-                      <div>
-                        <p className="text-gray-400 text-sm font-medium mb-1">Instrucoes:</p>
-                        <p className="text-gray-300 text-sm">{exercise.instructions}</p>
-                      </div>
-                      {exercise.tips && (
-                        <div>
-                          <p className="text-orange-400 text-sm font-medium mb-1">Dica:</p>
-                          <p className="text-gray-300 text-sm">{exercise.tips}</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                  Treino {String.fromCharCode(65 + index)}
+                </button>
               ))}
-            </CardContent>
-          </Card>
-
-          {/* Volta a Calma */}
-          <Card className="bg-white/[0.03] border-white/[0.08]">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg text-green-400 flex items-center gap-2">
-                <Zap className="w-5 h-5" />
-                Volta a Calma
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {workout.cooldown.map((item, index) => (
-                <div key={index} className="p-3 bg-white/[0.02] rounded-lg border border-white/[0.05]">
-                  <div className="flex justify-between items-center">
-                    <span className="text-white font-medium">{item.exercise}</span>
-                    <span className="text-gray-400 text-sm">{item.duration}</span>
-                  </div>
-                  <p className="text-gray-400 text-sm mt-1">{item.instructions}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* Dicas */}
-          {workout.tips && workout.tips.length > 0 && (
-            <Card className="bg-white/[0.03] border-white/[0.08]">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg text-yellow-400">Dicas Importantes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {workout.tips.map((tip, index) => (
-                    <li key={index} className="flex items-start gap-2 text-gray-300 text-sm">
-                      <span className="text-yellow-400 mt-1">•</span>
-                      {tip}
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+            </div>
           )}
+
+          {/* Treino Selecionado */}
+          {workoutPlan.workouts[expandedWorkout] && (
+            <>
+              {/* Info do Treino */}
+              <Card className="bg-white/[0.03] border-white/[0.08]">
+                <CardContent className="p-4">
+                  <h4 className="text-lg font-semibold text-white">{workoutPlan.workouts[expandedWorkout].name}</h4>
+                  <p className="text-gray-400 text-sm mt-1">{workoutPlan.workouts[expandedWorkout].description}</p>
+                  <div className="flex gap-4 mt-3">
+                    <div className="flex items-center gap-2 text-gray-300 text-sm">
+                      <Clock className="w-4 h-4 text-orange-400" />
+                      <span>{workoutPlan.workouts[expandedWorkout].duration}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-300 text-sm">
+                      <Target className="w-4 h-4 text-orange-400" />
+                      <span>{workoutPlan.workouts[expandedWorkout].exercises.length} exercicios</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Aquecimento */}
+              {workoutPlan.workouts[expandedWorkout].warmup?.length > 0 && (
+                <Card className="bg-white/[0.03] border-white/[0.08]">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg text-orange-400 flex items-center gap-2">
+                      <Zap className="w-5 h-5" />
+                      Aquecimento
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {workoutPlan.workouts[expandedWorkout].warmup.map((item, index) => (
+                      <div key={index} className="p-3 bg-white/[0.02] rounded-lg border border-white/[0.05]">
+                        <div className="flex justify-between items-center">
+                          <span className="text-white font-medium">{item.exercise}</span>
+                          <span className="text-gray-400 text-sm">{item.duration}</span>
+                        </div>
+                        <p className="text-gray-400 text-sm mt-1">{item.instructions}</p>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Exercicios */}
+              <Card className="bg-white/[0.03] border-white/[0.08]">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg text-white flex items-center gap-2">
+                    <Dumbbell className="w-5 h-5 text-orange-400" />
+                    Exercicios
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {workoutPlan.workouts[expandedWorkout].exercises.map((exercise, index) => (
+                    <div 
+                      key={index} 
+                      className="p-4 bg-white/[0.02] rounded-lg border border-white/[0.05] hover:border-orange-500/30 transition-colors"
+                    >
+                      <div 
+                        className="flex justify-between items-center cursor-pointer"
+                        onClick={() => setExpandedExercise(expandedExercise === index ? null : index)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 font-bold text-sm">
+                            {index + 1}
+                          </span>
+                          <div>
+                            <h4 className="text-white font-medium">{exercise.name}</h4>
+                            <p className="text-gray-500 text-sm">{exercise.muscleGroup}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <p className="text-orange-400 font-medium">{exercise.sets} x {exercise.reps}</p>
+                            <p className="text-gray-500 text-sm">Descanso: {exercise.rest}</p>
+                          </div>
+                          {expandedExercise === index ? (
+                            <ChevronUp className="w-5 h-5 text-gray-400" />
+                          ) : (
+                            <ChevronDown className="w-5 h-5 text-gray-400" />
+                          )}
+                        </div>
+                      </div>
+                      
+                      {expandedExercise === index && (
+                        <div className="mt-4 pt-4 border-t border-white/[0.05] space-y-2">
+                          <div>
+                            <p className="text-gray-400 text-sm font-medium mb-1">Instrucoes:</p>
+                            <p className="text-gray-300 text-sm">{exercise.instructions}</p>
+                          </div>
+                          {exercise.tips && (
+                            <div>
+                              <p className="text-orange-400 text-sm font-medium mb-1">Dica:</p>
+                              <p className="text-gray-300 text-sm">{exercise.tips}</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Volta a Calma */}
+              {workoutPlan.workouts[expandedWorkout].cooldown?.length > 0 && (
+                <Card className="bg-white/[0.03] border-white/[0.08]">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg text-green-400 flex items-center gap-2">
+                      <Zap className="w-5 h-5" />
+                      Volta a Calma
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {workoutPlan.workouts[expandedWorkout].cooldown.map((item, index) => (
+                      <div key={index} className="p-3 bg-white/[0.02] rounded-lg border border-white/[0.05]">
+                        <div className="flex justify-between items-center">
+                          <span className="text-white font-medium">{item.exercise}</span>
+                          <span className="text-gray-400 text-sm">{item.duration}</span>
+                        </div>
+                        <p className="text-gray-400 text-sm mt-1">{item.instructions}</p>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
+
+          
         </div>
       )}
     </div>

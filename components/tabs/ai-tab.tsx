@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Sparkles, Dumbbell, Utensils, History, ChevronRight } from "lucide-react"
+import { Sparkles, Dumbbell, Utensils, History, ChevronRight, Pill } from "lucide-react"
 import { WorkoutGenerator } from "@/components/ai/workout-generator"
 import { NutritionAssistant } from "@/components/ai/nutrition-assistant"
+import { SupplementsAssistant } from "@/components/ai/supplements-assistant"
 import { Card, CardContent } from "@/components/ui/card"
 
 interface UserProfile {
@@ -24,11 +25,11 @@ interface AiTabProps {
 }
 
 export function AiTab({ userId, preferences }: AiTabProps) {
-  const [activeSection, setActiveSection] = useState<"workout" | "nutrition" | "history">("workout")
+  const [activeSection, setActiveSection] = useState<"workout" | "nutrition" | "supplements" | "history">("workout")
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [history, setHistory] = useState<Array<{
     id: string
-    type: "workout" | "nutrition"
+    type: "workout" | "nutrition" | "supplements"
     title: string
     date: string
     data: unknown
@@ -58,7 +59,7 @@ export function AiTab({ userId, preferences }: AiTabProps) {
   }, [userId])
 
   // Funcao para salvar no historico
-  const saveToHistory = (type: "workout" | "nutrition", title: string, data: unknown) => {
+  const saveToHistory = (type: "workout" | "nutrition" | "supplements", title: string, data: unknown) => {
     const newEntry = {
       id: Date.now().toString(),
       type,
@@ -109,6 +110,18 @@ export function AiTab({ userId, preferences }: AiTabProps) {
         </button>
 
         <button
+          onClick={() => setActiveSection("supplements")}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-lg text-sm font-medium transition-all ${
+            activeSection === "supplements"
+              ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg"
+              : "text-gray-400 hover:text-white hover:bg-white/[0.05]"
+          }`}
+        >
+          <Pill className="w-5 h-5" />
+          <span className="hidden sm:inline">Suplementos</span>
+        </button>
+
+        <button
           onClick={() => setActiveSection("history")}
           className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-lg text-sm font-medium transition-all ${
             activeSection === "history"
@@ -140,6 +153,13 @@ export function AiTab({ userId, preferences }: AiTabProps) {
             onSave={(title, data) => saveToHistory("nutrition", title, data)}
           />
         )}
+        {activeSection === "supplements" && (
+          <SupplementsAssistant 
+            userId={userId}
+            userProfile={userProfile}
+            onSave={(title, data) => saveToHistory("supplements", title, data)}
+          />
+        )}
         {activeSection === "history" && (
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-white">Historico de Geracoes</h2>
@@ -167,10 +187,14 @@ export function AiTab({ userId, preferences }: AiTabProps) {
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                         item.type === "workout" 
                           ? "bg-gradient-to-r from-orange-500/20 to-red-500/20" 
-                          : "bg-gradient-to-r from-green-500/20 to-emerald-500/20"
+                          : item.type === "supplements"
+                            ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20"
+                            : "bg-gradient-to-r from-green-500/20 to-emerald-500/20"
                       }`}>
                         {item.type === "workout" ? (
                           <Dumbbell className="w-5 h-5 text-orange-400" />
+                        ) : item.type === "supplements" ? (
+                          <Pill className="w-5 h-5 text-cyan-400" />
                         ) : (
                           <Utensils className="w-5 h-5 text-green-400" />
                         )}
