@@ -37,7 +37,11 @@ import {
   Edit2,
   Trash2,
   Check,
+  CheckCircle2,
+  ExternalLink,
+  AlertCircle,
 } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
 
 interface CalendarEvent {
   id: number
@@ -67,6 +71,32 @@ interface GymClass {
   instructor: string
   max_capacity: number
   location: string
+}
+
+interface SpinningSchedule {
+  time_slot: string
+  day_of_week: number
+  instructor: string | null
+}
+
+interface GinasticaSchedule {
+  time_slot: string
+  monday: string | null
+  tuesday: string | null
+  wednesday: string | null
+  thursday: string | null
+  friday: string | null
+}
+
+interface ClassBooking {
+  id: number
+  class_type: "spinning" | "ginastica"
+  class_date: string
+  class_time: string
+  instructor: string
+  checked_in_app: boolean
+  checked_in_gym: boolean
+  reminder_sent: boolean
 }
 
 interface FitnessCalendarProps {
@@ -107,11 +137,17 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
   const [viewMode, setViewMode] = useState<"month" | "week">("month")
   const [events, setEvents] = useState<CalendarEvent[]>([])
   const [gymClasses, setGymClasses] = useState<GymClass[]>([])
+  const [spinningSchedule, setSpinningSchedule] = useState<SpinningSchedule[]>([])
+  const [ginasticaSchedule, setGinasticaSchedule] = useState<GinasticaSchedule[]>([])
+  const [classBookings, setClassBookings] = useState<ClassBooking[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
+  const [selectedClass, setSelectedClass] = useState<{ type: "spinning" | "ginastica"; time: string; instructor: string; date: Date } | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isClassModalOpen, setIsClassModalOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
+  const [checkingIn, setCheckingIn] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -138,16 +174,25 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [eventsRes, classesRes] = await Promise.all([
+      const [eventsRes, classesRes, spinningRes, ginasticaRes, bookingsRes] = await Promise.all([
         fetch(`/api/calendar?userId=${userId}`),
-        fetch("/api/gym-admin/classes")
+        fetch("/api/gym-admin/classes"),
+        fetch("/api/spinning"),
+        fetch("/api/ginastica"),
+        fetch(`/api/class-bookings?userId=${userId}`)
       ])
 
       const eventsData = await eventsRes.json()
       const classesData = await classesRes.json()
+      const spinningData = await spinningRes.json()
+      const ginasticaData = await ginasticaRes.json()
+      const bookingsData = await bookingsRes.json()
 
       if (eventsData.success) setEvents(eventsData.data || [])
       if (classesData.success) setGymClasses(classesData.data || [])
+      if (spinningData.success) setSpinningSchedule(spinningData.data || [])
+      if (ginasticaData.success) setGinasticaSchedule(ginasticaData.data || [])
+      if (bookingsData.success) setClassBookings(bookingsData.data || [])
     } catch (error) {
       console.error("Erro ao carregar dados:", error)
     } finally {
@@ -234,6 +279,162 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
   // Obter aulas da academia para um dia da semana
   const getGymClassesForDay = (dayOfWeek: number): GymClass[] => {
     return gymClasses.filter(gc => gc.day_of_week === dayOfWeek)
+  }
+
+  // Obter aulas de Spinning para uma data especifica
+  const getSpinningClassesForDate = (date: Date): Array<{ time: string; instructor: string }> => {
+    const dayOfWeek = date.getDay()
+    // Spinning so tem aulas de segunda a sexta (1-5)
+    if (dayOfWeek === 0 || dayOfWeek === 6) return []
+    
+    // Verifica se a data esta dentro do periodo valido (ate 31/12/2026)
+    const endDate = new Date("2026-12-31")
+    if (date > endDate) return []
+    
+    return spinningSchedule
+      .filter(s => s.day_of_week === dayOfWeek && s.instructor)
+      .map(s => ({ time: s.time_slot, instructor: s.instructor! }))
+  }
+
+  // Obter aulas de Ginastica para uma data especifica
+  const getGinasticaClassesForDate = (date: Date): Array<{ time: string; className: string }> => {
+    const dayOfWeek = date.getDay()
+    // Ginastica so tem aulas de segunda a sexta (1-5)
+    if (dayOfWeek === 0 || dayOfWeek === 6) return []
+    
+    // Verifica se a data esta dentro do periodo valido (ate 31/12/2026)
+    const endDate = new Date("2026-12-31")
+    if (date > endDate) return []
+    
+    const dayKeys: Record<number, keyof GinasticaSchedule> = {
+      1: "monday",
+      2: "tuesday",
+      3: "wednesday",
+      4: "thursday",
+      5: "friday"
+    }
+    
+    const dayKey = dayKeys[dayOfWeek]
+    if (!dayKey) return []
+    
+    return ginasticaSchedule
+      .filter(g => g[dayKey])
+      .map(g => ({ time: g.time_slot, className: g[dayKey]! }))
+  }
+
+  // Verificar se tem booking para uma aula
+  const getBookingForClass = (type: "spinning" | "ginastica", date: Date, time: string): ClassBooking | undefined => {
+    const dateStr = date.toISOString().split("T")[0]
+    return classBookings.find(b => 
+      b.class_type === type && 
+      b.class_date === dateStr && 
+      b.class_time === time
+    )
+  }
+
+  // Abrir modal de detalhes da aula
+  const openClassModal = (type: "spinning" | "ginastica", time: string, instructor: string, date: Date) => {
+    setSelectedClass({ type, time, instructor, date })
+    setIsClassModalOpen(true)
+  }
+
+  // Fazer booking de uma aula
+  const bookClass = async () => {
+    if (!selectedClass) return
+    setCheckingIn(true)
+    
+    try {
+      const response = await fetch("/api/class-bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          classType: selectedClass.type,
+          classDate: selectedClass.date.toISOString().split("T")[0],
+          classTime: selectedClass.time,
+          instructor: selectedClass.instructor
+        })
+      })
+      
+      const result = await response.json()
+      if (result.success) {
+        await loadData()
+      }
+    } catch (error) {
+      console.error("Erro ao reservar aula:", error)
+    } finally {
+      setCheckingIn(false)
+    }
+  }
+
+  // Check-in no app
+  const checkInApp = async (bookingId: number) => {
+    setCheckingIn(true)
+    try {
+      const response = await fetch("/api/class-bookings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: bookingId,
+          checkedInApp: true
+        })
+      })
+      
+      const result = await response.json()
+      if (result.success) {
+        await loadData()
+      }
+    } catch (error) {
+      console.error("Erro no check-in:", error)
+    } finally {
+      setCheckingIn(false)
+    }
+  }
+
+  // Check-in na academia (marca que fez check-in no app da academia)
+  const checkInGym = async (bookingId: number) => {
+    setCheckingIn(true)
+    try {
+      const response = await fetch("/api/class-bookings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: bookingId,
+          checkedInGym: true
+        })
+      })
+      
+      const result = await response.json()
+      if (result.success) {
+        await loadData()
+      }
+    } catch (error) {
+      console.error("Erro no check-in:", error)
+    } finally {
+      setCheckingIn(false)
+    }
+  }
+
+  // Cancelar booking
+  const cancelBooking = async (bookingId: number) => {
+    if (!confirm("Tem certeza que deseja cancelar esta reserva?")) return
+    setCheckingIn(true)
+    
+    try {
+      const response = await fetch(`/api/class-bookings?id=${bookingId}`, {
+        method: "DELETE"
+      })
+      
+      const result = await response.json()
+      if (result.success) {
+        await loadData()
+        setIsClassModalOpen(false)
+      }
+    } catch (error) {
+      console.error("Erro ao cancelar:", error)
+    } finally {
+      setCheckingIn(false)
+    }
   }
 
   // Navegacao
@@ -485,8 +686,9 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
               <div className="grid grid-cols-7 gap-1">
                 {calendarDays.map((date, idx) => {
                   const dayEvents = getEventsForDate(date)
-                  const dayClasses = getGymClassesForDay(date.getDay())
-                  const hasEvents = dayEvents.length > 0 || (isCurrentMonth(date) && dayClasses.length > 0)
+                  const spinningClasses = getSpinningClassesForDate(date)
+                  const ginasticaClasses = getGinasticaClassesForDate(date)
+                  const hasClasses = spinningClasses.length > 0 || ginasticaClasses.length > 0
 
                   return (
                     <div
@@ -506,7 +708,54 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
                         {date.getDate()}
                       </div>
                       <div className="space-y-1">
-                        {dayEvents.slice(0, 3).map((event, i) => (
+                        {/* Aulas de Spinning */}
+                        {spinningClasses.slice(0, 1).map((sc, i) => {
+                          const booking = getBookingForClass("spinning", date, sc.time)
+                          return (
+                            <div
+                              key={`spin-${i}`}
+                              className={`text-xs p-1 rounded truncate cursor-pointer hover:opacity-80 flex items-center gap-1 ${booking ? "ring-1 ring-green-500" : ""}`}
+                              style={{ backgroundColor: "#7c3aed40", color: "#a78bfa" }}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                openClassModal("spinning", sc.time, sc.instructor, date)
+                              }}
+                            >
+                              <Bike className="w-3 h-3 shrink-0" />
+                              <span className="truncate">{sc.time}</span>
+                              {booking?.checked_in_app && <CheckCircle2 className="w-3 h-3 text-green-500 shrink-0" />}
+                            </div>
+                          )
+                        })}
+                        {spinningClasses.length > 1 && (
+                          <div className="text-xs text-purple-400">+{spinningClasses.length - 1} spin</div>
+                        )}
+                        
+                        {/* Aulas de Ginastica */}
+                        {ginasticaClasses.slice(0, 1).map((gc, i) => {
+                          const booking = getBookingForClass("ginastica", date, gc.time)
+                          return (
+                            <div
+                              key={`gin-${i}`}
+                              className={`text-xs p-1 rounded truncate cursor-pointer hover:opacity-80 flex items-center gap-1 ${booking ? "ring-1 ring-green-500" : ""}`}
+                              style={{ backgroundColor: "#f9731640", color: "#fdba74" }}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                openClassModal("ginastica", gc.time, gc.className, date)
+                              }}
+                            >
+                              <Dumbbell className="w-3 h-3 shrink-0" />
+                              <span className="truncate">{gc.time}</span>
+                              {booking?.checked_in_app && <CheckCircle2 className="w-3 h-3 text-green-500 shrink-0" />}
+                            </div>
+                          )
+                        })}
+                        {ginasticaClasses.length > 1 && (
+                          <div className="text-xs text-orange-400">+{ginasticaClasses.length - 1} gin</div>
+                        )}
+
+                        {/* Eventos normais */}
+                        {dayEvents.slice(0, hasClasses ? 1 : 3).map((event, i) => (
                           <div
                             key={i}
                             className="text-xs p-1 rounded truncate cursor-pointer hover:opacity-80"
@@ -534,7 +783,9 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
             <div className="space-y-2">
               {weekDays.map((date, idx) => {
                 const dayEvents = getEventsForDate(date)
-                const dayClasses = getGymClassesForDay(date.getDay())
+                const spinningClasses = getSpinningClassesForDate(date)
+                const ginasticaClasses = getGinasticaClassesForDate(date)
+                const hasAnyContent = dayEvents.length > 0 || spinningClasses.length > 0 || ginasticaClasses.length > 0
 
                 return (
                   <div
@@ -554,6 +805,43 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
                       </Button>
                     </div>
                     <div className="space-y-1">
+                      {/* Aulas de Spinning na semana */}
+                      {spinningClasses.map((sc, i) => {
+                        const booking = getBookingForClass("spinning", date, sc.time)
+                        return (
+                          <div
+                            key={`spin-${i}`}
+                            className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:opacity-80 ${booking ? "ring-1 ring-green-500" : ""}`}
+                            style={{ backgroundColor: "#7c3aed20" }}
+                            onClick={() => openClassModal("spinning", sc.time, sc.instructor, date)}
+                          >
+                            <Bike className="w-4 h-4 text-purple-400" />
+                            <span className="text-sm font-medium text-white">Spinning - {sc.instructor}</span>
+                            <span className="text-xs text-gray-400">{sc.time}</span>
+                            {booking?.checked_in_app && <CheckCircle2 className="w-4 h-4 text-green-500 ml-auto" />}
+                          </div>
+                        )
+                      })}
+                      
+                      {/* Aulas de Ginastica na semana */}
+                      {ginasticaClasses.map((gc, i) => {
+                        const booking = getBookingForClass("ginastica", date, gc.time)
+                        return (
+                          <div
+                            key={`gin-${i}`}
+                            className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:opacity-80 ${booking ? "ring-1 ring-green-500" : ""}`}
+                            style={{ backgroundColor: "#f9731620" }}
+                            onClick={() => openClassModal("ginastica", gc.time, gc.className, date)}
+                          >
+                            <Dumbbell className="w-4 h-4 text-orange-400" />
+                            <span className="text-sm font-medium text-white">{gc.className}</span>
+                            <span className="text-xs text-gray-400">{gc.time}</span>
+                            {booking?.checked_in_app && <CheckCircle2 className="w-4 h-4 text-green-500 ml-auto" />}
+                          </div>
+                        )
+                      })}
+                      
+                      {/* Eventos normais */}
                       {dayEvents.map((event, i) => (
                         <div
                           key={i}
@@ -571,7 +859,7 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
                           )}
                         </div>
                       ))}
-                      {dayEvents.length === 0 && dayClasses.length === 0 && (
+                      {!hasAnyContent && (
                         <div className="text-sm text-gray-500 italic">Nenhum evento</div>
                       )}
                     </div>
@@ -582,46 +870,74 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
           )}
         </Card>
 
-        {/* Sidebar - Aulas da Academia */}
+        {/* Sidebar - Aulas de Spinning e Ginastica */}
         <Card className="p-4 bg-white/5 border-white/10">
           <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <Dumbbell className="w-5 h-5" style={{ color: preferences.theme_primary }} />
-            Aulas da Academia
+            <CalendarIcon className="w-5 h-5" style={{ color: preferences.theme_primary }} />
+            Minhas Aulas
           </h3>
-          <p className="text-xs text-gray-400 mb-4">Clique para adicionar ao seu calendario</p>
+          <p className="text-xs text-gray-400 mb-4">Clique nas aulas do calendario para reservar</p>
 
+          {/* Proximas reservas */}
           <div className="space-y-3">
-            {gymClasses.length === 0 ? (
-              <p className="text-sm text-gray-500">Nenhuma aula cadastrada</p>
+            <h4 className="text-sm font-medium text-gray-300">Proximas Reservas</h4>
+            {classBookings.filter(b => new Date(b.class_date) >= new Date()).length === 0 ? (
+              <p className="text-sm text-gray-500">Nenhuma reserva</p>
             ) : (
-              gymClasses.map((gc) => (
-                <div
-                  key={gc.id}
-                  className="p-3 rounded-lg border border-white/10 hover:border-white/30 cursor-pointer transition-all"
-                  onClick={() => addGymClassToCalendar(gc)}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-medium text-white">{gc.name}</span>
-                    <Badge variant="outline" className="text-xs">
-                      {gc.type === "spinning" ? "Spinning" : "Ginastica"}
-                    </Badge>
+              classBookings
+                .filter(b => new Date(b.class_date) >= new Date())
+                .slice(0, 5)
+                .map((booking) => (
+                  <div
+                    key={booking.id}
+                    className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                      booking.class_type === "spinning" 
+                        ? "border-purple-500/30 bg-purple-500/10" 
+                        : "border-orange-500/30 bg-orange-500/10"
+                    }`}
+                    onClick={() => {
+                      const date = new Date(booking.class_date)
+                      openClassModal(
+                        booking.class_type,
+                        booking.class_time,
+                        booking.instructor,
+                        date
+                      )
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium text-white flex items-center gap-2">
+                        {booking.class_type === "spinning" ? (
+                          <Bike className="w-4 h-4 text-purple-400" />
+                        ) : (
+                          <Dumbbell className="w-4 h-4 text-orange-400" />
+                        )}
+                        {booking.class_type === "spinning" ? "Spinning" : booking.instructor}
+                      </span>
+                      {booking.checked_in_app && booking.checked_in_gym && (
+                        <Badge className="bg-green-600 text-xs">OK</Badge>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-400 space-y-1">
+                      <div className="flex items-center gap-1">
+                        <CalendarIcon className="w-3 h-3" />
+                        {new Date(booking.class_date).toLocaleDateString("pt-BR")}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {booking.class_time}
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                      <div className={`text-xs px-2 py-0.5 rounded ${booking.checked_in_app ? "bg-green-500/20 text-green-400" : "bg-gray-500/20 text-gray-400"}`}>
+                        App {booking.checked_in_app ? "OK" : "-"}
+                      </div>
+                      <div className={`text-xs px-2 py-0.5 rounded ${booking.checked_in_gym ? "bg-green-500/20 text-green-400" : "bg-gray-500/20 text-gray-400"}`}>
+                        Academia {booking.checked_in_gym ? "OK" : "-"}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-400 space-y-1">
-                    <div className="flex items-center gap-1">
-                      <CalendarIcon className="w-3 h-3" />
-                      {DAYS_FULL[gc.day_of_week]}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {gc.start_time?.slice(0,5)} - {gc.end_time?.slice(0,5)}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
-                      {gc.location}
-                    </div>
-                  </div>
-                </div>
-              ))
+                ))
             )}
           </div>
 
@@ -629,12 +945,22 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
           <div className="mt-6 pt-4 border-t border-white/10">
             <h4 className="text-sm font-medium text-gray-400 mb-2">Legenda</h4>
             <div className="space-y-2">
-              {EVENT_TYPES.map(type => (
-                <div key={type.value} className="flex items-center gap-2 text-xs text-gray-300">
-                  <type.icon className="w-4 h-4" />
-                  {type.label}
-                </div>
-              ))}
+              <div className="flex items-center gap-2 text-xs text-gray-300">
+                <Bike className="w-4 h-4 text-purple-400" />
+                Spinning
+              </div>
+              <div className="flex items-center gap-2 text-xs text-gray-300">
+                <Dumbbell className="w-4 h-4 text-orange-400" />
+                Ginastica
+              </div>
+              <div className="flex items-center gap-2 text-xs text-gray-300">
+                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                Check-in Feito
+              </div>
+              <div className="flex items-center gap-2 text-xs text-gray-300">
+                <Bell className="w-4 h-4 text-yellow-500" />
+                Lembrete 1h antes
+              </div>
             </div>
           </div>
         </Card>
@@ -833,6 +1159,160 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
               Salvar
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Detalhes da Aula */}
+      <Dialog open={isClassModalOpen} onOpenChange={setIsClassModalOpen}>
+        <DialogContent className="max-w-md bg-gray-900 border-gray-700">
+          {selectedClass && (() => {
+            const booking = getBookingForClass(selectedClass.type, selectedClass.date, selectedClass.time)
+            const isSpinning = selectedClass.type === "spinning"
+            const classTime = selectedClass.time
+            const classDate = selectedClass.date
+            
+            // Calcular se esta dentro de 1 hora antes da aula para habilitar check-in
+            const classDateTime = new Date(classDate)
+            const [hours, minutes] = classTime.split(":").map(Number)
+            classDateTime.setHours(hours, minutes, 0, 0)
+            const now = new Date()
+            const oneHourBefore = new Date(classDateTime.getTime() - 60 * 60 * 1000)
+            const canCheckIn = now >= oneHourBefore && now <= classDateTime
+
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="text-white flex items-center gap-2">
+                    {isSpinning ? (
+                      <Bike className="w-5 h-5 text-purple-400" />
+                    ) : (
+                      <Dumbbell className="w-5 h-5 text-orange-400" />
+                    )}
+                    {isSpinning ? "Aula de Spinning" : selectedClass.instructor}
+                  </DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-4 py-4">
+                  {/* Informacoes da aula */}
+                  <div className={`p-4 rounded-lg ${isSpinning ? "bg-purple-500/10 border border-purple-500/30" : "bg-orange-500/10 border border-orange-500/30"}`}>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <CalendarIcon className="w-4 h-4 text-gray-400" />
+                        <span className="text-white">{classDate.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-gray-400" />
+                        <span className="text-white">{classTime}</span>
+                      </div>
+                      {isSpinning && (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-gray-400" />
+                          <span className="text-white">Instrutor: {selectedClass.instructor}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Status da reserva */}
+                  {booking ? (
+                    <div className="space-y-3">
+                      <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <CheckCircle2 className="w-5 h-5 text-green-500" />
+                          <span className="text-green-400 font-medium">Aula Reservada</span>
+                        </div>
+                        
+                        {/* Aviso de lembrete */}
+                        <div className="flex items-start gap-2 p-3 bg-yellow-500/10 rounded-lg mt-3">
+                          <AlertCircle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+                          <div className="text-sm">
+                            <p className="text-yellow-400 font-medium">Lembrete: Check-in 1h antes</p>
+                            <p className="text-gray-400 mt-1">Faca o check-in no app da academia e depois aqui no app para confirmar sua presenca.</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Check-ins */}
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium text-gray-300">Check-in Duplo</h4>
+                        
+                        {/* Check-in Academia */}
+                        <div className={`p-3 rounded-lg border flex items-center justify-between ${booking.checked_in_gym ? "bg-green-500/10 border-green-500/30" : "bg-gray-800 border-gray-700"}`}>
+                          <div className="flex items-center gap-3">
+                            <ExternalLink className="w-5 h-5 text-gray-400" />
+                            <div>
+                              <p className="text-white text-sm font-medium">App da Academia</p>
+                              <p className="text-gray-500 text-xs">Faca check-in no app oficial</p>
+                            </div>
+                          </div>
+                          {booking.checked_in_gym ? (
+                            <CheckCircle2 className="w-6 h-6 text-green-500" />
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={checkingIn || !canCheckIn}
+                              onClick={() => checkInGym(booking.id)}
+                            >
+                              {canCheckIn ? "Marcar" : "Aguarde"}
+                            </Button>
+                          )}
+                        </div>
+
+                        {/* Check-in App */}
+                        <div className={`p-3 rounded-lg border flex items-center justify-between ${booking.checked_in_app ? "bg-green-500/10 border-green-500/30" : "bg-gray-800 border-gray-700"}`}>
+                          <div className="flex items-center gap-3">
+                            <CheckCircle2 className="w-5 h-5 text-gray-400" />
+                            <div>
+                              <p className="text-white text-sm font-medium">Este App</p>
+                              <p className="text-gray-500 text-xs">Confirme aqui tambem</p>
+                            </div>
+                          </div>
+                          {booking.checked_in_app ? (
+                            <CheckCircle2 className="w-6 h-6 text-green-500" />
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={checkingIn || !canCheckIn}
+                              onClick={() => checkInApp(booking.id)}
+                            >
+                              {canCheckIn ? "Marcar" : "Aguarde"}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Botao cancelar */}
+                      <Button
+                        variant="destructive"
+                        className="w-full"
+                        disabled={checkingIn}
+                        onClick={() => cancelBooking(booking.id)}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Cancelar Reserva
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-gray-400 text-sm">
+                        Reserve esta aula para receber um lembrete 1 hora antes e poder fazer o check-in.
+                      </p>
+                      <Button
+                        className="w-full"
+                        style={{ backgroundColor: isSpinning ? "#7c3aed" : "#f97316" }}
+                        disabled={checkingIn}
+                        onClick={bookClass}
+                      >
+                        {checkingIn ? "Reservando..." : "Reservar Aula"}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </>
+            )
+          })()}
         </DialogContent>
       </Dialog>
     </div>

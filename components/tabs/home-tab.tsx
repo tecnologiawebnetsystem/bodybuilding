@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Trophy, Target, Flame, TrendingDown, Calendar, CheckCircle2, Activity, LogOut, Wine, X, Copy, Check, QrCode, Coins, Star, Zap, Bike, Dumbbell } from "lucide-react"
+import { Trophy, Target, Flame, TrendingDown, Calendar, CheckCircle2, Activity, LogOut, Wine, X, Copy, Check, QrCode, Coins, Star, Zap } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ProgressionAlert } from "@/components/progression-alert"
 import { QRAccessCard } from "@/components/qr-access-card"
@@ -382,80 +382,29 @@ export function HomeTab({ userId, onLogout, preferences }: HomeTabProps) {
         </Card>
       )}
 
-      {/* Widgets Calistenia, Spinning, Ginastica - Apenas para Kleber e Pamela */}
-      {["kleber", "pamela"].includes(userId?.toLowerCase() || "") && (
-        <>
-          {/* Widget Calistenia - apenas Kleber tem acesso */}
-          {(userId?.toLowerCase() || "") === "kleber" && (
-            <Card
-              className="p-6 cursor-pointer hover:scale-[1.02] transition-transform border-2"
-              style={{
-                borderColor: "#ef4444",
-                background: "linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%)",
-              }}
-              onClick={() => {
-                const event = new CustomEvent('changeTab', { detail: 'calisthenics' });
-                window.dispatchEvent(event);
-              }}
-            >
-              <div className="flex items-center gap-4 text-white">
-                <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
-                  <Zap className="w-8 h-8" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold">Calistenia</h3>
-                  <p className="text-white/80 text-sm">Treino militar de peso corporal</p>
-                </div>
-              </div>
-            </Card>
-          )}
-
-          {/* Widget Spinning */}
-          <Card
-            className="p-6 cursor-pointer hover:scale-[1.02] transition-transform border-2"
-            style={{
-              borderColor: "#7c3aed",
-              background: "linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%)",
-            }}
-            onClick={() => {
-              const event = new CustomEvent('changeTab', { detail: 'spinning' });
-              window.dispatchEvent(event);
-            }}
-          >
-            <div className="flex items-center gap-4 text-white">
-              <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
-                <Bike className="w-8 h-8" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold">Spinning</h3>
-                <p className="text-white/80 text-sm">Horarios das aulas de bike</p>
-              </div>
+      {/* Widget Calistenia - apenas Kleber tem acesso */}
+      {(userId?.toLowerCase() || "") === "kleber" && (
+        <Card
+          className="p-6 cursor-pointer hover:scale-[1.02] transition-transform border-2"
+          style={{
+            borderColor: "#ef4444",
+            background: "linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%)",
+          }}
+          onClick={() => {
+            const event = new CustomEvent('changeTab', { detail: 'calisthenics' });
+            window.dispatchEvent(event);
+          }}
+        >
+          <div className="flex items-center gap-4 text-white">
+            <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
+              <Zap className="w-8 h-8" />
             </div>
-          </Card>
-
-          {/* Widget Ginastica */}
-          <Card
-            className="p-6 cursor-pointer hover:scale-[1.02] transition-transform border-2"
-            style={{
-              borderColor: "#f97316",
-              background: "linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%)",
-            }}
-            onClick={() => {
-              const event = new CustomEvent('changeTab', { detail: 'ginastica' });
-              window.dispatchEvent(event);
-            }}
-          >
-            <div className="flex items-center gap-4 text-white">
-              <div className="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center">
-                <Dumbbell className="w-8 h-8" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold">Ginastica</h3>
-                <p className="text-white/80 text-sm">Quadro de aulas da sala</p>
-              </div>
+            <div>
+              <h3 className="text-xl font-bold">Calistenia</h3>
+              <p className="text-white/80 text-sm">Treino militar de peso corporal</p>
             </div>
-          </Card>
-        </>
+          </div>
+        </Card>
       )}
 
       {/* Modal QR Code Catraca */}
