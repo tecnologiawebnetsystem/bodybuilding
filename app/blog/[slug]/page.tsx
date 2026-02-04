@@ -1,11 +1,13 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
+import { Metadata } from "next"
 import { Calendar, User, Eye, ArrowLeft, Tag, Clock, Share2, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { SharedHeader } from "@/components/shared-header"
 import { SharedFooter } from "@/components/shared-footer"
+import { BlogPostSchema, BreadcrumbSchema } from "@/components/seo/json-ld"
 
 // Imagens por categoria
 const categoryImages: Record<string, string> = {
@@ -36,7 +38,59 @@ async function getPost(slug: string) {
   }
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+// Gerar metadata dinamica para SEO
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const post = await getPost(slug)
+  
+  if (!post) {
+    return { title: "Post nao encontrado" }
+  }
+
+  const postImage = post.image_url || categoryImages[post.category?.slug] || categoryImages["academia"]
+  
+  return {
+    title: post.title,
+    description: post.excerpt,
+    keywords: [
+      post.category?.name || "fitness",
+      "treino",
+      "academia",
+      "FitTransform",
+      "musculacao",
+      "saude",
+    ],
+    authors: [{ name: post.author || "FitTransform" }],
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: "article",
+      publishedTime: post.created_at,
+      modifiedTime: post.updated_at || post.created_at,
+      authors: [post.author || "FitTransform"],
+      images: [
+        {
+          url: postImage,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+      url: `https://fittransform.com.br/blog/${slug}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: [postImage],
+    },
+    alternates: {
+      canonical: `https://fittransform.com.br/blog/${slug}`,
+    },
+  }
+}
+
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params
   const post = await getPost(resolvedParams.slug)
 
@@ -48,6 +102,24 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
+      {/* Schema.org JSON-LD para SEO */}
+      <BlogPostSchema
+        title={post.title}
+        description={post.excerpt}
+        url={`https://fittransform.com.br/blog/${resolvedParams.slug}`}
+        image={postImage}
+        datePublished={post.created_at}
+        dateModified={post.updated_at}
+        author={post.author}
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: "https://fittransform.com.br" },
+          { name: "Blog", url: "https://fittransform.com.br/blog" },
+          { name: post.title, url: `https://fittransform.com.br/blog/${resolvedParams.slug}` },
+        ]}
+      />
+
       <SharedHeader />
 
       {/* Hero Image */}

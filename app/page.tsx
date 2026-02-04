@@ -3,10 +3,40 @@ import { Button } from "@/components/ui/button"
 import { Dumbbell, Users, TrendingUp, Calendar, Smartphone, CheckCircle, ArrowRight, Star, Play, Shield, Zap, Clock, CreditCard, BarChart3, Menu, BookOpen } from "lucide-react"
 import { MobileMenu } from "@/components/mobile-menu"
 import { Chatbot } from "@/components/chatbot"
+import { OrganizationSchema, SoftwareApplicationSchema, WebsiteSchema, FAQSchema } from "@/components/seo/json-ld"
+
+// FAQs para SEO
+const faqs = [
+  {
+    question: "O que e o FitTransform?",
+    answer: "FitTransform e a plataforma mais completa de gestao para academias e personal trainers do Brasil. Oferece gestao de alunos, treinos com IA, controle financeiro, agendamento e muito mais."
+  },
+  {
+    question: "O FitTransform funciona em quais cidades?",
+    answer: "O FitTransform atende academias em todo o Brasil, com forte presenca no Vale do Paraiba, incluindo Taubate, Cacapava, Pindamonhangaba, Sao Jose dos Campos, Jacarei e regiao."
+  },
+  {
+    question: "Quanto custa o FitTransform?",
+    answer: "O FitTransform oferece planos a partir de R$ 49,90/mes para personal trainers e R$ 149,90/mes para academias. Oferecemos teste gratuito de 14 dias sem necessidade de cartao de credito."
+  },
+  {
+    question: "O FitTransform gera treinos automaticos?",
+    answer: "Sim! O FitTransform utiliza Inteligencia Artificial para gerar treinos personalizados para cada aluno, considerando objetivos, nivel de experiencia, equipamentos disponiveis e restricoes."
+  },
+  {
+    question: "Posso gerenciar multiplas unidades da academia?",
+    answer: "Sim! O plano Enterprise permite gerenciar multiplas unidades com relatorios consolidados, controle de acesso por unidade e dashboard centralizado."
+  },
+]
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
+      {/* Schema.org JSON-LD para SEO */}
+      <OrganizationSchema />
+      <SoftwareApplicationSchema />
+      <WebsiteSchema />
+      <FAQSchema faqs={faqs} />
       {/* Announcement Bar */}
       <div className="bg-gradient-to-r from-orange-600 to-red-600 py-2 px-4 text-center">
         <p className="text-white text-sm font-medium">
@@ -39,6 +69,9 @@ export default function HomePage() {
             </Link>
             <Link href="/sobre-nos" className="text-gray-400 hover:text-white transition text-sm font-medium">
               Sobre Nos
+            </Link>
+            <Link href="/contato" className="text-gray-400 hover:text-white transition text-sm font-medium">
+              Contato
             </Link>
           </nav>
           <div className="flex items-center gap-4">
@@ -256,6 +289,35 @@ export default function HomePage() {
                   <p className="text-gray-500 text-sm">{testimonial.role}</p>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-32 border-t border-white/[0.08]">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <p className="text-orange-500 font-semibold mb-4 text-sm uppercase tracking-wider">FAQ</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Perguntas Frequentes</h2>
+            <p className="text-gray-400 text-lg">Tudo que voce precisa saber sobre o FitTransform</p>
+          </div>
+
+          <div className="space-y-4">
+            {faqs.map((faq, i) => (
+              <details key={i} className="group bg-white/[0.03] border border-white/[0.08] rounded-xl overflow-hidden">
+                <summary className="flex items-center justify-between p-6 cursor-pointer list-none">
+                  <h3 className="text-white font-medium text-left pr-4">{faq.question}</h3>
+                  <span className="text-orange-500 group-open:rotate-180 transition-transform">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+                </summary>
+                <div className="px-6 pb-6 text-gray-400 leading-relaxed">
+                  {faq.answer}
+                </div>
+              </details>
             ))}
           </div>
         </div>
