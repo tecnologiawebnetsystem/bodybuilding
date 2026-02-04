@@ -638,7 +638,7 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
             <h2 className="text-xl font-bold text-white">
               {MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}
             </h2>
-            <Button variant="ghost" size="sm" onClick={goToToday}>
+            <Button variant="outline" size="sm" onClick={goToToday} className="text-white font-bold border-white/30 hover:bg-white/10">
               Hoje
             </Button>
           </div>
@@ -649,6 +649,7 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
                 variant={viewMode === "month" ? "secondary" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("month")}
+                className={viewMode === "month" ? "text-white font-bold" : "text-white font-bold hover:bg-white/10"}
               >
                 Mes
               </Button>
@@ -656,6 +657,7 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
                 variant={viewMode === "week" ? "secondary" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("week")}
+                className={viewMode === "week" ? "text-white font-bold" : "text-white font-bold hover:bg-white/10"}
               >
                 Semana
               </Button>
