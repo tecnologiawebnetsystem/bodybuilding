@@ -159,6 +159,8 @@ const getUserPreferences = (userId: string): UserPreferences => {
 export function Dashboard({ userId, onLogout }: DashboardProps) {
   const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState("home")
+  const [userRole, setUserRole] = useState<string>("student")
+  const [hasPersonalTrainer, setHasPersonalTrainer] = useState(false)
   const preferences = getUserPreferences(userId)
   
   // Montagem do componente
@@ -171,7 +173,36 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
       sessionStorage.removeItem("activeTab")
       setActiveTab(savedTab)
     }
+    
+    // Verificar role e se tem personal trainer
+    checkUserRoleAndTrainer()
   }, [])
+
+  const checkUserRoleAndTrainer = async () => {
+    try {
+      // Verificar role salva na sessao
+      const storedRole = sessionStorage.getItem(`user_role_${userId}`)
+      if (storedRole) {
+        setUserRole(storedRole)
+      }
+      
+      // Buscar dados do usuario para verificar se tem personal trainer
+      const response = await fetch(`/api/user-profile?userId=${userId}`)
+      const data = await response.json()
+      if (data.success && data.data) {
+        // Se tem personal_trainer_id, e cliente de personal
+        if (data.data.personal_trainer_id) {
+          setHasPersonalTrainer(true)
+        }
+        // Se role for trainer
+        if (data.data.role === 'trainer') {
+          setUserRole('trainer')
+        }
+      }
+    } catch (error) {
+      console.error("Error checking user role:", error)
+    }
+  }
 
   // Listener para mudar de tab via evento customizado (usado pelos widgets da home)
   useEffect(() => {
@@ -245,8 +276,8 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
     { id: "assessment", label: "Avaliacao", icon: ClipboardList, color: "#10b981", enabled: true },
     // 12. Gamificacao (oculto temporariamente)
     { id: "gamification", label: "Conquistas", icon: Trophy, color: "#eab308", enabled: false },
-    // 13. Chat
-    { id: "chat", label: "Chat", icon: MessageCircle, color: "#8b5cf6", enabled: true },
+    // 13. Chat (apenas para Personal Trainers ou alunos exclusivos de personal)
+    { id: "chat", label: "Chat", icon: MessageCircle, color: "#8b5cf6", enabled: userRole === "trainer" || hasPersonalTrainer },
     // 14. Stats (oculto temporariamente)
     {
       id: "stats",
