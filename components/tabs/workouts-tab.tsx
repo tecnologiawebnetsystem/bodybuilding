@@ -4,9 +4,11 @@ import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Dumbbell, Clock, Share2, Sparkles, ChevronDown, ChevronUp } from "lucide-react"
-import { getWorkoutsByUser } from "@/lib/workout-data"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dumbbell, Clock, Share2, Sparkles, ChevronDown, ChevronUp, Play, X, Info } from "lucide-react"
+import { getWorkoutsByUser, Exercise } from "@/lib/workout-data"
 import { FitnessPDFGenerator, sharePDF } from "@/lib/pdf-generator"
+import { getExerciseGif, ExerciseMedia } from "@/lib/exercise-gifs"
 
 interface AIWorkout {
   name: string
@@ -43,6 +45,15 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
   const [expandedAIWorkout, setExpandedAIWorkout] = useState<number>(0)
   const [expandedAIExercise, setExpandedAIExercise] = useState<number | null>(null)
   const [loadingAI, setLoadingAI] = useState(true)
+  const [selectedExercise, setSelectedExercise] = useState<{ name: string; sets: string; notes: string; media: ExerciseMedia | null } | null>(null)
+  const [isGifModalOpen, setIsGifModalOpen] = useState(false)
+
+  // Abrir modal com GIF do exercicio
+  const openExerciseGif = (exercise: { name: string; sets: string; notes: string }) => {
+    const media = getExerciseGif(exercise.name)
+    setSelectedExercise({ ...exercise, media })
+    setIsGifModalOpen(true)
+  }
 
   const workoutPlans = getWorkoutsByUser(userId)
 
@@ -216,13 +227,45 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
 
             {expandedWorkout === workout.name && (
               <div className="space-y-3 mt-6 pt-6 border-t border-white/10">
-                {workout.exercises.map((exercise, idx) => (
-                  <div key={idx} className="p-4 rounded-lg bg-white/5">
-                    <h4 className="font-semibold mb-1 text-white">{exercise.name}</h4>
-                    <p className="text-sm text-orange-400 font-medium mb-2">{exercise.sets}</p>
-                    {exercise.notes && <p className="text-sm text-gray-300 italic">{exercise.notes}</p>}
-                  </div>
-                ))}
+                {workout.exercises.map((exercise, idx) => {
+                  const hasGif = !!getExerciseGif(exercise.name)
+                  return (
+                    <div 
+                      key={idx} 
+                      className={`p-4 rounded-lg bg-white/5 ${hasGif ? "cursor-pointer hover:bg-white/10 transition-colors" : ""}`}
+                      onClick={() => hasGif && openExerciseGif(exercise)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-semibold text-white">{exercise.name}</h4>
+                            {hasGif && (
+                              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 text-xs">
+                                <Play className="w-3 h-3" />
+                                Ver GIF
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-orange-400 font-medium mt-1">{exercise.sets}</p>
+                          {exercise.notes && <p className="text-sm text-gray-300 italic mt-1">{exercise.notes}</p>}
+                        </div>
+                        {hasGif && (
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="text-green-400 hover:text-green-300 hover:bg-green-500/10"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              openExerciseGif(exercise)
+                            }}
+                          >
+                            <Play className="w-5 h-5" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             )}
           </div>
@@ -392,6 +435,96 @@ export function WorkoutsTab({ userId }: WorkoutsTabProps) {
           </p>
         </Card>
       )}
+
+      {/* Modal com GIF do Exercicio */}
+      <Dialog open={isGifModalOpen} onOpenChange={setIsGifModalOpen}>
+        <DialogContent className="max-w-lg bg-gray-900 border-gray-700">
+          {selectedExercise && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-white flex items-center gap-2">
+                  <Dumbbell className="w-5 h-5 text-orange-500" />
+                  {selectedExercise.name}
+                </DialogTitle>
+              </DialogHeader>
+
+              <div className="space-y-4 py-4">
+                {/* GIF do Exercicio */}
+                {selectedExercise.media?.gifUrl ? (
+                  <div className="relative rounded-lg overflow-hidden bg-black">
+                    <img
+                      src={selectedExercise.media.gifUrl}
+                      alt={`Como fazer ${selectedExercise.name}`}
+                      className="w-full h-auto max-h-[300px] object-contain mx-auto"
+                      onError={(e) => {
+                        // Fallback se o GIF nao carregar
+                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/400x300/1f2937/ffffff?text=GIF+Indisponivel"
+                      }}
+                    />
+                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 rounded text-xs text-gray-300">
+                      GIF Animado
+                    </div>
+                  </div>
+                ) : (
+                  <div className="h-[200px] bg-gray-800 rounded-lg flex items-center justify-center">
+                    <div className="text-center">
+                      <Info className="w-12 h-12 text-gray-600 mx-auto mb-2" />
+                      <p className="text-gray-500 text-sm">GIF nao disponivel para este exercicio</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Informacoes do Exercicio */}
+                <div className="space-y-3">
+                  {/* Series e Repeticoes */}
+                  <div className="p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+                    <p className="text-orange-400 font-bold">{selectedExercise.sets}</p>
+                  </div>
+
+                  {/* Musculo Alvo */}
+                  {selectedExercise.media?.muscleTarget && (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="bg-red-500/20 text-red-400">
+                        Musculo: {selectedExercise.media.muscleTarget}
+                      </Badge>
+                      {selectedExercise.media.equipment && (
+                        <Badge variant="secondary" className="bg-blue-500/20 text-blue-400">
+                          {selectedExercise.media.equipment}
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Dicas */}
+                  {selectedExercise.notes && (
+                    <div className="p-3 bg-white/5 rounded-lg">
+                      <p className="text-sm text-gray-300">
+                        <span className="text-white font-medium">Dica: </span>
+                        {selectedExercise.notes}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Instrucoes Detalhadas */}
+                  {selectedExercise.media?.instructions && selectedExercise.media.instructions.length > 0 && (
+                    <div className="p-3 bg-white/5 rounded-lg">
+                      <p className="text-white font-medium mb-2">Como executar:</p>
+                      <ol className="space-y-1">
+                        {selectedExercise.media.instructions.map((instruction, idx) => (
+                          <li key={idx} className="text-sm text-gray-300 flex items-start gap-2">
+                            <span className="text-orange-500 font-bold">{idx + 1}.</span>
+                            {instruction}
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

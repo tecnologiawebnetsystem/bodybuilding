@@ -2,6 +2,9 @@ export interface Exercise {
   name: string
   sets: string
   notes: string
+  gifUrl?: string // URL do GIF animado mostrando execucao
+  videoUrl?: string // URL de video tutorial (opcional)
+  muscleTarget?: string // Musculo principal trabalhado
 }
 
 export interface WorkoutPlan {
