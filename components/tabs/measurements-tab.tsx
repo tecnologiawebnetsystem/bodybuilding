@@ -407,16 +407,16 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
 
       {/* Sub-tabs: Medidas, Fotos, Metas */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-white/5">
-          <TabsTrigger value="medidas" className="data-[state=active]:bg-orange-600">
+        <TabsList className="grid w-full grid-cols-3 bg-orange-100 p-1">
+          <TabsTrigger value="medidas" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white text-black font-medium">
             <Ruler className="w-4 h-4 mr-2" />
             Medidas
           </TabsTrigger>
-          <TabsTrigger value="fotos" className="data-[state=active]:bg-orange-600">
+          <TabsTrigger value="fotos" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white text-black font-medium">
             <Camera className="w-4 h-4 mr-2" />
             Fotos
           </TabsTrigger>
-          <TabsTrigger value="metas" className="data-[state=active]:bg-orange-600">
+          <TabsTrigger value="metas" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white text-black font-medium">
             <Goal className="w-4 h-4 mr-2" />
             Metas
           </TabsTrigger>
