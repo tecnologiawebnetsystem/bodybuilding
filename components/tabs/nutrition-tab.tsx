@@ -65,9 +65,27 @@ interface NutritionTabProps {
   userName?: string
 }
 
+interface AISupplement {
+  name: string
+  dosage: string
+  timing: string
+  purpose: string
+  howToUse: string
+  tips: string[]
+}
+
+interface AISupplementsData {
+  supplements: AISupplement[]
+  daily_schedule: Array<{
+    time: string
+    supplements: string[]
+  }>
+}
+
 export function NutritionTab({ userId, preferences, userName }: NutritionTabProps) {
   const supplements = getSupplementsByUser(userId)
   const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
+  const [aiSupplements, setAiSupplements] = useState<AISupplementsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [showAIDialog, setShowAIDialog] = useState(false)
@@ -80,9 +98,10 @@ export function NutritionTab({ userId, preferences, userName }: NutritionTabProp
   const [expandedSupplement, setExpandedSupplement] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
-  // Carregar plano alimentar do banco
+  // Carregar plano alimentar e suplementos do banco
   useEffect(() => {
     loadMealPlan()
+    loadAISupplements()
   }, [userId])
 
   const loadMealPlan = async () => {
@@ -100,6 +119,21 @@ export function NutritionTab({ userId, preferences, userName }: NutritionTabProp
       setMealPlan(null)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadAISupplements = async () => {
+    try {
+      const response = await fetch(`/api/user-supplements?userId=${userId}`)
+      const data = await response.json()
+      if (data.success && data.data) {
+        setAiSupplements({
+          supplements: data.data.supplements,
+          daily_schedule: data.data.daily_schedule || []
+        })
+      }
+    } catch (error) {
+      console.error("Error loading AI supplements:", error)
     }
   }
 
@@ -542,6 +576,59 @@ export function NutritionTab({ userId, preferences, userName }: NutritionTabProp
           preferences={preferences}
           userId={userId}
         />
+      )}
+
+      {/* Suplementos Gerados por IA */}
+      {aiSupplements && aiSupplements.supplements.length > 0 && (
+        <Card className="p-6 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border-cyan-500/20">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-cyan-400" />
+              Suplementos Personalizados (IA)
+            </h3>
+            <Badge variant="outline" className="text-cyan-400 border-cyan-400">
+              Gerado por IA
+            </Badge>
+          </div>
+
+          {/* Cronograma Diario */}
+          {aiSupplements.daily_schedule.length > 0 && (
+            <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+              {aiSupplements.daily_schedule.map((schedule, idx) => (
+                <div key={idx} className="p-3 rounded-lg bg-white/[0.05] border border-white/[0.08]">
+                  <p className="text-cyan-400 font-semibold text-sm">{schedule.time}</p>
+                  <ul className="mt-1 space-y-1">
+                    {schedule.supplements.map((supp, sIdx) => (
+                      <li key={sIdx} className="text-xs text-gray-300">- {supp}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Lista de Suplementos */}
+          <div className="space-y-3">
+            {aiSupplements.supplements.map((supp, idx) => (
+              <div
+                key={idx}
+                className="p-4 rounded-lg bg-white/[0.03] border border-white/[0.08] hover:border-cyan-500/30 transition-colors"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center shrink-0">
+                    <Pill className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-white">{supp.name}</h4>
+                    <p className="text-cyan-400 text-sm">{supp.dosage} - {supp.timing}</p>
+                    <p className="text-gray-400 text-sm mt-1">{supp.purpose}</p>
+                    <p className="text-gray-500 text-xs mt-2">Como tomar: {supp.howToUse}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
       )}
 
       {/* Guia Rapido de Horarios */}

@@ -1,7 +1,7 @@
 -- Tabela para planos de treino gerados por IA
 CREATE TABLE IF NOT EXISTS ai_workout_plans (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id SERIAL PRIMARY KEY,
+  user_id VARCHAR(100) NOT NULL,
   plan_type VARCHAR(10) NOT NULL, -- AB, ABC, ABCD, ABCDE, single
   plan_data JSONB NOT NULL,
   is_active BOOLEAN DEFAULT true,
@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS ai_workout_plans (
 
 -- Tabela para suplementos do usuario
 CREATE TABLE IF NOT EXISTS user_supplements (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id SERIAL PRIMARY KEY,
+  user_id VARCHAR(100) NOT NULL,
   supplements JSONB NOT NULL,
   daily_schedule JSONB NOT NULL,
   is_active BOOLEAN DEFAULT true,
@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS user_supplements (
 
 -- Tabela para planos nutricionais gerados por IA
 CREATE TABLE IF NOT EXISTS ai_meal_plans (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id SERIAL PRIMARY KEY,
+  user_id VARCHAR(100) NOT NULL,
   plan_data JSONB NOT NULL,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

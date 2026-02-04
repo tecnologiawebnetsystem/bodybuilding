@@ -143,6 +143,7 @@ export function AiTab({ userId, preferences }: AiTabProps) {
       <div>
         {activeSection === "workout" && (
           <WorkoutGenerator 
+            userId={userId}
             userProfile={userProfile} 
             onSave={(title, data) => saveToHistory("workout", title, data)}
           />
