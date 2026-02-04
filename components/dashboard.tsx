@@ -276,8 +276,8 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
     { id: "assessment", label: "Avaliacao", icon: ClipboardList, color: "#10b981", enabled: true },
     // 12. Gamificacao (oculto temporariamente)
     { id: "gamification", label: "Conquistas", icon: Trophy, color: "#eab308", enabled: false },
-    // 13. Chat (apenas para Personal Trainers ou alunos exclusivos de personal)
-    { id: "chat", label: "Chat", icon: MessageCircle, color: "#8b5cf6", enabled: userRole === "trainer" || hasPersonalTrainer },
+    // 13. Chat (oculto temporariamente)
+    { id: "chat", label: "Chat", icon: MessageCircle, color: "#8b5cf6", enabled: false },
     // 14. Stats (oculto temporariamente)
     {
       id: "stats",
