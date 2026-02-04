@@ -18,6 +18,9 @@ import {
   Bike,
   Coins,
   CalendarDays,
+  Trophy,
+  MessageCircle,
+  ClipboardList,
 } from "lucide-react"
 
 // Lazy load das tabs para evitar erros de inicializacao
@@ -37,6 +40,9 @@ const SpinningTab = lazy(() => import("@/components/tabs/spinning-tab").then(m =
 const GinasticaTab = lazy(() => import("@/components/tabs/ginastica-tab").then(m => ({ default: m.GinasticaTab })))
 const LoyaltyTab = lazy(() => import("@/components/tabs/loyalty-tab").then(m => ({ default: m.LoyaltyTab })))
 const CalendarTab = lazy(() => import("@/components/tabs/calendar-tab").then(m => ({ default: m.CalendarTab })))
+const AssessmentTab = lazy(() => import("@/components/tabs/assessment-tab").then(m => ({ default: m.AssessmentTab })))
+const GamificationTab = lazy(() => import("@/components/tabs/gamification-tab").then(m => ({ default: m.GamificationTab })))
+const ChatTab = lazy(() => import("@/components/tabs/chat-tab").then(m => ({ default: m.ChatTab })))
 const Chatbot = lazy(() => import("@/components/ai/chatbot").then(m => ({ default: m.Chatbot })))
 
 // Componente de loading para Suspense
@@ -235,7 +241,13 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
     { id: "calendar", label: "Agenda", icon: CalendarDays, color: "#06b6d4", enabled: preferences.enable_calendar },
     // 10. Pontos
     { id: "loyalty", label: "Pontos", icon: Coins, color: "#f59e0b", enabled: true },
-    // 11. Stats (oculto temporariamente)
+    // 11. Avaliacao Fisica
+    { id: "assessment", label: "Avaliacao", icon: ClipboardList, color: "#10b981", enabled: true },
+    // 12. Gamificacao
+    { id: "gamification", label: "Conquistas", icon: Trophy, color: "#eab308", enabled: true },
+    // 13. Chat
+    { id: "chat", label: "Chat", icon: MessageCircle, color: "#8b5cf6", enabled: true },
+    // 14. Stats (oculto temporariamente)
     {
       id: "stats",
       label: "Stats",
@@ -378,6 +390,15 @@ export function Dashboard({ userId, onLogout }: DashboardProps) {
             )}
             <TabsContent value="loyalty" className="mt-0">
               <LoyaltyTab userId={userId} preferences={preferences} />
+            </TabsContent>
+            <TabsContent value="assessment" className="mt-0">
+              <AssessmentTab userId={userId} />
+            </TabsContent>
+            <TabsContent value="gamification" className="mt-0">
+              <GamificationTab userId={userId} />
+            </TabsContent>
+            <TabsContent value="chat" className="mt-0">
+              <ChatTab userId={userId} />
             </TabsContent>
             <TabsContent value="more" className="mt-0">
               <MoreTab userId={userId} preferences={preferences} />
