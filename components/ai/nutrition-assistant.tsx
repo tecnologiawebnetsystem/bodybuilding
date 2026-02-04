@@ -169,9 +169,12 @@ export function NutritionAssistant({ userProfile, onSave }: NutritionAssistantPr
     restrictions: "",
   })
 
+  const [error, setError] = useState<string | null>(null)
+
   const handleGeneratePlan = async () => {
     setIsLoading(true)
     setMealPlan(null)
+    setError(null)
 
     try {
       const response = await fetch("/api/ai/nutrition-assistant", {
@@ -181,9 +184,17 @@ export function NutritionAssistant({ userProfile, onSave }: NutritionAssistantPr
       })
 
       const data = await response.json()
+      
+      if (!response.ok || data.error) {
+        console.error("[v0] Erro da API:", data.error)
+        setError(data.error || "Erro ao gerar plano alimentar")
+        return
+      }
+      
       setMealPlan(data.mealPlan)
-    } catch (error) {
-      console.error("Erro ao gerar plano:", error)
+    } catch (error: any) {
+      console.error("[v0] Erro ao gerar plano:", error)
+      setError(error?.message || "Erro de conexao. Tente novamente.")
     } finally {
       setIsLoading(false)
     }
@@ -400,6 +411,23 @@ export function NutritionAssistant({ userProfile, onSave }: NutritionAssistantPr
               </Button>
             </CardContent>
           </Card>
+
+          {/* Mensagem de Erro */}
+          {error && (
+            <Card className="bg-red-500/10 border-red-500/30">
+              <CardContent className="p-4">
+                <p className="text-red-400 text-sm">{error}</p>
+                <Button
+                  onClick={() => setError(null)}
+                  variant="ghost"
+                  size="sm"
+                  className="mt-2 text-red-300 hover:text-red-200"
+                >
+                  Fechar
+                </Button>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Loading com Etapas */}
           {isLoading && (

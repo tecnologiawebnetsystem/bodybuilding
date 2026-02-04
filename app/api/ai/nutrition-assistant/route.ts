@@ -107,10 +107,11 @@ Crie uma receita completa, saborosa e nutritiva com instrucoes de preparo.`;
     }
 
     return Response.json({ error: 'Tipo de requisicao invalido' }, { status: 400 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[v0] Erro no assistente de nutricao:', error);
+    console.error('[v0] Detalhes do erro:', error?.message, error?.cause);
     return Response.json(
-      { error: 'Erro ao processar requisicao. Tente novamente.' },
+      { error: error?.message || 'Erro ao processar requisicao. Tente novamente.' },
       { status: 500 }
     );
   }
