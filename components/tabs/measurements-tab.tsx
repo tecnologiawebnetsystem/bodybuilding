@@ -6,7 +6,9 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Ruler, Trash2, Plus, User, Target, TrendingUp, TrendingDown } from "lucide-react"
+import { Ruler, Trash2, Plus, User, Target, TrendingUp, TrendingDown, Camera, ImageIcon, Calendar, ArrowLeftRight, Goal } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Progress } from "@/components/ui/progress"
 import {
   Dialog,
   DialogContent,
@@ -34,6 +36,28 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
     targetWeight: "",
     currentWeight: "",
     gender: "",
+  })
+
+  // Estados para fotos e metas
+  const [progressPhotos, setProgressPhotos] = useState<any[]>([])
+  const [measurementGoals, setMeasurementGoals] = useState<any[]>([])
+  const [photoDialogOpen, setPhotoDialogOpen] = useState(false)
+  const [goalDialogOpen, setGoalDialogOpen] = useState(false)
+  const [compareDialogOpen, setCompareDialogOpen] = useState(false)
+  const [selectedPhotos, setSelectedPhotos] = useState<{ before: any | null; after: any | null }>({ before: null, after: null })
+  const [activeTab, setActiveTab] = useState("medidas")
+  
+  const [photoForm, setPhotoForm] = useState({
+    photoUrl: "",
+    photoType: "front",
+    notes: "",
+    takenAt: new Date().toISOString().split("T")[0],
+  })
+  
+  const [goalForm, setGoalForm] = useState({
+    measurementType: "weight",
+    targetValue: "",
+    targetDate: "",
   })
 
   const [formData, setFormData] = useState({
@@ -144,6 +168,79 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
       console.error(" Error loading user profile:", error)
     }
   }
+
+  // Carregar fotos de progresso
+  const loadProgressPhotos = async () => {
+    try {
+      const response = await fetch(`/api/progress-photos?userId=${userId}`)
+      const data = await response.json()
+      if (data.success) {
+        setProgressPhotos(data.data || [])
+      }
+    } catch (error) {
+      console.error(" Error loading progress photos:", error)
+    }
+  }
+
+  // Carregar metas de medidas
+  const loadMeasurementGoals = async () => {
+    try {
+      const response = await fetch(`/api/measurement-goals?userId=${userId}`)
+      const data = await response.json()
+      if (data.success) {
+        setMeasurementGoals(data.data || [])
+      }
+    } catch (error) {
+      console.error(" Error loading measurement goals:", error)
+    }
+  }
+
+  // Salvar foto de progresso
+  const handlePhotoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const response = await fetch("/api/progress-photos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, ...photoForm }),
+      })
+      if (response.ok) {
+        setPhotoDialogOpen(false)
+        setPhotoForm({ photoUrl: "", photoType: "front", notes: "", takenAt: new Date().toISOString().split("T")[0] })
+        loadProgressPhotos()
+      }
+    } catch (error) {
+      console.error(" Error saving photo:", error)
+    }
+  }
+
+  // Salvar meta de medida
+  const handleGoalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const startValue = latestMeasurement ? latestMeasurement[goalForm.measurementType === "weight" ? "weight" : goalForm.measurementType] : null
+    try {
+      const response = await fetch("/api/measurement-goals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, ...goalForm, startValue }),
+      })
+      if (response.ok) {
+        setGoalDialogOpen(false)
+        setGoalForm({ measurementType: "weight", targetValue: "", targetDate: "" })
+        loadMeasurementGoals()
+      }
+    } catch (error) {
+      console.error(" Error saving goal:", error)
+    }
+  }
+
+  // Carregar fotos e metas ao iniciar
+  useEffect(() => {
+    if (userId) {
+      loadProgressPhotos()
+      loadMeasurementGoals()
+    }
+  }, [userId])
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -261,6 +358,39 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
   // Usar theme_primary diretamente (não é JSON)
   const themeColor = userProfile?.theme_primary || "#3b82f6"
 
+  // Calcular progresso das metas
+  const getGoalProgress = (goal: any) => {
+    if (!latestMeasurement || !goal.start_value) return 0
+    const currentValue = goal.measurement_type === "weight" 
+      ? latestMeasurement.weight 
+      : latestMeasurement[goal.measurement_type]
+    if (!currentValue) return 0
+    
+    const start = parseFloat(goal.start_value)
+    const target = parseFloat(goal.target_value)
+    const current = parseFloat(currentValue)
+    
+    // Se meta é diminuir (perder peso/cintura)
+    if (target < start) {
+      const totalToLose = start - target
+      const lost = start - current
+      return Math.min(100, Math.max(0, (lost / totalToLose) * 100))
+    }
+    // Se meta é aumentar (ganhar massa)
+    const totalToGain = target - start
+    const gained = current - start
+    return Math.min(100, Math.max(0, (gained / totalToGain) * 100))
+  }
+
+  const measurementTypeLabels: Record<string, string> = {
+    weight: "Peso (kg)",
+    waist: "Cintura (cm)",
+    chest: "Peito (cm)",
+    hips: "Quadril (cm)",
+    arm_right: "Braco (cm)",
+    thigh_right: "Coxa (cm)",
+  }
+
   return (
     <div className="space-y-6">
       {/* Header com icone */}
@@ -275,11 +405,30 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
         <p className="text-muted-foreground text-sm mt-1">Acompanhe sua evolucao fisica</p>
       </div>
 
-      {/* Botao Nova Medicao */}
-      <div className="flex justify-center">
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button 
+      {/* Sub-tabs: Medidas, Fotos, Metas */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3 bg-white/5">
+          <TabsTrigger value="medidas" className="data-[state=active]:bg-orange-600">
+            <Ruler className="w-4 h-4 mr-2" />
+            Medidas
+          </TabsTrigger>
+          <TabsTrigger value="fotos" className="data-[state=active]:bg-orange-600">
+            <Camera className="w-4 h-4 mr-2" />
+            Fotos
+          </TabsTrigger>
+          <TabsTrigger value="metas" className="data-[state=active]:bg-orange-600">
+            <Goal className="w-4 h-4 mr-2" />
+            Metas
+          </TabsTrigger>
+        </TabsList>
+
+        {/* TAB MEDIDAS */}
+        <TabsContent value="medidas" className="space-y-6 mt-6">
+          {/* Botao Nova Medicao */}
+          <div className="flex justify-center">
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
               size="lg"
               className="shadow-md"
               style={{ backgroundColor: "#c2410c", color: "#ffffff" }}
@@ -696,6 +845,306 @@ export function MeasurementsTab({ userId }: MeasurementsTabProps) {
           </div>
         )}
       </div>
+        </TabsContent>
+
+        {/* TAB FOTOS DE PROGRESSO */}
+        <TabsContent value="fotos" className="space-y-6 mt-6">
+          {/* Botoes de acao */}
+          <div className="flex flex-wrap justify-center gap-3">
+            <Dialog open={photoDialogOpen} onOpenChange={setPhotoDialogOpen}>
+              <DialogTrigger asChild>
+                <Button style={{ backgroundColor: "#c2410c", color: "#ffffff" }}>
+                  <Camera className="w-4 h-4 mr-2" />
+                  Nova Foto
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Adicionar Foto de Progresso</DialogTitle>
+                  <DialogDescription>Registre sua evolucao com fotos</DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handlePhotoSubmit} className="space-y-4">
+                  <div>
+                    <Label>URL da Foto *</Label>
+                    <Input
+                      value={photoForm.photoUrl}
+                      onChange={(e) => setPhotoForm({ ...photoForm, photoUrl: e.target.value })}
+                      placeholder="https://exemplo.com/foto.jpg"
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Use um servico de hospedagem de imagens como Imgur ou Google Fotos
+                    </p>
+                  </div>
+                  <div>
+                    <Label>Tipo de Foto</Label>
+                    <Select value={photoForm.photoType} onValueChange={(v) => setPhotoForm({ ...photoForm, photoType: v })}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="front">Frontal</SelectItem>
+                        <SelectItem value="side">Lateral</SelectItem>
+                        <SelectItem value="back">Costas</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Data</Label>
+                    <Input
+                      type="date"
+                      value={photoForm.takenAt}
+                      onChange={(e) => setPhotoForm({ ...photoForm, takenAt: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label>Observacoes</Label>
+                    <Input
+                      value={photoForm.notes}
+                      onChange={(e) => setPhotoForm({ ...photoForm, notes: e.target.value })}
+                      placeholder="Ex: Apos 30 dias de dieta"
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" style={{ backgroundColor: "#c2410c", color: "#ffffff" }}>
+                    Salvar Foto
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            {progressPhotos.length >= 2 && (
+              <Dialog open={compareDialogOpen} onOpenChange={setCompareDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline">
+                    <ArrowLeftRight className="w-4 h-4 mr-2" />
+                    Comparar Fotos
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl">
+                  <DialogHeader>
+                    <DialogTitle>Comparar Antes e Depois</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <Label className="mb-2 block">Foto Antes</Label>
+                      <Select 
+                        value={selectedPhotos.before?.id?.toString() || ""} 
+                        onValueChange={(v) => setSelectedPhotos({ ...selectedPhotos, before: progressPhotos.find(p => p.id.toString() === v) })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione uma foto" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {progressPhotos.map((photo) => (
+                            <SelectItem key={photo.id} value={photo.id.toString()}>
+                              {new Date(photo.taken_at).toLocaleDateString("pt-BR")} - {photo.photo_type === "front" ? "Frontal" : photo.photo_type === "side" ? "Lateral" : "Costas"}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {selectedPhotos.before && (
+                        <div className="mt-4 rounded-lg overflow-hidden bg-black">
+                          <img src={selectedPhotos.before.photo_url} alt="Antes" className="w-full h-auto max-h-[400px] object-contain" />
+                          <p className="text-center text-sm py-2">{new Date(selectedPhotos.before.taken_at).toLocaleDateString("pt-BR")}</p>
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <Label className="mb-2 block">Foto Depois</Label>
+                      <Select 
+                        value={selectedPhotos.after?.id?.toString() || ""} 
+                        onValueChange={(v) => setSelectedPhotos({ ...selectedPhotos, after: progressPhotos.find(p => p.id.toString() === v) })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione uma foto" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {progressPhotos.map((photo) => (
+                            <SelectItem key={photo.id} value={photo.id.toString()}>
+                              {new Date(photo.taken_at).toLocaleDateString("pt-BR")} - {photo.photo_type === "front" ? "Frontal" : photo.photo_type === "side" ? "Lateral" : "Costas"}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {selectedPhotos.after && (
+                        <div className="mt-4 rounded-lg overflow-hidden bg-black">
+                          <img src={selectedPhotos.after.photo_url} alt="Depois" className="w-full h-auto max-h-[400px] object-contain" />
+                          <p className="text-center text-sm py-2">{new Date(selectedPhotos.after.taken_at).toLocaleDateString("pt-BR")}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
+
+          {/* Grid de Fotos */}
+          {progressPhotos.length === 0 ? (
+            <Card className="p-12 text-center border-dashed border-2">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: themeColor + "20" }}>
+                <ImageIcon className="w-8 h-8" style={{ color: themeColor }} />
+              </div>
+              <h4 className="font-semibold mb-2">Nenhuma foto registrada</h4>
+              <p className="text-muted-foreground text-sm mb-4">
+                Adicione fotos para acompanhar sua transformacao visual
+              </p>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {progressPhotos.map((photo) => (
+                <Card key={photo.id} className="overflow-hidden">
+                  <div className="relative aspect-[3/4] bg-black">
+                    <img 
+                      src={photo.photo_url} 
+                      alt={`Foto ${photo.photo_type}`} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/300x400/1f2937/ffffff?text=Foto"
+                      }}
+                    />
+                    <div className="absolute top-2 left-2 px-2 py-1 rounded bg-black/70 text-xs text-white">
+                      {photo.photo_type === "front" ? "Frontal" : photo.photo_type === "side" ? "Lateral" : "Costas"}
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <p className="font-medium text-sm">{new Date(photo.taken_at).toLocaleDateString("pt-BR")}</p>
+                    {photo.notes && <p className="text-xs text-muted-foreground mt-1">{photo.notes}</p>}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* TAB METAS */}
+        <TabsContent value="metas" className="space-y-6 mt-6">
+          {/* Botao Nova Meta */}
+          <div className="flex justify-center">
+            <Dialog open={goalDialogOpen} onOpenChange={setGoalDialogOpen}>
+              <DialogTrigger asChild>
+                <Button style={{ backgroundColor: "#c2410c", color: "#ffffff" }}>
+                  <Target className="w-4 h-4 mr-2" />
+                  Nova Meta
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Definir Meta de Medida</DialogTitle>
+                  <DialogDescription>Estabeleca um objetivo para acompanhar</DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleGoalSubmit} className="space-y-4">
+                  <div>
+                    <Label>Tipo de Medida</Label>
+                    <Select value={goalForm.measurementType} onValueChange={(v) => setGoalForm({ ...goalForm, measurementType: v })}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="weight">Peso (kg)</SelectItem>
+                        <SelectItem value="waist">Cintura (cm)</SelectItem>
+                        <SelectItem value="chest">Peito (cm)</SelectItem>
+                        <SelectItem value="hips">Quadril (cm)</SelectItem>
+                        <SelectItem value="arm_right">Braco (cm)</SelectItem>
+                        <SelectItem value="thigh_right">Coxa (cm)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Valor da Meta *</Label>
+                    <Input
+                      type="number"
+                      step="0.1"
+                      value={goalForm.targetValue}
+                      onChange={(e) => setGoalForm({ ...goalForm, targetValue: e.target.value })}
+                      placeholder={goalForm.measurementType === "weight" ? "Ex: 75" : "Ex: 80"}
+                      required
+                    />
+                    {latestMeasurement && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Valor atual: {latestMeasurement[goalForm.measurementType === "weight" ? "weight" : goalForm.measurementType] || "N/A"}
+                        {goalForm.measurementType === "weight" ? "kg" : "cm"}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <Label>Data Alvo (opcional)</Label>
+                    <Input
+                      type="date"
+                      value={goalForm.targetDate}
+                      onChange={(e) => setGoalForm({ ...goalForm, targetDate: e.target.value })}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" style={{ backgroundColor: "#c2410c", color: "#ffffff" }}>
+                    Definir Meta
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {/* Lista de Metas */}
+          {measurementGoals.length === 0 ? (
+            <Card className="p-12 text-center border-dashed border-2">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: themeColor + "20" }}>
+                <Target className="w-8 h-8" style={{ color: themeColor }} />
+              </div>
+              <h4 className="font-semibold mb-2">Nenhuma meta definida</h4>
+              <p className="text-muted-foreground text-sm mb-4">
+                Defina metas para acompanhar seu progresso
+              </p>
+            </Card>
+          ) : (
+            <div className="grid gap-4">
+              {measurementGoals.map((goal) => {
+                const progress = getGoalProgress(goal)
+                const currentValue = latestMeasurement 
+                  ? (goal.measurement_type === "weight" ? latestMeasurement.weight : latestMeasurement[goal.measurement_type])
+                  : null
+
+                return (
+                  <Card key={goal.id} className="p-5">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: themeColor }}>
+                          <Target className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold">{measurementTypeLabels[goal.measurement_type] || goal.measurement_type}</h4>
+                          {goal.target_date && (
+                            <p className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              Prazo: {new Date(goal.target_date).toLocaleDateString("pt-BR")}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold" style={{ color: themeColor }}>
+                          {goal.target_value}{goal.measurement_type === "weight" ? "kg" : "cm"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">Meta</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Inicio: {goal.start_value || "N/A"}</span>
+                        <span>Atual: {currentValue || "N/A"}</span>
+                        <span>Meta: {goal.target_value}</span>
+                      </div>
+                      <Progress value={progress} className="h-3" />
+                      <p className="text-center text-sm font-medium" style={{ color: progress >= 100 ? "#22c55e" : themeColor }}>
+                        {progress >= 100 ? "Meta Alcancada!" : `${progress.toFixed(0)}% concluido`}
+                      </p>
+                    </div>
+                  </Card>
+                )
+              })}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
