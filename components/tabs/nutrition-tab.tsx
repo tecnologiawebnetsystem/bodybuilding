@@ -69,17 +69,19 @@ interface AISupplement {
   name: string
   dosage: string
   timing: string
-  purpose: string
-  howToUse: string
-  tips: string[]
+  benefits: string[]
+  warnings?: string
+  brand_suggestion?: string
 }
 
 interface AISupplementsData {
   supplements: AISupplement[]
-  daily_schedule: Array<{
-    time: string
-    supplements: string[]
-  }>
+  daily_schedule: {
+    morning: string[]
+    pre_workout: string[]
+    post_workout: string[]
+    evening: string[]
+  }
 }
 
 export function NutritionTab({ userId, preferences, userName }: NutritionTabProps) {
@@ -128,8 +130,13 @@ export function NutritionTab({ userId, preferences, userName }: NutritionTabProp
       const data = await response.json()
       if (data.success && data.data) {
         setAiSupplements({
-          supplements: data.data.supplements,
-          daily_schedule: data.data.daily_schedule || []
+          supplements: data.data.supplements || [],
+          daily_schedule: data.data.daily_schedule || {
+            morning: [],
+            pre_workout: [],
+            post_workout: [],
+            evening: []
+          }
         })
       }
     } catch (error) {
@@ -592,18 +599,51 @@ export function NutritionTab({ userId, preferences, userName }: NutritionTabProp
           </div>
 
           {/* Cronograma Diario */}
-          {aiSupplements.daily_schedule.length > 0 && (
+          {(aiSupplements.daily_schedule.morning.length > 0 || 
+            aiSupplements.daily_schedule.pre_workout.length > 0 ||
+            aiSupplements.daily_schedule.post_workout.length > 0 ||
+            aiSupplements.daily_schedule.evening.length > 0) && (
             <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-              {aiSupplements.daily_schedule.map((schedule, idx) => (
-                <div key={idx} className="p-3 rounded-lg bg-white/[0.05] border border-white/[0.08]">
-                  <p className="text-cyan-400 font-semibold text-sm">{schedule.time}</p>
+              {aiSupplements.daily_schedule.morning.length > 0 && (
+                <div className="p-3 rounded-lg bg-white/[0.05] border border-white/[0.08]">
+                  <p className="text-cyan-400 font-semibold text-sm">Manha</p>
                   <ul className="mt-1 space-y-1">
-                    {schedule.supplements.map((supp, sIdx) => (
-                      <li key={sIdx} className="text-xs text-gray-300">- {supp}</li>
+                    {aiSupplements.daily_schedule.morning.map((item, idx) => (
+                      <li key={idx} className="text-xs text-gray-300">- {item}</li>
                     ))}
                   </ul>
                 </div>
-              ))}
+              )}
+              {aiSupplements.daily_schedule.pre_workout.length > 0 && (
+                <div className="p-3 rounded-lg bg-white/[0.05] border border-white/[0.08]">
+                  <p className="text-orange-400 font-semibold text-sm">Pre-treino</p>
+                  <ul className="mt-1 space-y-1">
+                    {aiSupplements.daily_schedule.pre_workout.map((item, idx) => (
+                      <li key={idx} className="text-xs text-gray-300">- {item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {aiSupplements.daily_schedule.post_workout.length > 0 && (
+                <div className="p-3 rounded-lg bg-white/[0.05] border border-white/[0.08]">
+                  <p className="text-green-400 font-semibold text-sm">Pos-treino</p>
+                  <ul className="mt-1 space-y-1">
+                    {aiSupplements.daily_schedule.post_workout.map((item, idx) => (
+                      <li key={idx} className="text-xs text-gray-300">- {item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {aiSupplements.daily_schedule.evening.length > 0 && (
+                <div className="p-3 rounded-lg bg-white/[0.05] border border-white/[0.08]">
+                  <p className="text-purple-400 font-semibold text-sm">Noite</p>
+                  <ul className="mt-1 space-y-1">
+                    {aiSupplements.daily_schedule.evening.map((item, idx) => (
+                      <li key={idx} className="text-xs text-gray-300">- {item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
 
@@ -621,8 +661,19 @@ export function NutritionTab({ userId, preferences, userName }: NutritionTabProp
                   <div className="flex-1">
                     <h4 className="font-semibold text-white">{supp.name}</h4>
                     <p className="text-cyan-400 text-sm">{supp.dosage} - {supp.timing}</p>
-                    <p className="text-gray-400 text-sm mt-1">{supp.purpose}</p>
-                    <p className="text-gray-500 text-xs mt-2">Como tomar: {supp.howToUse}</p>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {supp.benefits.map((benefit, bIdx) => (
+                        <span key={bIdx} className="px-2 py-0.5 bg-white/[0.05] rounded text-xs text-gray-400">
+                          {benefit}
+                        </span>
+                      ))}
+                    </div>
+                    {supp.warnings && (
+                      <div className="flex items-start gap-1 mt-2 p-2 bg-yellow-500/10 rounded">
+                        <AlertCircle className="w-3 h-3 text-yellow-500 mt-0.5 shrink-0" />
+                        <p className="text-yellow-200 text-xs">{supp.warnings}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
