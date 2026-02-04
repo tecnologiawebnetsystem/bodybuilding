@@ -404,7 +404,7 @@ export function HydrationTab({ userId, preferences }: HydrationTabProps) {
 
             {/* Selecao de bebida */}
             <div className="mb-6">
-              <Label className="mb-3 block text-center">Tipo de bebida</Label>
+              <Label className="mb-3 block text-center text-white font-bold">Tipo de bebida</Label>
               <div className="flex flex-wrap justify-center gap-2">
                 {beverageTypes.slice(0, 6).map((beverage) => {
                   const Icon = getBeverageIcon(beverage.icon)
