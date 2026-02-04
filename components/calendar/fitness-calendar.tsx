@@ -628,17 +628,32 @@ export function FitnessCalendar({ userId, preferences }: FitnessCalendarProps) {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" onClick={goToPrevious}>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={goToPrevious}
+                className="border-orange-600 bg-gradient-to-r from-orange-700 to-orange-600 hover:from-orange-600 hover:to-orange-500 text-white"
+              >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <Button variant="outline" size="icon" onClick={goToNext}>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={goToNext}
+                className="border-orange-600 bg-gradient-to-r from-orange-700 to-orange-600 hover:from-orange-600 hover:to-orange-500 text-white"
+              >
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
             <h2 className="text-xl font-bold text-white">
               {MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}
             </h2>
-            <Button variant="outline" size="sm" onClick={goToToday} className="text-white font-bold border-white/30 hover:bg-white/10">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={goToToday} 
+              className="border-orange-600 bg-gradient-to-r from-orange-700 to-orange-600 hover:from-orange-600 hover:to-orange-500 text-white font-bold"
+            >
               Hoje
             </Button>
           </div>
