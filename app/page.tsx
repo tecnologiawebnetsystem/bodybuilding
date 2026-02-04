@@ -40,6 +40,9 @@ export default function HomePage() {
             <Link href="/sobre-nos" className="text-gray-400 hover:text-white transition text-sm font-medium">
               Sobre Nos
             </Link>
+            <Link href="/contato" className="text-gray-400 hover:text-white transition text-sm font-medium">
+              Contato
+            </Link>
           </nav>
           <div className="flex items-center gap-4">
             <Link href="/entrar" className="hidden md:block text-gray-300 hover:text-white transition text-sm font-medium">
