@@ -131,6 +131,41 @@ export default function HomePage() {
               </Button>
             </div>
 
+            {/* Download App Badges */}
+            <div className="mb-10">
+              <p className="text-gray-500 text-sm mb-4">Baixe o app no seu celular</p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="/download"
+                  className="inline-flex items-center gap-3 px-6 py-3.5 bg-white/[0.06] border border-white/[0.12] rounded-xl hover:bg-white/[0.10] hover:border-white/[0.20] transition-all group"
+                >
+                  <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                  </svg>
+                  <div className="text-left">
+                    <p className="text-[10px] text-gray-400 leading-none">Disponivel para</p>
+                    <p className="text-base font-semibold text-white leading-tight">iPhone (iOS)</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-500 group-hover:text-white group-hover:translate-x-0.5 transition-all ml-auto" />
+                </Link>
+
+                <Link
+                  href="/download"
+                  className="inline-flex items-center gap-3 px-6 py-3.5 bg-white/[0.06] border border-white/[0.12] rounded-xl hover:bg-white/[0.10] hover:border-white/[0.20] transition-all group"
+                >
+                  <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3.18 23.04c.17.06.35.09.53.09.42 0 .83-.15 1.16-.45l3.83-3.4h7.3c2.76 0 5-2.24 5-5V5.68c0-2.76-2.24-5-5-5H5c-2.76 0-5 2.24-5 5v8.6c0 2.47 1.81 4.53 4.18 4.93v2.83c0 .6.4 1.13.97 1.3zM3 5.68c0-1.1.9-2 2-2h11c1.1 0 2 .9 2 2v8.6c0 1.1-.9 2-2 2H8.37l-.22.2L5 19.15v-3.87H5c-1.1 0-2-.9-2-2V5.68z"/>
+                    <path d="M17.18.96H7.64l.77 2h8.77c1.1 0 2 .9 2 2v7.46l2 1.58V4.96c0-2.21-1.79-4-4-4z"/>
+                  </svg>
+                  <div className="text-left">
+                    <p className="text-[10px] text-gray-400 leading-none">Disponivel para</p>
+                    <p className="text-base font-semibold text-white leading-tight">Android</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-500 group-hover:text-white group-hover:translate-x-0.5 transition-all ml-auto" />
+                </Link>
+              </div>
+            </div>
+
             {/* Trust Badges */}
             <div className="flex flex-wrap items-center justify-center gap-8 text-gray-500 text-sm">
               <div className="flex items-center gap-2">
